@@ -1,78 +1,69 @@
-# Bevy GitHub CI Template
+# Legend of Mierda - Design Document
 
-This repo show how to set up CI on a GitHub project for Bevy.
+## 1. Overview
 
-It creates two workflows:
+"Legend of Mierda" is an action-adventure game heavily inspired by the renowned Legend of Zelda series. The game follows the thrilling journey of Alextime, a courageous warrior armed with a machete, as he battles against a horde of mischievous Mierdas in Mexico. Players will explore a set of levels inspired by SNES-generation of Zelda games, solve puzzles, engage in intense combat, and embark on a quest to rid the land of these pesky creatures.
 
-* [CI](#CI)
-* [Release](#Release)
+## 2. Gameplay Mechanics
 
-## CI
+### 2.1. Exploration and Open World:
 
-Definition: [.github/workflows/ci.yaml](./.github/workflows/ci.yaml)
+The game will feature an expansive open world set in the diverse landscapes of Mexico, encompassing lush jungles, scorching deserts, ancient ruins, tourist cities and Mexican prisons.
 
-This workflow runs on every commit to `main` branch, and on every PR targeting the `main` branch.
+Players will have the freedom to explore the world at their own pace, uncovering hidden treasures, discovering side quests, and encountering a variety of non-playable characters (NPCs) who offer assistance or valuable information.
 
-It will use rust stable on linux, with cache between different executions, those commands:
+The world will be divided into distinct regions, each with its own distinct visual style and unique challenges.
 
-* `cargo test`
-* `cargo clippy -- -D warnings`
-* `cargo fmt --all -- --check`
+### 2.2. Combat and Abilities:
 
-If you are using anything OS specific or rust nightly, you should update the file [ci.yaml](./.github/workflows/ci.yaml) to use those.
+Players will engage in fast-paced, real-time combat against waves of mischievous Mierdas, utilizing Alextime's machete as their primary weapon.
 
-## Release
+The machete will be upgradable with various enhancements, enabling players to unleash devastating combos and special attacks on their foes.
 
-Definition: [.github/workflows/release.yaml](./.github/workflows/release.yaml)
+As players progress, they will unlock new combat maneuvers and abilities that enhance Alextime's agility, strength, and defense.
 
-This workflow runs on every tag.
+### 2.3. Puzzles and Dungeons:
 
-It will build:
-* For Linux and Windows, a .zip archive containing the executable and the `assets`.
-* For macOS, a dmg image with a .app containing the assets.
-* For wasm, a .zip archive with the wasm binary, the js bindings, an html file loading it, and the assets.
+The game will present players with intricate puzzles and challenging dungeons inspired by Mexican culture and folklore.
 
-If you don't want to target some of those platforms, you can remove the corresponding job from the file [release.yaml](./.github/workflows/release.yaml).
+Players will need to solve environmental puzzles, manipulate objects, and harness their acquired abilities to navigate through dungeons and uncover hidden rewards.
 
-If you don't want to attach the builds to the GitHub release, set `env.add_binaries_to_github_release` to `false`.
+Each dungeon will culminate in an epic boss battle, testing players' combat prowess and strategic thinking.
 
-### Git Tag from GitHub UI
+### 2.4. Side Quests and Character Interactions:
 
-You can follow [Managing releases in a repository](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
+Players can embark on engaging side quests and interact with NPCs, delving deeper into the lore of Mierdas and the world around them.
 
-### Git Tag from the CLI
+Completing side quests will reward players with unique items, powerful machete upgrades, and valuable insights that aid in their journey.
 
-Execute the following commands: 
+## 3. Art Style and Visuals
 
-```sh
-git tag -a "my-game-1.0" -m "First official release"
-git push --tags
-```
+The game will boast a visually striking art style that draws inspiration from Mexican folk art, featuring vibrant colors, intricate patterns, and lively environments.
 
-### Result
+The world will be meticulously crafted, depicting diverse locales that authentically represent Mexico's rich cultural and geographical diversity.
 
-A new release will be available in GitHub, with the archives per platform available as downloadable assets.
+Character and enemy designs will fuse elements of fantasy and Mexican mythology, bringing to life the whimsical and formidable Mierdas.
 
-The `git` commands above produced this release: [my-game-1.0](
-https://github.com/bevyengine/bevy_github_ci_template/releases/tag/my-game-1.0).
+## 4. Narrative and Storyline
 
-## Using the workflows in your own project
+The game's narrative centers around Alextime, a fearless schizophrenic who embarks on a mission to protect Mexico from the mischievous Mierdas that plague the land.
 
-If you would like to use the GitHub workflows included here for your own project, there are a few things you might have to adapt:
+As Alextime ventures deeper into his quest, he uncovers the origins of the Mierdas and the dark forces behind their sudden proliferation.
 
-1. The release workflow relies on the `index.html` file under `/wasm` for web builds
-2. Make sure that the env variable `binary` ([release.yaml](.github/workflows/release.yaml#L10)) matches the name of your binary
-3. In case your project doesn't have an `assets` folder
-   1. Either create one and put a `.gitkeep` file in it to be able to push it
-   2. Or remove the `cp -r assets` statements in the build jobs
-4. Adapt the used toolchain if you are using nightly
+Players will uncover the truth behind the Mierdas and their connection to Mexican folklore, unraveling a captivating storyline filled with unexpected twists and discoveries.
 
-### Publish on itch.io
+## 5. Platforms and Controls
 
-The release flow can be configured to push the releases to itch.io:
+"Legend of Mierda" will be developed for Linux and Windows platoforms primarily.
 
-1. Create an API key in https://itch.io/user/settings/api-keys
-2. Go to the repository's Settings tab in GitHub, click on Secrets->Actions in the sidebar,and add a repository secret named `BUTLER_CREDENTIALS` set to the API key.
-3. Uncomment `env.itch_target` in `release.yaml` and set it to the itch.io username and the name of the game on itch.io, separated by a slash (`/`)
+Controls will be designed to be intuitive and responsive, accommodating both keyboard and mouse inputs as well as gamepad controllers for a seamless gameplay experience.
 
-Once that is done, any tag pushed to GitHub will trigger an itch.io release and use the tag as the [user version](https://itch.io/docs/butler/pushing.html#specifying-your-own-version-number).
+## 6. Target Audience
+
+The game caters to action-adventure enthusiasts who enjoy retro Zelda games, challenging puzzles, and thrilling combat experiences.
+
+The target audience includes fans of the Legend of Zelda series, players intrigued by Mexican culture and mythology, and schizophrenics as well as interested in Internet meme culture.
+
+# Legend of Mierda - Tech Document
+
+Game is developed with Bevy engine and levels are designed with LDTK.
