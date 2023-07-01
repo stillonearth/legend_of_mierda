@@ -5,7 +5,7 @@
 
 ## 1. Overview
 
-"Legend of Mierda" is an action-adventure game heavily inspired by the renowned Legend of Zelda series. The game follows the thrilling journey of Alextime, a courageous warrior armed with a machete, as he battles against a horde of mischievous Mierdas in Mexico. Players will explore a set of levels inspired by SNES-generation of Zelda games, solve puzzles, engage in intense combat, and embark on a quest to rid the land of these pesky creatures.
+"Legend of Mierda" is an action-adventure game heavily inspired by the renowned Legend of Zelda series. The game follows the thrilling journey of Alextime, a courageous schizophrenic armed with a machete, as he battles against a horde of mischievous Mierdas in Mexico. Players will explore a set of levels inspired by SNES-generation of Zelda games, solve puzzles, engage in intense combat, and embark on a quest to rid the land of these pesky creatures.
 
 ## 2. Gameplay Mechanics
 
