@@ -108,13 +108,13 @@ impl LdtkEntity for PlayerBundle {
             ..Default::default()
         };
 
-        return PlayerBundle {
+        PlayerBundle {
             animation_indices,
             animation_timer: AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
             sprite_bundle,
             collider_bundle,
             ..default()
-        };
+        }
     }
 }
 

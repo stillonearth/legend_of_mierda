@@ -94,7 +94,7 @@ pub fn animate_sprite(
     }
 }
 
-pub fn movement(input: Res<Input<KeyCode>>, mut query: Query<(&mut Velocity), With<Player>>) {
+pub fn movement(input: Res<Input<KeyCode>>, mut query: Query<&mut Velocity, With<Player>>) {
     for mut velocity in &mut query {
         let right = if input.pressed(KeyCode::D) { 1. } else { 0. };
         let left = if input.pressed(KeyCode::A) { 1. } else { 0. };
