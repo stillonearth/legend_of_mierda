@@ -66,6 +66,35 @@ pub struct AnimationIndices {
     pub last: usize,
 }
 
+#[derive(Clone, Default)]
+pub enum AnimationState {
+    #[default]
+    Idle,
+    Run,
+}
+
+#[derive(Clone, Default)]
+pub enum AnimationDirection {
+    #[default]
+    Left,
+    Right,
+}
+
+#[derive(Clone, Default)]
+pub enum AnimationType {
+    Walk,
+    #[default]
+    Stand,
+    Attack,
+}
+
+#[derive(Component, Clone, Default)]
+pub struct PlayerAnimation {
+    pub state: AnimationState,
+    pub direction: AnimationDirection,
+    pub animation_type: AnimationType,
+}
+
 #[derive(Component, Deref, DerefMut, Clone, Default)]
 pub struct AnimationTimer(Timer);
 
@@ -91,14 +120,14 @@ impl LdtkEntity for PlayerBundle {
         let sprite_bundle = SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             sprite: TextureAtlasSprite::new(animation_indices.first),
-            // transform: Transform::from_scale(Vec3::splat(2.0)),
+            // transform: Transform::from_translation(Vec3::new(10.0, 10., 0.0)),
             ..default()
         };
 
         let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
         let collider_bundle = ColliderBundle {
-            collider: Collider::cuboid(12., 5.),
+            collider: Collider::cuboid(16., 27.),
             rigid_body: RigidBody::Dynamic,
             friction: Friction {
                 coefficient: 0.0,

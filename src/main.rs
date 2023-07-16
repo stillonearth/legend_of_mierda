@@ -2,7 +2,7 @@
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+
 use bevy_rapier2d::prelude::*;
 
 mod components;
@@ -20,7 +20,7 @@ fn main() {
             set_clear_color: SetClearColor::FromLevelBackground,
             ..Default::default()
         })
-        .add_plugin(WorldInspectorPlugin::new())
+        // .add_plugin(WorldInspectorPlugin::new())
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .configure_set(LdtkSystemSet::ProcessApi.before(PhysicsSet::SyncBackend))
         .insert_resource(RapierConfiguration {

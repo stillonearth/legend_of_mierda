@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
-use rand::Rng;
 use std::collections::{HashMap, HashSet};
 
 use crate::components::*;
@@ -14,28 +13,8 @@ pub fn update_level_selection(
     mut level_selection: ResMut<LevelSelection>,
     ldtk_levels: Res<Assets<LdtkLevel>>,
 ) {
-    // println!(
-    //     "# of levelvs without player: {}",
-    //     level_query.iter().count()
-    // );
-
-    // for player_transform in &player_query {
-    //     println!("Player translation: {:?}", player_transform.translation());
-    // }
-
     for (level_handle, level_transform) in &level_query {
-        // select random level and set it as level selection
-        // let mut rng = rand::thread_rng();
-        // let random_level_index = rng.gen_range(0..level_query.iter().count());
-        // let random_level_handle = level_query.iter().nth(random_level_index).unwrap().0;
-        // let random_level = ldtk_levels.get(random_level_handle).unwrap();
-        // *level_selection = LevelSelection::Iid(random_level.level.iid.clone());
-        // print!("random level: {}", random_level.level.iid);
-        // return;
-
         if let Some(ldtk_level) = ldtk_levels.get(level_handle) {
-            println!("\tldtk_level.level.iid: {:?}", ldtk_level.level.iid);
-
             let level_bounds = Rect {
                 min: Vec2::new(level_transform.translation.x, level_transform.translation.y),
                 max: Vec2::new(
@@ -43,29 +22,23 @@ pub fn update_level_selection(
                     level_transform.translation.y + ldtk_level.level.px_hei as f32,
                 ),
             };
-            println!("\tlevel bounds: {:?}", level_bounds);
 
             for player_transform in &player_query {
                 // println!("Level bounds: {:?}", level_bounds);
 
-                let player_within_x_bounds = (player_transform.translation().x
+                let player_within_x_bounds = player_transform.translation().x
                     < level_bounds.max.x
-                    && player_transform.translation().x > level_bounds.min.x);
+                    && player_transform.translation().x > level_bounds.min.x;
 
-                let player_within_y_bounds = (player_transform.translation().y
+                let player_within_y_bounds = player_transform.translation().y
                     < level_bounds.max.y
-                    && player_transform.translation().y > level_bounds.min.y);
+                    && player_transform.translation().y > level_bounds.min.y;
 
-                println!("\t\twithin_x_bounds: {}", player_within_x_bounds);
-                println!("\t\twithin_y_bounds: {}", player_within_y_bounds);
-                println!("\t\t---------");
-
-                let is_not_current_level = !level_selection.is_match(&0, &ldtk_level.level);
+                // let is_not_current_level = !level_selection.is_match(&0, &ldtk_level.level);
 
                 if player_within_x_bounds && player_within_y_bounds {
                     // println!("\t\t\tswitch!");
                     *level_selection = LevelSelection::Iid(ldtk_level.level.iid.clone());
-                    println!("new level: {}", ldtk_level.level.iid.clone());
                 }
             }
         }
@@ -148,7 +121,8 @@ pub fn animate_sprite(
     for (indices, mut timer, mut sprite, mut transform) in &mut query {
         timer.tick(time.delta());
         // For some reason sprite scaling is not working when set in the bundle
-        transform.scale = Vec3::splat(0.5);
+        transform.scale = Vec3::new(0.5, 0.5, 1.0);
+
         if timer.just_finished() {
             sprite.index = if sprite.index == indices.last {
                 indices.first
