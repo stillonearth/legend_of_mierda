@@ -12,13 +12,14 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(LdtkPlugin)
-        // .insert_resource(LdtkSettings {
-        //     level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
-        //         load_level_neighbors: true,
-        //     },
-        //     set_clear_color: SetClearColor::FromLevelBackground,
-        //     ..Default::default()
-        // })
+        .insert_resource(LdtkSettings {
+            level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
+                load_level_neighbors: true,
+            },
+            // level_spawn_behavior: LevelSpawnBehavior::UseZeroTranslation,
+            set_clear_color: SetClearColor::FromLevelBackground,
+            ..Default::default()
+        })
         .add_plugin(WorldInspectorPlugin::new())
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .configure_set(LdtkSystemSet::ProcessApi.before(PhysicsSet::SyncBackend))
@@ -30,6 +31,7 @@ fn main() {
         .insert_resource(LevelSelection::Index(0))
         .add_system(systems::spawn_wall_collision)
         .add_system(systems::camera_fit_inside_current_level)
+        .add_system(systems::update_level_selection)
         .add_system(systems::animate_sprite)
         .add_system(systems::movement)
         .register_ldtk_int_cell::<components::WallBundle>(1)
@@ -43,6 +45,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.spawn(LdtkWorldBundle {
         ldtk_handle: asset_server.load("levels/example.ldtk"),
+        // ldtk_handle: asset_server.load("levels/Typical_2D_platformer_example.ldtk"),
         ..Default::default()
     });
 }
