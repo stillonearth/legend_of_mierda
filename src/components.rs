@@ -48,7 +48,8 @@ pub struct Player;
 pub struct PlayerBundle {
     #[bundle]
     pub sprite_bundle: SpriteSheetBundle,
-    pub animation_indices: AnimationIndices,
+    // pub animation_indices: AnimationIndices,
+    pub character_animation: CharacterAnimation,
     pub animation_timer: AnimationTimer,
     // pub transform: Transform,
     pub player: Player,
@@ -56,11 +57,12 @@ pub struct PlayerBundle {
     pub collider_bundle: ColliderBundle,
 }
 
-const ROW: usize = 11;
-const N_FRAMES: usize = 8;
+const COLUMNS: usize = 13;
+const ROWS: usize = 21;
+const N_FRAMES_WALK: usize = 8;
 
 #[allow(dead_code)]
-#[derive(Component, Clone, Default)]
+#[derive(Component, Clone, Default, Debug)]
 pub struct AnimationIndices {
     pub first: usize,
     pub last: usize,
@@ -73,23 +75,76 @@ pub enum AnimationState {
     Run,
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Copy, PartialEq)]
 pub enum AnimationDirection {
-    #[default]
     Left,
     Right,
+    Up,
+    #[default]
+    Down,
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Copy, PartialEq)]
 pub enum AnimationType {
-    Walk,
     #[default]
+    Walk,
     Stand,
     Attack,
 }
 
+pub fn get_animation_indices(
+    animation_type: AnimationType,
+    animation_direction: AnimationDirection,
+) -> AnimationIndices {
+    let mut first = 0;
+    let mut last = 0;
+
+    // Walk
+
+    if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Right {
+        first = COLUMNS * 11 + 1;
+        last = COLUMNS * 11 + N_FRAMES_WALK;
+    }
+    if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Left {
+        first = COLUMNS * 9 + 1;
+        last = COLUMNS * 9 + N_FRAMES_WALK;
+    }
+    if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Up {
+        first = COLUMNS * 8 + 1;
+        last = COLUMNS * 8 + N_FRAMES_WALK;
+    }
+    if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Down {
+        first = COLUMNS * 10 + 1;
+        last = COLUMNS * 10 + N_FRAMES_WALK;
+    }
+
+    // Stand
+
+    if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Right {
+        first = COLUMNS * 11;
+        last = last;
+    }
+    if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Left {
+        first = COLUMNS * 9;
+        last = last;
+    }
+    if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Up {
+        first = COLUMNS * 8;
+        last = last;
+    }
+    if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Down {
+        first = COLUMNS * 10;
+        last = last;
+    }
+
+    AnimationIndices {
+        first: first,
+        last: last,
+    }
+}
+
 #[derive(Component, Clone, Default)]
-pub struct PlayerAnimation {
+pub struct CharacterAnimation {
     pub state: AnimationState,
     pub direction: AnimationDirection,
     pub animation_type: AnimationType,
@@ -108,19 +163,22 @@ impl LdtkEntity for PlayerBundle {
         texture_atlases: &mut Assets<TextureAtlas>,
     ) -> PlayerBundle {
         let texture_handle = asset_server.load("sprites/alextime-1.png");
-        let texture_atlas =
-            TextureAtlas::from_grid(texture_handle, Vec2::new(64.0, 64.0), 13, 21, None, None);
+        let texture_atlas = TextureAtlas::from_grid(
+            texture_handle,
+            Vec2::new(64.0, 64.0),
+            COLUMNS,
+            ROWS,
+            None,
+            None,
+        );
         let texture_atlas_handle = texture_atlases.add(texture_atlas);
         // Use only the subset of sprites in the sheet that make up the run animation
-        let animation_indices = AnimationIndices {
-            first: ROW * 13 + 1,
-            last: ROW * 13 + N_FRAMES,
-        };
+        let animation_indices =
+            get_animation_indices(AnimationType::Walk, AnimationDirection::Right);
 
         let sprite_bundle = SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             sprite: TextureAtlasSprite::new(animation_indices.first),
-            // transform: Transform::from_translation(Vec3::new(10.0, 10., 0.0)),
             ..default()
         };
 
@@ -138,7 +196,7 @@ impl LdtkEntity for PlayerBundle {
         };
 
         PlayerBundle {
-            animation_indices,
+            character_animation: CharacterAnimation { ..default() },
             animation_timer: AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
             sprite_bundle,
             collider_bundle,

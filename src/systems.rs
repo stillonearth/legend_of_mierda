@@ -26,12 +26,10 @@ pub fn update_level_selection(
             for player_transform in &player_query {
                 // println!("Level bounds: {:?}", level_bounds);
 
-                let player_within_x_bounds = player_transform.translation().x
-                    < level_bounds.max.x
+                let player_within_x_bounds = player_transform.translation().x < level_bounds.max.x
                     && player_transform.translation().x > level_bounds.min.x;
 
-                let player_within_y_bounds = player_transform.translation().y
-                    < level_bounds.max.y
+                let player_within_y_bounds = player_transform.translation().y < level_bounds.max.y
                     && player_transform.translation().y > level_bounds.min.y;
 
                 // let is_not_current_level = !level_selection.is_match(&0, &ldtk_level.level);
@@ -112,19 +110,27 @@ pub fn camera_fit_inside_current_level(
 pub fn animate_sprite(
     time: Res<Time>,
     mut query: Query<(
-        &AnimationIndices,
+        &CharacterAnimation,
         &mut AnimationTimer,
         &mut TextureAtlasSprite,
         &mut Transform,
     )>,
 ) {
-    for (indices, mut timer, mut sprite, mut transform) in &mut query {
+    for (character_animation, mut timer, mut sprite, mut transform) in &mut query {
         timer.tick(time.delta());
+
         // For some reason sprite scaling is not working when set in the bundle
         transform.scale = Vec3::new(0.5, 0.5, 1.0);
 
+        let indices = get_animation_indices(
+            character_animation.animation_type,
+            character_animation.direction,
+        );
+
+        // println!("indices: {:?}", indices);
+
         if timer.just_finished() {
-            sprite.index = if sprite.index == indices.last {
+            sprite.index = if (sprite.index >= indices.last) || (sprite.index < indices.first) {
                 indices.first
             } else {
                 sprite.index + 1
@@ -133,8 +139,11 @@ pub fn animate_sprite(
     }
 }
 
-pub fn movement(input: Res<Input<KeyCode>>, mut query: Query<&mut Velocity, With<Player>>) {
-    for mut velocity in &mut query {
+pub fn movement(
+    input: Res<Input<KeyCode>>,
+    mut query: Query<(&mut Velocity, &mut CharacterAnimation), With<Player>>,
+) {
+    for (mut velocity, mut char_animation) in &mut query {
         let right = if input.pressed(KeyCode::D) { 1. } else { 0. };
         let left = if input.pressed(KeyCode::A) { 1. } else { 0. };
         let up = if input.pressed(KeyCode::W) { 1. } else { 0. };
@@ -143,7 +152,26 @@ pub fn movement(input: Res<Input<KeyCode>>, mut query: Query<&mut Velocity, With
         velocity.linvel.x = right - left;
         velocity.linvel.y = up - down;
 
-        velocity.linvel = velocity.linvel.normalize_or_zero() * 200.;
+        velocity.linvel = velocity.linvel.normalize_or_zero() * 100.;
+
+        let linvel_norm = velocity.linvel.distance(Vec2::ZERO);
+        if linvel_norm == 0.0 && char_animation.animation_type != AnimationType::Attack {
+            char_animation.animation_type = AnimationType::Stand;
+        } else {
+            char_animation.animation_type = AnimationType::Walk;
+        }
+
+        if char_animation.animation_type == AnimationType::Walk {
+            if velocity.linvel.x > 0. {
+                char_animation.direction = AnimationDirection::Right;
+            } else if velocity.linvel.x < 0. {
+                char_animation.direction = AnimationDirection::Left;
+            } else if velocity.linvel.y > 0. {
+                char_animation.direction = AnimationDirection::Up;
+            } else if velocity.linvel.y < 0. {
+                char_animation.direction = AnimationDirection::Down;
+            }
+        }
     }
 }
 
