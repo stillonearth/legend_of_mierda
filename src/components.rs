@@ -57,9 +57,12 @@ pub struct PlayerBundle {
     pub collider_bundle: ColliderBundle,
 }
 
-const COLUMNS: usize = 13;
-const ROWS: usize = 21;
+const SHEET_1_COLUMNS: usize = 13;
+const SHEET_1_ROWS: usize = 21;
+const SHEET_2_COLUMNS: usize = 6;
+const SHEET_2_ROWS: usize = 4;
 const N_FRAMES_WALK: usize = 8;
+const N_FRAMES_ATTACK: usize = 5;
 
 #[allow(dead_code)]
 #[derive(Component, Clone, Default, Debug)]
@@ -84,12 +87,54 @@ pub enum AnimationDirection {
     Down,
 }
 
-#[derive(Clone, Default, Copy, PartialEq)]
+#[derive(Clone, Default, Copy, PartialEq, Debug)]
 pub enum AnimationType {
-    #[default]
     Walk,
     Stand,
+    #[default]
     Attack,
+}
+
+#[derive(Resource)]
+pub struct PlayerSpritesheets {
+    pub player_atlas_1: Handle<TextureAtlas>,
+    pub player_atlas_2: Handle<TextureAtlas>,
+}
+
+impl FromWorld for PlayerSpritesheets {
+    fn from_world(world: &mut World) -> Self {
+        let world = world.cell();
+
+        let asset_server = world.get_resource::<AssetServer>().unwrap();
+
+        let mut texture_atlasses = world.get_resource_mut::<Assets<TextureAtlas>>().unwrap();
+        let texture_handle = asset_server.load("sprites/alextime-1.png");
+
+        let atlas_1 = TextureAtlas::from_grid(
+            texture_handle.clone(),
+            Vec2::new(64.0, 64.0),
+            SHEET_1_COLUMNS,
+            SHEET_1_ROWS,
+            None,
+            None,
+        );
+
+        let texture_handle = asset_server.load("sprites/alextime-2.png");
+
+        let atlas_2 = TextureAtlas::from_grid(
+            texture_handle.clone(),
+            Vec2::new(64.0, 64.0),
+            SHEET_2_COLUMNS,
+            SHEET_2_ROWS,
+            Some(Vec2::ONE * 64.),
+            None,
+        );
+
+        PlayerSpritesheets {
+            player_atlas_1: texture_atlasses.add(atlas_1),
+            player_atlas_2: texture_atlasses.add(atlas_2),
+        }
+    }
 }
 
 pub fn get_animation_indices(
@@ -102,39 +147,58 @@ pub fn get_animation_indices(
     // Walk
 
     if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Right {
-        first = COLUMNS * 11 + 1;
-        last = COLUMNS * 11 + N_FRAMES_WALK;
+        first = SHEET_1_COLUMNS * 11 + 1;
+        last = SHEET_1_COLUMNS * 11 + N_FRAMES_WALK;
     }
     if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Left {
-        first = COLUMNS * 9 + 1;
-        last = COLUMNS * 9 + N_FRAMES_WALK;
+        first = SHEET_1_COLUMNS * 9 + 1;
+        last = SHEET_1_COLUMNS * 9 + N_FRAMES_WALK;
     }
     if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Up {
-        first = COLUMNS * 8 + 1;
-        last = COLUMNS * 8 + N_FRAMES_WALK;
+        first = SHEET_1_COLUMNS * 8 + 1;
+        last = SHEET_1_COLUMNS * 8 + N_FRAMES_WALK;
     }
     if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Down {
-        first = COLUMNS * 10 + 1;
-        last = COLUMNS * 10 + N_FRAMES_WALK;
+        first = SHEET_1_COLUMNS * 10 + 1;
+        last = SHEET_1_COLUMNS * 10 + N_FRAMES_WALK;
     }
 
     // Stand
 
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Right {
-        first = COLUMNS * 11;
+        first = SHEET_1_COLUMNS * 11;
         last = last;
     }
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Left {
-        first = COLUMNS * 9;
+        first = SHEET_1_COLUMNS * 9;
         last = last;
     }
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Up {
-        first = COLUMNS * 8;
+        first = SHEET_1_COLUMNS * 8;
         last = last;
     }
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Down {
-        first = COLUMNS * 10;
+        first = SHEET_1_COLUMNS * 10;
         last = last;
+    }
+
+    // Attack
+
+    if animation_type == AnimationType::Attack && animation_direction == AnimationDirection::Right {
+        first = SHEET_2_COLUMNS * 3 + 1;
+        last = SHEET_2_COLUMNS * 3 + N_FRAMES_ATTACK;
+    }
+    if animation_type == AnimationType::Attack && animation_direction == AnimationDirection::Left {
+        first = SHEET_2_COLUMNS * 1 + 1;
+        last = SHEET_2_COLUMNS * 1 + N_FRAMES_ATTACK;
+    }
+    if animation_type == AnimationType::Attack && animation_direction == AnimationDirection::Up {
+        first = SHEET_2_COLUMNS * 0 + 1;
+        last = SHEET_2_COLUMNS * 0 + N_FRAMES_ATTACK;
+    }
+    if animation_type == AnimationType::Attack && animation_direction == AnimationDirection::Down {
+        first = SHEET_2_COLUMNS * 2 + 1;
+        last = SHEET_2_COLUMNS * 2 + N_FRAMES_ATTACK;
     }
 
     AnimationIndices {
@@ -160,27 +224,9 @@ impl LdtkEntity for PlayerBundle {
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
         asset_server: &AssetServer,
-        texture_atlases: &mut Assets<TextureAtlas>,
+        texture_atlasses: &mut Assets<TextureAtlas>,
     ) -> PlayerBundle {
-        let texture_handle = asset_server.load("sprites/alextime-1.png");
-        let texture_atlas = TextureAtlas::from_grid(
-            texture_handle,
-            Vec2::new(64.0, 64.0),
-            COLUMNS,
-            ROWS,
-            None,
-            None,
-        );
-        let texture_atlas_handle = texture_atlases.add(texture_atlas);
-        // Use only the subset of sprites in the sheet that make up the run animation
-        let animation_indices =
-            get_animation_indices(AnimationType::Walk, AnimationDirection::Right);
-
-        let sprite_bundle = SpriteSheetBundle {
-            texture_atlas: texture_atlas_handle,
-            sprite: TextureAtlasSprite::new(animation_indices.first),
-            ..default()
-        };
+        // let sprite_bundle = load_sprite_bundle_2(asset_server, texture_atlases);
 
         let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
@@ -195,10 +241,27 @@ impl LdtkEntity for PlayerBundle {
             ..Default::default()
         };
 
+        let texture_handle = asset_server.load("sprites/alextime-1.png");
+
+        let atlas = TextureAtlas::from_grid(
+            texture_handle,
+            Vec2::new(64.0, 64.0),
+            SHEET_2_COLUMNS,
+            SHEET_2_ROWS,
+            None, // Some(Vec2::ONE * 64.),
+            None,
+        );
+
+        let sprite_bundle = SpriteSheetBundle {
+            texture_atlas: texture_atlasses.add(atlas),
+            sprite: TextureAtlasSprite::new(0),
+            ..default()
+        };
+
         PlayerBundle {
             character_animation: CharacterAnimation { ..default() },
             animation_timer: AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-            sprite_bundle,
+            sprite_bundle: sprite_bundle,
             collider_bundle,
             ..default()
         }

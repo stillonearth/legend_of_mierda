@@ -139,37 +139,58 @@ pub fn animate_sprite(
     }
 }
 
-pub fn movement(
+pub fn controls(
+    mut commands: Commands,
     input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Velocity, &mut CharacterAnimation), With<Player>>,
+    mut query: Query<(Entity, &mut Velocity, &mut CharacterAnimation), With<Player>>,
+    spritesheets: Res<PlayerSpritesheets>,
+    // asset_server: Res<AssetServer>,
+    // texture_atlases: &mut Assets<TextureAtlas>,
 ) {
-    for (mut velocity, mut char_animation) in &mut query {
-        let right = if input.pressed(KeyCode::D) { 1. } else { 0. };
-        let left = if input.pressed(KeyCode::A) { 1. } else { 0. };
-        let up = if input.pressed(KeyCode::W) { 1. } else { 0. };
-        let down = if input.pressed(KeyCode::S) { 1. } else { 0. };
+    for (e, mut velocity, mut char_animation) in &mut query {
+        if input.pressed(KeyCode::Space) {
+            char_animation.animation_type = AnimationType::Attack;
 
-        velocity.linvel.x = right - left;
-        velocity.linvel.y = up - down;
-
-        velocity.linvel = velocity.linvel.normalize_or_zero() * 100.;
-
-        let linvel_norm = velocity.linvel.distance(Vec2::ZERO);
-        if linvel_norm == 0.0 && char_animation.animation_type != AnimationType::Attack {
-            char_animation.animation_type = AnimationType::Stand;
+            commands.entity(e).insert(SpriteSheetBundle {
+                texture_atlas: spritesheets.player_atlas_2.clone(),
+                ..default()
+            });
         } else {
-            char_animation.animation_type = AnimationType::Walk;
-        }
+            // commands.entity(e).insert(SpriteSheetBundle {
+            //     texture_atlas: spritesheets.player_atlas_1.clone(),
+            //     sprite: TextureAtlasSprite::new(0),
+            //     ..default()
+            // });
 
-        if char_animation.animation_type == AnimationType::Walk {
-            if velocity.linvel.x > 0. {
-                char_animation.direction = AnimationDirection::Right;
-            } else if velocity.linvel.x < 0. {
-                char_animation.direction = AnimationDirection::Left;
-            } else if velocity.linvel.y > 0. {
-                char_animation.direction = AnimationDirection::Up;
-            } else if velocity.linvel.y < 0. {
-                char_animation.direction = AnimationDirection::Down;
+            let right = if input.pressed(KeyCode::D) { 1. } else { 0. };
+            let left = if input.pressed(KeyCode::A) { 1. } else { 0. };
+            let up = if input.pressed(KeyCode::W) { 1. } else { 0. };
+            let down = if input.pressed(KeyCode::S) { 1. } else { 0. };
+
+            velocity.linvel.x = right - left;
+            velocity.linvel.y = up - down;
+
+            velocity.linvel = velocity.linvel.normalize_or_zero() * 100.;
+
+            let linvel_norm = velocity.linvel.distance(Vec2::ZERO);
+            if char_animation.animation_type != AnimationType::Attack {
+                if linvel_norm == 0.0 {
+                    char_animation.animation_type = AnimationType::Stand;
+                } else {
+                    char_animation.animation_type = AnimationType::Walk;
+                }
+            }
+
+            if char_animation.animation_type == AnimationType::Walk {
+                if velocity.linvel.x > 0. {
+                    char_animation.direction = AnimationDirection::Right;
+                } else if velocity.linvel.x < 0. {
+                    char_animation.direction = AnimationDirection::Left;
+                } else if velocity.linvel.y > 0. {
+                    char_animation.direction = AnimationDirection::Up;
+                } else if velocity.linvel.y < 0. {
+                    char_animation.direction = AnimationDirection::Down;
+                }
             }
         }
     }
