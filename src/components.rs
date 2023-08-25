@@ -33,16 +33,19 @@ impl From<&EntityInstance> for ColliderBundle {
     }
 }
 
-#[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
-pub struct SensorBundle {
-    pub collider: Collider,
-    pub sensor: Sensor,
-    pub active_events: ActiveEvents,
-    pub rotation_constraints: LockedAxes,
-}
+// #[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
+// pub struct SensorBundle {
+//     pub collider: Collider,
+//     pub sensor: Sensor,
+//     pub active_events: ActiveEvents,
+//     pub rotation_constraints: LockedAxes,
+// }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Player;
+
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
+pub struct Mierda;
 
 #[derive(Clone, Default, Bundle)]
 pub struct PlayerBundle {
@@ -53,6 +56,20 @@ pub struct PlayerBundle {
     pub animation_timer: AnimationTimer,
     // pub transform: Transform,
     pub player: Player,
+    #[bundle]
+    pub collider_bundle: ColliderBundle,
+}
+
+#[derive(Clone, Default, Bundle)]
+pub struct MierdaBundle {
+    #[bundle]
+    pub sprite_bundle: SpriteSheetBundle,
+    // pub animation_indices: AnimationIndices,
+    // pub character_animation: CharacterAnimation,
+    // pub animation_timer: AnimationTimer,
+    // pub transform: Transform,
+    pub mierda: Mierda,
+    // pub sensor: Sensor,
     #[bundle]
     pub collider_bundle: ColliderBundle,
 }
@@ -99,10 +116,12 @@ pub enum AnimationType {
 pub struct PlayerSpritesheets {
     pub player_atlas_1: Handle<TextureAtlas>,
     pub player_atlas_2: Handle<TextureAtlas>,
+    pub mierda_atlas: Handle<TextureAtlas>,
 }
 
 const PLAYER_ASSET_SHEET_1: &str = "sprites/alextime-1.png";
 const PLAYER_ASSET_SHEET_2: &str = "sprites/alextime-2.png";
+const MIERDA_ASSET_SHEET: &str = "sprites/mierda.png";
 
 fn load_texture_atlas(
     path: &str,
@@ -116,7 +135,7 @@ fn load_texture_atlas(
     let texture_handle = asset_server.load(path);
 
     let atlas = TextureAtlas::from_grid(
-        texture_handle.clone(),
+        texture_handle,
         Vec2::ONE * sprite_size,
         sheet_columns,
         sheet_rows,
@@ -124,8 +143,7 @@ fn load_texture_atlas(
         None,
     );
 
-    let texture_handle = texture_atlasses.add(atlas);
-    return texture_handle;
+    texture_atlasses.add(atlas)
 }
 
 impl FromWorld for PlayerSpritesheets {
@@ -136,7 +154,7 @@ impl FromWorld for PlayerSpritesheets {
         let asset_server = asset_server_world_borrow.as_deref().unwrap();
 
         let mut texture_atlasses_world_borrow = world.get_resource_mut::<Assets<TextureAtlas>>();
-        let mut texture_atlasses = texture_atlasses_world_borrow.as_deref_mut().unwrap();
+        let texture_atlasses = texture_atlasses_world_borrow.as_deref_mut().unwrap();
 
         let atlas_1 = load_texture_atlas(
             PLAYER_ASSET_SHEET_1,
@@ -158,13 +176,25 @@ impl FromWorld for PlayerSpritesheets {
             texture_atlasses,
         );
 
+        let mierda_atlas = load_texture_atlas(
+            MIERDA_ASSET_SHEET,
+            asset_server,
+            5,
+            1,
+            None,
+            16.0,
+            texture_atlasses,
+        );
+
         PlayerSpritesheets {
             player_atlas_1: atlas_1,
             player_atlas_2: atlas_2,
+            mierda_atlas,
         }
     }
 }
 
+#[allow(clippy::erasing_op)]
 pub fn get_animation_indices(
     animation_type: AnimationType,
     animation_direction: AnimationDirection,
@@ -193,36 +223,36 @@ pub fn get_animation_indices(
     // Stand
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Right {
         first = SHEET_1_COLUMNS * 11;
-        last = last;
+        last = first;
     }
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Left {
         first = SHEET_1_COLUMNS * 9;
-        last = last;
+        last = first;
     }
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Up {
         first = SHEET_1_COLUMNS * 8;
-        last = last;
+        last = first;
     }
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Down {
         first = SHEET_1_COLUMNS * 10;
-        last = last;
+        last = first;
     }
 
     // Attack
     if animation_type == AnimationType::Attack && animation_direction == AnimationDirection::Right {
-        first = SHEET_2_COLUMNS * 3 + 1;
+        first = SHEET_2_COLUMNS * 3;
         last = SHEET_2_COLUMNS * 3 + N_FRAMES_ATTACK;
     }
     if animation_type == AnimationType::Attack && animation_direction == AnimationDirection::Left {
-        first = SHEET_2_COLUMNS * 1 + 1;
-        last = SHEET_2_COLUMNS * 1 + N_FRAMES_ATTACK;
+        first = SHEET_2_COLUMNS;
+        last = SHEET_2_COLUMNS + N_FRAMES_ATTACK;
     }
     if animation_type == AnimationType::Attack && animation_direction == AnimationDirection::Up {
-        first = SHEET_2_COLUMNS * 0 + 1;
+        first = SHEET_2_COLUMNS * 0;
         last = SHEET_2_COLUMNS * 0 + N_FRAMES_ATTACK;
     }
     if animation_type == AnimationType::Attack && animation_direction == AnimationDirection::Down {
-        first = SHEET_2_COLUMNS * 2 + 1;
+        first = SHEET_2_COLUMNS * 2;
         last = SHEET_2_COLUMNS * 2 + N_FRAMES_ATTACK;
     }
 
@@ -231,10 +261,7 @@ pub fn get_animation_indices(
     // println!("first: {:?}", first);
     // println!("last: {:?}", last);
 
-    AnimationIndices {
-        first: first,
-        last: last,
-    }
+    AnimationIndices { first, last }
 }
 
 #[derive(Component, Clone, Default, Debug)]
@@ -288,7 +315,53 @@ impl LdtkEntity for PlayerBundle {
         PlayerBundle {
             character_animation: CharacterAnimation { ..default() },
             animation_timer: AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-            sprite_bundle: sprite_bundle,
+            sprite_bundle,
+            collider_bundle,
+            ..default()
+        }
+    }
+}
+
+impl LdtkEntity for MierdaBundle {
+    fn bundle_entity(
+        _entity_instance: &EntityInstance,
+        _layer_instance: &LayerInstance,
+        _: Option<&Handle<Image>>,
+        _: Option<&TilesetDefinition>,
+        asset_server: &AssetServer,
+        texture_atlasses: &mut Assets<TextureAtlas>,
+    ) -> MierdaBundle {
+        let rotation_constraints = LockedAxes::ROTATION_LOCKED;
+
+        let collider_bundle = ColliderBundle {
+            collider: Collider::cuboid(8., 8.),
+            rigid_body: RigidBody::Dynamic,
+            friction: Friction {
+                coefficient: 0.0,
+                combine_rule: CoefficientCombineRule::Min,
+            },
+            rotation_constraints,
+            ..Default::default()
+        };
+
+        let atlas_handle = load_texture_atlas(
+            MIERDA_ASSET_SHEET,
+            asset_server,
+            5,
+            1,
+            None,
+            16.,
+            texture_atlasses,
+        );
+
+        let sprite_bundle = SpriteSheetBundle {
+            texture_atlas: atlas_handle,
+            sprite: TextureAtlasSprite::new(3),
+            ..default()
+        };
+
+        MierdaBundle {
+            sprite_bundle,
             collider_bundle,
             ..default()
         }
@@ -301,4 +374,5 @@ pub struct Wall;
 #[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
 pub struct WallBundle {
     wall: Wall,
+    sensor: Sensor,
 }

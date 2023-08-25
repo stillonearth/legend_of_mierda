@@ -35,9 +35,11 @@ fn main() {
         .add_system(systems::update_level_selection)
         .add_system(systems::animate_sprite)
         .add_system(systems::controls)
+        .add_system(systems::handle_collisions)
         .register_ldtk_int_cell::<components::WallBundle>(1)
         // .register_ldtk_int_cell::<components::WallBundle>(3)
         .register_ldtk_entity::<components::PlayerBundle>("Player")
+        .register_ldtk_entity::<components::MierdaBundle>("Mierda")
         .run();
 }
 

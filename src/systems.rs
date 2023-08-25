@@ -150,10 +150,10 @@ pub fn animate_sprite(
                 sprite.index + 1
             };
 
-            println!(
-                "animation type: {:?}, animation_direction: {:?} sprite_index: {}",
-                character_animation.animation_type, character_animation.direction, sprite.index
-            );
+            // println!(
+            //     "animation type: {:?}, animation_direction: {:?} sprite_index: {}",
+            //     character_animation.animation_type, character_animation.direction, sprite.index
+            // );
         }
     }
 }
@@ -184,7 +184,10 @@ pub fn controls(
         if input.pressed(KeyCode::Space) {
             char_animation.animation_type = AnimationType::Attack;
             texture_atlas.clone_from(&spritesheets.player_atlas_2);
-            sprite.index = 0;
+
+            let indices =
+                get_animation_indices(char_animation.animation_type, char_animation.direction);
+            sprite.index = indices.first;
 
             velocity.linvel = Vec2::ZERO;
         } else {
@@ -372,13 +375,17 @@ pub fn spawn_wall_collision(
                     for wall_rect in wall_rects {
                         level
                             .spawn_empty()
-                            .insert(Collider::cuboid(
-                                (wall_rect.right as f32 - wall_rect.left as f32 + 1.)
-                                    * grid_size as f32
-                                    / 2.,
-                                (wall_rect.top as f32 - wall_rect.bottom as f32 + 1.)
-                                    * grid_size as f32
-                                    / 2.,
+                            .insert((
+                                Collider::cuboid(
+                                    (wall_rect.right as f32 - wall_rect.left as f32 + 1.)
+                                        * grid_size as f32
+                                        / 2.,
+                                    (wall_rect.top as f32 - wall_rect.bottom as f32 + 1.)
+                                        * grid_size as f32
+                                        / 2.,
+                                ),
+                                // Sensor {},
+                                ActiveEvents::COLLISION_EVENTS,
                             ))
                             .insert(RigidBody::Fixed)
                             .insert(Friction::new(1.0))
@@ -394,5 +401,20 @@ pub fn spawn_wall_collision(
                 });
             }
         });
+    }
+}
+
+pub(crate) fn handle_collisions(
+    mut collision_events: EventReader<CollisionEvent>,
+    mut los_mierdas: Query<(Entity, &mut Velocity, &Mierda)>,
+) {
+    for event in collision_events.iter() {
+        for (e, mut v, _) in los_mierdas.iter_mut() {
+            if let CollisionEvent::Started(e1, e2, _) = event {
+                if e1.index() == e.index() || e2.index() == e.index() {
+                    v.linvel *= -1.;
+                }
+            }
+        }
     }
 }
