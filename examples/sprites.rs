@@ -40,17 +40,23 @@ fn animate_sprite(
     }
 }
 
-const ROW: usize = 11;
-const N_FRAMES: usize = 8;
+const ROW: usize = 0;
+const N_FRAMES: usize = 5;
 
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    let texture_handle = asset_server.load("sprites/alextime-1.png");
-    let texture_atlas =
-        TextureAtlas::from_grid(texture_handle, Vec2::new(64.0, 64.0), 13, 21, None, None);
+    let texture_handle = asset_server.load("sprites/alextime-2.png");
+    let texture_atlas = TextureAtlas::from_grid(
+        texture_handle,
+        Vec2::ONE * (64. * 2.),
+        6,
+        4,
+        Some(Vec2::ONE * 64.),
+        None,
+    );
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
     // Use only the subset of sprites in the sheet that make up the run animation
     let animation_indices = AnimationIndices {
@@ -62,7 +68,7 @@ fn setup(
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             sprite: TextureAtlasSprite::new(animation_indices.first),
-            transform: Transform::from_scale(Vec3::splat(6.0)),
+            transform: Transform::from_scale(Vec3::splat(1.0)),
             ..default()
         },
         animation_indices,

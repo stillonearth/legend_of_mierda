@@ -71,27 +71,27 @@ pub struct AnimationIndices {
     pub last: usize,
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub enum AnimationState {
     #[default]
     Idle,
-    Run,
+    // Run,
 }
 
-#[derive(Clone, Default, Copy, PartialEq)]
+#[derive(Clone, Default, Copy, PartialEq, Debug)]
 pub enum AnimationDirection {
+    #[default]
     Left,
     Right,
     Up,
-    #[default]
     Down,
 }
 
 #[derive(Clone, Default, Copy, PartialEq, Debug)]
 pub enum AnimationType {
     Walk,
-    Stand,
     #[default]
+    Stand,
     Attack,
 }
 
@@ -101,38 +101,66 @@ pub struct PlayerSpritesheets {
     pub player_atlas_2: Handle<TextureAtlas>,
 }
 
+const PLAYER_ASSET_SHEET_1: &str = "sprites/alextime-1.png";
+const PLAYER_ASSET_SHEET_2: &str = "sprites/alextime-2.png";
+
+fn load_texture_atlas(
+    path: &str,
+    asset_server: &AssetServer,
+    sheet_columns: usize,
+    sheet_rows: usize,
+    padding: Option<Vec2>,
+    sprite_size: f32,
+    texture_atlasses: &mut Assets<TextureAtlas>,
+) -> Handle<TextureAtlas> {
+    let texture_handle = asset_server.load(path);
+
+    let atlas = TextureAtlas::from_grid(
+        texture_handle.clone(),
+        Vec2::ONE * sprite_size,
+        sheet_columns,
+        sheet_rows,
+        padding,
+        None,
+    );
+
+    let texture_handle = texture_atlasses.add(atlas);
+    return texture_handle;
+}
+
 impl FromWorld for PlayerSpritesheets {
     fn from_world(world: &mut World) -> Self {
         let world = world.cell();
 
-        let asset_server = world.get_resource::<AssetServer>().unwrap();
+        let asset_server_world_borrow = world.get_resource::<AssetServer>();
+        let asset_server = asset_server_world_borrow.as_deref().unwrap();
 
-        let mut texture_atlasses = world.get_resource_mut::<Assets<TextureAtlas>>().unwrap();
-        let texture_handle = asset_server.load("sprites/alextime-1.png");
+        let mut texture_atlasses_world_borrow = world.get_resource_mut::<Assets<TextureAtlas>>();
+        let mut texture_atlasses = texture_atlasses_world_borrow.as_deref_mut().unwrap();
 
-        let atlas_1 = TextureAtlas::from_grid(
-            texture_handle.clone(),
-            Vec2::new(64.0, 64.0),
+        let atlas_1 = load_texture_atlas(
+            PLAYER_ASSET_SHEET_1,
+            asset_server,
             SHEET_1_COLUMNS,
             SHEET_1_ROWS,
             None,
-            None,
+            64.,
+            texture_atlasses,
         );
 
-        let texture_handle = asset_server.load("sprites/alextime-2.png");
-
-        let atlas_2 = TextureAtlas::from_grid(
-            texture_handle.clone(),
-            Vec2::new(64.0, 64.0),
+        let atlas_2 = load_texture_atlas(
+            PLAYER_ASSET_SHEET_2,
+            asset_server,
             SHEET_2_COLUMNS,
             SHEET_2_ROWS,
-            Some(Vec2::ONE * 64.),
             None,
+            64. * 3.,
+            texture_atlasses,
         );
 
         PlayerSpritesheets {
-            player_atlas_1: texture_atlasses.add(atlas_1),
-            player_atlas_2: texture_atlasses.add(atlas_2),
+            player_atlas_1: atlas_1,
+            player_atlas_2: atlas_2,
         }
     }
 }
@@ -145,7 +173,6 @@ pub fn get_animation_indices(
     let mut last = 0;
 
     // Walk
-
     if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Right {
         first = SHEET_1_COLUMNS * 11 + 1;
         last = SHEET_1_COLUMNS * 11 + N_FRAMES_WALK;
@@ -164,7 +191,6 @@ pub fn get_animation_indices(
     }
 
     // Stand
-
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Right {
         first = SHEET_1_COLUMNS * 11;
         last = last;
@@ -183,7 +209,6 @@ pub fn get_animation_indices(
     }
 
     // Attack
-
     if animation_type == AnimationType::Attack && animation_direction == AnimationDirection::Right {
         first = SHEET_2_COLUMNS * 3 + 1;
         last = SHEET_2_COLUMNS * 3 + N_FRAMES_ATTACK;
@@ -201,13 +226,18 @@ pub fn get_animation_indices(
         last = SHEET_2_COLUMNS * 2 + N_FRAMES_ATTACK;
     }
 
+    // println!("animataion_type: {:?}", animation_type);
+    // println!("animataion_direction: {:?}", animation_direction);
+    // println!("first: {:?}", first);
+    // println!("last: {:?}", last);
+
     AnimationIndices {
         first: first,
         last: last,
     }
 }
 
-#[derive(Component, Clone, Default)]
+#[derive(Component, Clone, Default, Debug)]
 pub struct CharacterAnimation {
     pub state: AnimationState,
     pub direction: AnimationDirection,
@@ -226,8 +256,6 @@ impl LdtkEntity for PlayerBundle {
         asset_server: &AssetServer,
         texture_atlasses: &mut Assets<TextureAtlas>,
     ) -> PlayerBundle {
-        // let sprite_bundle = load_sprite_bundle_2(asset_server, texture_atlases);
-
         let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
         let collider_bundle = ColliderBundle {
@@ -241,19 +269,18 @@ impl LdtkEntity for PlayerBundle {
             ..Default::default()
         };
 
-        let texture_handle = asset_server.load("sprites/alextime-1.png");
-
-        let atlas = TextureAtlas::from_grid(
-            texture_handle,
-            Vec2::new(64.0, 64.0),
-            SHEET_2_COLUMNS,
-            SHEET_2_ROWS,
-            None, // Some(Vec2::ONE * 64.),
+        let atlas_handle = load_texture_atlas(
+            PLAYER_ASSET_SHEET_1,
+            asset_server,
+            SHEET_1_COLUMNS,
+            SHEET_1_ROWS,
             None,
+            64.,
+            texture_atlasses,
         );
 
         let sprite_bundle = SpriteSheetBundle {
-            texture_atlas: texture_atlasses.add(atlas),
+            texture_atlas: atlas_handle,
             sprite: TextureAtlasSprite::new(0),
             ..default()
         };

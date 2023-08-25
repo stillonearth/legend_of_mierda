@@ -110,58 +110,84 @@ pub fn camera_fit_inside_current_level(
 pub fn animate_sprite(
     time: Res<Time>,
     mut query: Query<(
-        &CharacterAnimation,
+        &mut CharacterAnimation,
         &mut AnimationTimer,
         &mut TextureAtlasSprite,
         &mut Transform,
     )>,
 ) {
-    for (character_animation, mut timer, mut sprite, mut transform) in &mut query {
+    for (mut character_animation, mut timer, mut sprite, mut transform) in &mut query {
         timer.tick(time.delta());
 
         // For some reason sprite scaling is not working when set in the bundle
         transform.scale = Vec3::new(0.5, 0.5, 1.0);
 
-        let indices = get_animation_indices(
+        let mut indices = get_animation_indices(
             character_animation.animation_type,
             character_animation.direction,
         );
 
-        // println!("indices: {:?}", indices);
+        // println!("indices here: {:?}", indices);
 
         if timer.just_finished() {
             sprite.index = if (sprite.index >= indices.last) || (sprite.index < indices.first) {
+                // if attacking animation finished, go back to standing
+                if character_animation.animation_type == AnimationType::Attack
+                    && (sprite.index >= indices.last)
+                {
+                    character_animation.animation_type = AnimationType::Stand;
+                }
+
+                if character_animation.animation_type == AnimationType::Stand {
+                    indices = get_animation_indices(
+                        character_animation.animation_type,
+                        character_animation.direction,
+                    );
+                }
+
                 indices.first
             } else {
                 sprite.index + 1
             };
+
+            println!(
+                "animation type: {:?}, animation_direction: {:?} sprite_index: {}",
+                character_animation.animation_type, character_animation.direction, sprite.index
+            );
         }
     }
 }
 
 pub fn controls(
-    mut commands: Commands,
+    mut _commands: Commands,
     input: Res<Input<KeyCode>>,
-    mut query: Query<(Entity, &mut Velocity, &mut CharacterAnimation), With<Player>>,
+    mut query: Query<
+        (
+            Entity,
+            &mut Handle<TextureAtlas>,
+            &mut Velocity,
+            &mut CharacterAnimation,
+            &mut TextureAtlasSprite,
+        ),
+        With<Player>,
+    >,
     spritesheets: Res<PlayerSpritesheets>,
     // asset_server: Res<AssetServer>,
     // texture_atlases: &mut Assets<TextureAtlas>,
 ) {
-    for (e, mut velocity, mut char_animation) in &mut query {
+    for (_e, mut texture_atlas, mut velocity, mut char_animation, mut sprite) in &mut query {
+        // no control during attack phase
+        if char_animation.animation_type == AnimationType::Attack {
+            return;
+        }
+
         if input.pressed(KeyCode::Space) {
             char_animation.animation_type = AnimationType::Attack;
+            texture_atlas.clone_from(&spritesheets.player_atlas_2);
+            sprite.index = 0;
 
-            commands.entity(e).insert(SpriteSheetBundle {
-                texture_atlas: spritesheets.player_atlas_2.clone(),
-                ..default()
-            });
+            velocity.linvel = Vec2::ZERO;
         } else {
-            // commands.entity(e).insert(SpriteSheetBundle {
-            //     texture_atlas: spritesheets.player_atlas_1.clone(),
-            //     sprite: TextureAtlasSprite::new(0),
-            //     ..default()
-            // });
-
             let right = if input.pressed(KeyCode::D) { 1. } else { 0. };
             let left = if input.pressed(KeyCode::A) { 1. } else { 0. };
             let up = if input.pressed(KeyCode::W) { 1. } else { 0. };
@@ -173,14 +199,8 @@ pub fn controls(
             velocity.linvel = velocity.linvel.normalize_or_zero() * 100.;
 
             let linvel_norm = velocity.linvel.distance(Vec2::ZERO);
-            if char_animation.animation_type != AnimationType::Attack {
-                if linvel_norm == 0.0 {
-                    char_animation.animation_type = AnimationType::Stand;
-                } else {
-                    char_animation.animation_type = AnimationType::Walk;
-                }
-            }
 
+            // Change animation type if player moved
             if char_animation.animation_type == AnimationType::Walk {
                 if velocity.linvel.x > 0. {
                     char_animation.direction = AnimationDirection::Right;
@@ -190,6 +210,20 @@ pub fn controls(
                     char_animation.direction = AnimationDirection::Up;
                 } else if velocity.linvel.y < 0. {
                     char_animation.direction = AnimationDirection::Down;
+                }
+            }
+
+            // Don't interrupt attack animation
+            if char_animation.animation_type != AnimationType::Attack {
+                // Change spritesheet
+                if char_animation.animation_type != AnimationType::Walk {
+                    texture_atlas.clone_from(&spritesheets.player_atlas_1);
+                }
+
+                if linvel_norm == 0.0 {
+                    char_animation.animation_type = AnimationType::Stand;
+                } else {
+                    char_animation.animation_type = AnimationType::Walk;
                 }
             }
         }
