@@ -418,3 +418,18 @@ pub(crate) fn handle_collisions(
         }
     }
 }
+
+pub(crate) fn mierda_movement(time: Res<Time>, mut los_mierdas: Query<(&mut Velocity, &Mierda)>) {
+    for (mut v, _) in los_mierdas.iter_mut() {
+        // v.linvel.x += 3. * time.elapsed_seconds().cos();
+        v.linvel.y = 40. * time.elapsed_seconds().sin();
+    }
+}
+
+pub(crate) fn get_mierda_moving(time: Res<Time>, mut los_mierdas: Query<(&mut Velocity, &Mierda)>) {
+    for (mut v, _) in los_mierdas.iter_mut() {
+        if v.linvel.x == 0.0 {
+            v.linvel.x = 20.;
+        }
+    }
+}

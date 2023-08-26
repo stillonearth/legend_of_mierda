@@ -36,6 +36,8 @@ fn main() {
         .add_system(systems::animate_sprite)
         .add_system(systems::controls)
         .add_system(systems::handle_collisions)
+        .add_system(systems::mierda_movement)
+        .add_system(systems::get_mierda_moving)
         .register_ldtk_int_cell::<components::WallBundle>(1)
         // .register_ldtk_int_cell::<components::WallBundle>(3)
         .register_ldtk_entity::<components::PlayerBundle>("Player")

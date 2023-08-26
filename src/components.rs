@@ -356,7 +356,7 @@ impl LdtkEntity for MierdaBundle {
 
         let sprite_bundle = SpriteSheetBundle {
             texture_atlas: atlas_handle,
-            sprite: TextureAtlasSprite::new(3),
+            sprite: TextureAtlasSprite::new(0),
             ..default()
         };
 
