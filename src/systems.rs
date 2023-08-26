@@ -24,18 +24,13 @@ pub fn update_level_selection(
             };
 
             for player_transform in &player_query {
-                // println!("Level bounds: {:?}", level_bounds);
-
                 let player_within_x_bounds = player_transform.translation().x < level_bounds.max.x
                     && player_transform.translation().x > level_bounds.min.x;
 
                 let player_within_y_bounds = player_transform.translation().y < level_bounds.max.y
                     && player_transform.translation().y > level_bounds.min.y;
 
-                // let is_not_current_level = !level_selection.is_match(&0, &ldtk_level.level);
-
                 if player_within_x_bounds && player_within_y_bounds {
-                    // println!("\t\t\tswitch!");
                     *level_selection = LevelSelection::Iid(ldtk_level.level.iid.clone());
                 }
             }
@@ -67,9 +62,6 @@ pub fn camera_fit_inside_current_level(
     let player_translation = player_query.single().translation();
 
     let (mut orthographic_projection, mut camera_transform) = camera_query.single_mut();
-
-    // println!("number of levels: {}", level_query.iter().count());
-    // return;
 
     for (level_transform, level_handle) in &level_query {
         if let Some(ldtk_level) = ldtk_levels.get(level_handle) {
@@ -110,13 +102,17 @@ pub fn camera_fit_inside_current_level(
 pub fn animate_sprite(
     time: Res<Time>,
     mut query: Query<(
+        &mut Handle<TextureAtlas>,
         &mut CharacterAnimation,
         &mut AnimationTimer,
         &mut TextureAtlasSprite,
         &mut Transform,
     )>,
+    spritesheets: Res<PlayerSpritesheets>,
 ) {
-    for (mut character_animation, mut timer, mut sprite, mut transform) in &mut query {
+    for (mut texture_atlas, mut character_animation, mut timer, mut sprite, mut transform) in
+        &mut query
+    {
         timer.tick(time.delta());
 
         // For some reason sprite scaling is not working when set in the bundle
@@ -127,8 +123,6 @@ pub fn animate_sprite(
             character_animation.direction,
         );
 
-        // println!("indices here: {:?}", indices);
-
         if timer.just_finished() {
             sprite.index = if (sprite.index >= indices.last) || (sprite.index < indices.first) {
                 // if attacking animation finished, go back to standing
@@ -136,6 +130,7 @@ pub fn animate_sprite(
                     && (sprite.index >= indices.last)
                 {
                     character_animation.animation_type = AnimationType::Stand;
+                    texture_atlas.clone_from(&spritesheets.player_atlas_1);
                 }
 
                 if character_animation.animation_type == AnimationType::Stand {
@@ -149,11 +144,6 @@ pub fn animate_sprite(
             } else {
                 sprite.index + 1
             };
-
-            // println!(
-            //     "animation type: {:?}, animation_direction: {:?} sprite_index: {}",
-            //     character_animation.animation_type, character_animation.direction, sprite.index
-            // );
         }
     }
 }
@@ -172,8 +162,6 @@ pub fn controls(
         With<Player>,
     >,
     spritesheets: Res<PlayerSpritesheets>,
-    // asset_server: Res<AssetServer>,
-    // texture_atlases: &mut Assets<TextureAtlas>,
 ) {
     for (_e, mut texture_atlas, mut velocity, mut char_animation, mut sprite) in &mut query {
         // no control during attack phase
@@ -368,10 +356,6 @@ pub fn spawn_wall_collision(
                 }
 
                 commands.entity(level_entity).with_children(|level| {
-                    // Spawn colliders for every rectangle..
-                    // Making the collider a child of the level serves two purposes:
-                    // 1. Adjusts the transforms to be relative to the level for free
-                    // 2. the colliders will be despawned automatically when levels unload
                     for wall_rect in wall_rects {
                         level
                             .spawn_empty()
@@ -420,16 +404,71 @@ pub(crate) fn handle_collisions(
 }
 
 pub(crate) fn mierda_movement(time: Res<Time>, mut los_mierdas: Query<(&mut Velocity, &Mierda)>) {
-    for (mut v, _) in los_mierdas.iter_mut() {
-        // v.linvel.x += 3. * time.elapsed_seconds().cos();
-        v.linvel.y = 40. * time.elapsed_seconds().sin();
+    for (mut v, mierda) in los_mierdas.iter_mut() {
+        let rotation_angle = time.elapsed_seconds().cos() * std::f32::consts::FRAC_PI_4;
+
+        v.linvel = Vec2::new(
+            mierda.move_direction.x * rotation_angle.cos()
+                - mierda.move_direction.y * rotation_angle.sin(),
+            mierda.move_direction.x * rotation_angle.sin()
+                + mierda.move_direction.y * rotation_angle.cos(),
+        ) * 30.0;
     }
 }
 
-pub(crate) fn get_mierda_moving(time: Res<Time>, mut los_mierdas: Query<(&mut Velocity, &Mierda)>) {
-    for (mut v, _) in los_mierdas.iter_mut() {
-        if v.linvel.x == 0.0 {
-            v.linvel.x = 20.;
+pub(crate) fn update_mierdas_move_direction(
+    time: Res<Time>,
+    player: Query<(&Transform, &Player)>,
+    mut los_mierdas: Query<(&Transform, &mut DirectionUpdateTime, &mut Mierda)>,
+) {
+    if player.iter().count() == 0 {
+        return;
+    }
+
+    let player_position = player.single().0.translation;
+
+    for (mierda_position, mut direction_update_timer, mut mierda) in los_mierdas.iter_mut() {
+        direction_update_timer.timer.tick(time.delta());
+
+        if direction_update_timer.timer.finished() {
+            let mierda_position = mierda_position.translation;
+            mierda.move_direction = Vec2::new(
+                player_position.x - mierda_position.x,
+                player_position.y - mierda_position.y,
+            )
+            .normalize_or_zero();
         }
     }
+}
+
+pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands
+        .spawn(NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                position_type: PositionType::Absolute,
+                justify_content: JustifyContent::Center,
+                bottom: Val::Px(0.0),
+                align_items: AlignItems::FlexStart,
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|parent| {
+            parent.spawn((
+                NodeBundle {
+                    style: Style {
+                        width: Val::Px(125.0),
+                        height: Val::Px(125.0),
+                        margin: UiRect::top(Val::VMin(5.)),
+                        ..default()
+                    },
+                    // a `NodeBundle` is transparent by default, so to see the image we have to its color to `WHITE`
+                    background_color: Color::WHITE.into(),
+                    ..default()
+                },
+                UiImage::new(asset_server.load("face.png")),
+            ));
+        })
+        .insert(Name::new("gui"));
 }

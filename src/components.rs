@@ -1,6 +1,8 @@
-use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
+use std::time::Duration;
 
+use bevy::prelude::*;
+
+use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 #[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
@@ -33,45 +35,35 @@ impl From<&EntityInstance> for ColliderBundle {
     }
 }
 
-// #[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
-// pub struct SensorBundle {
-//     pub collider: Collider,
-//     pub sensor: Sensor,
-//     pub active_events: ActiveEvents,
-//     pub rotation_constraints: LockedAxes,
-// }
-
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Player;
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
-pub struct Mierda;
+#[derive(Copy, Clone, PartialEq, Debug, Default, Component)]
+pub struct Mierda {
+    pub move_direction: Vec2,
+}
 
 #[derive(Clone, Default, Bundle)]
 pub struct PlayerBundle {
-    #[bundle]
     pub sprite_bundle: SpriteSheetBundle,
-    // pub animation_indices: AnimationIndices,
     pub character_animation: CharacterAnimation,
     pub animation_timer: AnimationTimer,
-    // pub transform: Transform,
     pub player: Player,
-    #[bundle]
     pub collider_bundle: ColliderBundle,
+}
+
+#[derive(Component, Clone, Default)]
+pub struct DirectionUpdateTime {
+    /// track when the bomb should explode (non-repeating timer)
+    pub timer: Timer,
 }
 
 #[derive(Clone, Default, Bundle)]
 pub struct MierdaBundle {
-    #[bundle]
     pub sprite_bundle: SpriteSheetBundle,
-    // pub animation_indices: AnimationIndices,
-    // pub character_animation: CharacterAnimation,
-    // pub animation_timer: AnimationTimer,
-    // pub transform: Transform,
     pub mierda: Mierda,
-    // pub sensor: Sensor,
-    #[bundle]
     pub collider_bundle: ColliderBundle,
+    pub direction_update_time: DirectionUpdateTime,
 }
 
 const SHEET_1_COLUMNS: usize = 13;
@@ -256,11 +248,6 @@ pub fn get_animation_indices(
         last = SHEET_2_COLUMNS * 2 + N_FRAMES_ATTACK;
     }
 
-    // println!("animataion_type: {:?}", animation_type);
-    // println!("animataion_direction: {:?}", animation_direction);
-    // println!("first: {:?}", first);
-    // println!("last: {:?}", last);
-
     AnimationIndices { first, last }
 }
 
@@ -363,6 +350,9 @@ impl LdtkEntity for MierdaBundle {
         MierdaBundle {
             sprite_bundle,
             collider_bundle,
+            direction_update_time: DirectionUpdateTime {
+                timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
+            },
             ..default()
         }
     }
