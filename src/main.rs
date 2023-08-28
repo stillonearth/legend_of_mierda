@@ -1,18 +1,29 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
+use belly::prelude::*;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-// use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::prelude::*;
 
+mod ai;
 mod components;
-mod systems;
+mod controls;
+mod ldtk;
+mod physics;
+mod sprites;
+mod ui;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins(BellyPlugin)
+        .add_plugins(WorldInspectorPlugin::new())
+        .add_systems(Startup, setup)
+        // UI
+        .add_systems(Startup, ui::draw_ui)
+        // LDTK
         .add_plugins(LdtkPlugin)
-        // .add_plugins(WorldInspectorPlugin::new())
         .insert_resource(LdtkSettings {
             level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
                 load_level_neighbors: true,
@@ -21,28 +32,35 @@ fn main() {
             set_clear_color: SetClearColor::FromLevelBackground,
             ..Default::default()
         })
-        // .add_plugin(WorldInspectorPlugin::new())
+        .add_systems(
+            Update,
+            (
+                ldtk::spawn_wall_collision,
+                ldtk::camera_fit_inside_current_level,
+                ldtk::update_level_selection,
+            ),
+        )
+        .insert_resource(LevelSelection::Index(0))
+        .register_ldtk_int_cell::<components::WallBundle>(1)
+        .register_ldtk_entity::<components::PlayerBundle>("Player")
+        .register_ldtk_entity::<components::MierdaBundle>("Mierda")
+        // Enemy AI
+        .add_systems(
+            Update,
+            (ai::mierda_movement, ai::update_mierdas_move_direction),
+        )
+        // Sprites
+        .init_resource::<sprites::PlayerSpritesheets>()
+        .add_systems(Update, sprites::animate_sprite)
+        // Controls
+        .add_systems(Update, controls::controls)
+        // Physics
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .insert_resource(RapierConfiguration {
             gravity: Vec2::new(0.0, 0.0),
             ..Default::default()
         })
-        .add_systems(Startup, setup)
-        .add_systems(Startup, systems::draw_ui)
-        .init_resource::<components::PlayerSpritesheets>()
-        .insert_resource(LevelSelection::Index(0))
-        .add_systems(Update, systems::spawn_wall_collision)
-        .add_systems(Update, systems::camera_fit_inside_current_level)
-        .add_systems(Update, systems::update_level_selection)
-        .add_systems(Update, systems::animate_sprite)
-        .add_systems(Update, systems::controls)
-        .add_systems(Update, systems::handle_collisions)
-        .add_systems(Update, systems::mierda_movement)
-        .add_systems(Update, systems::update_mierdas_move_direction)
-        .register_ldtk_int_cell::<components::WallBundle>(1)
-        // .register_ldtk_int_cell::<components::WallBundle>(3)
-        .register_ldtk_entity::<components::PlayerBundle>("Player")
-        .register_ldtk_entity::<components::MierdaBundle>("Mierda")
+        .add_systems(Update, physics::handle_collisions)
         .run();
 }
 
