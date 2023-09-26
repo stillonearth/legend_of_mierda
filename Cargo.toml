@@ -10,4 +10,5 @@ bevy_ecs_ldtk = "0.8"
 bevy-inspector-egui = "0.19"
 bevy_rapier2d = "0.22"
 rand = "0.8.5"
+pecs = "0.4"
 belly = {git="https://github.com/jkb0o/belly.git", rev="0845c96cb2bb201586a7b8b3830af0e344d8241a"}

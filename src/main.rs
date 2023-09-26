@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::prelude::*;
+use pecs::prelude::*;
 
 mod ai;
 mod components;
@@ -19,6 +20,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(BellyPlugin)
+        .add_plugins(PecsPlugin)
         .add_plugins(WorldInspectorPlugin::new())
         .add_systems(Startup, setup)
         // UI
