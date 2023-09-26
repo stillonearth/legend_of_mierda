@@ -9,6 +9,7 @@ use bevy_rapier2d::prelude::*;
 mod ai;
 mod components;
 mod controls;
+mod events;
 mod ldtk;
 mod physics;
 mod sprites;
@@ -47,7 +48,7 @@ fn main() {
         // Enemy AI
         .add_systems(
             Update,
-            (ai::mierda_movement, ai::update_mierdas_move_direction),
+            (ai::mierda_activity, ai::update_mierdas_move_direction),
         )
         // Sprites
         .init_resource::<sprites::PlayerSpritesheets>()
@@ -60,7 +61,11 @@ fn main() {
             gravity: Vec2::new(0.0, 0.0),
             ..Default::default()
         })
+        // Events
+        .add_systems(Update, events::event_player_attack)
         .add_systems(Update, physics::handle_collisions)
+        // App Events
+        .add_event::<events::PlayerAttackEvent>()
         .run();
 }
 

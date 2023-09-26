@@ -38,9 +38,11 @@ impl From<&EntityInstance> for ColliderBundle {
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
 pub struct Player;
 
-#[derive(Copy, Clone, PartialEq, Debug, Default, Component)]
+#[derive(Clone, PartialEq, Debug, Default, Component)]
 pub struct Mierda {
     pub move_direction: Vec2,
+    pub health: u8,
+    pub hit_at: Option<Timer>,
 }
 
 #[derive(Clone, Default, Bundle)]
