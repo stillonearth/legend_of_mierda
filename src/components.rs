@@ -36,7 +36,9 @@ impl From<&EntityInstance> for ColliderBundle {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
-pub struct Player;
+pub struct Player {
+    pub health: u8,
+}
 
 #[derive(Clone, PartialEq, Debug, Default, Component)]
 pub struct Mierda {
@@ -52,6 +54,7 @@ pub struct PlayerBundle {
     pub animation_timer: AnimationTimer,
     pub player: Player,
     pub collider_bundle: ColliderBundle,
+    pub active_events: ActiveEvents,
 }
 
 #[derive(Component, Clone, Default)]
@@ -68,6 +71,15 @@ pub struct MierdaBundle {
     pub direction_update_time: DirectionUpdateTime,
 }
 
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
+pub struct Wall;
+
+#[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
+pub struct WallBundle {
+    wall: Wall,
+    sensor: Sensor,
+}
+
 impl FromWorld for PlayerSpritesheets {
     fn from_world(world: &mut World) -> Self {
         let world = world.cell();
@@ -78,7 +90,7 @@ impl FromWorld for PlayerSpritesheets {
         let mut texture_atlasses_world_borrow = world.get_resource_mut::<Assets<TextureAtlas>>();
         let texture_atlasses = texture_atlasses_world_borrow.as_deref_mut().unwrap();
 
-        let atlas_1 = load_texture_atlas(
+        let player_atlas_1 = load_texture_atlas(
             PLAYER_ASSET_SHEET_1,
             asset_server,
             SHEET_1_COLUMNS,
@@ -88,7 +100,7 @@ impl FromWorld for PlayerSpritesheets {
             texture_atlasses,
         );
 
-        let atlas_2 = load_texture_atlas(
+        let player_atlas_2 = load_texture_atlas(
             PLAYER_ASSET_SHEET_2,
             asset_server,
             SHEET_2_COLUMNS,
@@ -109,18 +121,9 @@ impl FromWorld for PlayerSpritesheets {
         );
 
         PlayerSpritesheets {
-            player_atlas_1: atlas_1,
-            player_atlas_2: atlas_2,
+            player_atlas_1,
+            player_atlas_2,
             mierda_atlas,
         }
     }
-}
-
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
-pub struct Wall;
-
-#[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
-pub struct WallBundle {
-    wall: Wall,
-    sensor: Sensor,
 }

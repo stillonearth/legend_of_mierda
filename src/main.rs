@@ -65,9 +65,17 @@ fn main() {
         })
         // Events
         .add_systems(Update, events::event_player_attack)
-        .add_systems(Update, physics::handle_collisions)
+        // Events: Collisions
+        .add_systems(
+            Update,
+            (
+                physics::handle_mierda_wall_collisions,
+                physics::handle_player_mierda_collisions,
+            ),
+        )
         // App Events
         .add_event::<events::PlayerAttackEvent>()
+        .add_event::<events::PlayerHitEvent>()
         .run();
 }
 
