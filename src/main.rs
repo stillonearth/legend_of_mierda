@@ -64,7 +64,10 @@ fn main() {
             ..Default::default()
         })
         // Events
-        .add_systems(Update, events::event_player_attack)
+        .add_systems(
+            Update,
+            (events::event_player_attack, events::event_player_hit),
+        )
         // Events: Collisions
         .add_systems(
             Update,
