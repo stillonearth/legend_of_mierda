@@ -1,3 +1,6 @@
+use rand;
+use std::time::Duration;
+
 use bevy::prelude::*;
 
 use bevy_ecs_ldtk::prelude::*;
@@ -69,6 +72,60 @@ pub struct MierdaBundle {
     pub mierda: Mierda,
     pub collider_bundle: ColliderBundle,
     pub direction_update_time: DirectionUpdateTime,
+}
+
+pub fn create_mierda_bundle(
+    asset_server: &AssetServer,
+    texture_atlasses: &mut Assets<TextureAtlas>,
+) -> MierdaBundle {
+    let rotation_constraints = LockedAxes::ROTATION_LOCKED;
+
+    let collider_bundle = ColliderBundle {
+        collider: Collider::cuboid(8., 8.),
+        rigid_body: RigidBody::Dynamic,
+        friction: Friction {
+            coefficient: 20.0,
+            combine_rule: CoefficientCombineRule::Min,
+        },
+        rotation_constraints,
+        ..Default::default()
+    };
+
+    let atlas_handle = load_texture_atlas(
+        MIERDA_ASSET_SHEET,
+        asset_server,
+        5,
+        1,
+        None,
+        16.,
+        texture_atlasses,
+    );
+
+    let sprite_bundle = SpriteSheetBundle {
+        texture_atlas: atlas_handle,
+        sprite: TextureAtlasSprite::new(4),
+        ..default()
+    };
+
+    let mierda = Mierda {
+        health: 100,
+        move_direction: Vec2 {
+            x: rand::random::<f32>() * 2.0 - 1.0,
+            y: rand::random::<f32>() * 2.0 - 1.0,
+        }
+        .normalize(),
+        hit_at: None,
+    };
+
+    MierdaBundle {
+        sprite_bundle,
+        collider_bundle,
+        mierda,
+        direction_update_time: DirectionUpdateTime {
+            timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
+        },
+        ..default()
+    }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]

@@ -1,6 +1,5 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
-use belly::prelude::*;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
@@ -19,7 +18,6 @@ mod ui;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(BellyPlugin)
         .add_plugins(PecsPlugin)
         .add_plugins(WorldInspectorPlugin::new())
         .add_systems(Startup, setup)
@@ -54,7 +52,7 @@ fn main() {
         )
         // Sprites
         .init_resource::<sprites::PlayerSpritesheets>()
-        .add_systems(Update, sprites::animate_sprite)
+        .add_systems(Update, (sprites::animate_sprite, sprites::flash_sprite))
         // Controls
         .add_systems(Update, controls::controls)
         // Physics
@@ -66,7 +64,13 @@ fn main() {
         // Events
         .add_systems(
             Update,
-            (events::event_player_attack, events::event_player_hit),
+            (
+                events::event_player_attack,
+                events::event_player_hit,
+                events::event_game_over,
+                events::event_mierda_hit,
+                events::event_spawn_mierda,
+            ),
         )
         // Events: Collisions
         .add_systems(
@@ -79,6 +83,9 @@ fn main() {
         // App Events
         .add_event::<events::PlayerAttackEvent>()
         .add_event::<events::PlayerHitEvent>()
+        .add_event::<events::GameOverEvent>()
+        .add_event::<events::MierdaHitEvent>()
+        .add_event::<events::SpawnMierdaEvent>()
         .run();
 }
 

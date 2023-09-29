@@ -70,3 +70,8 @@ The target audience includes fans of the Legend of Zelda series, players intrigu
 # Legend of Mierda - Tech Document
 
 Game is developed with Bevy engine and levels are designed with LDTK.
+
+
+## Acknowledgements
+
+font: https://www.dafont.com/mexicana.font

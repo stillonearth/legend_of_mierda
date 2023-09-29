@@ -2,4 +2,4 @@
 
 * Music & Sound Effects
 * Highscore
-* Healthbar
+* Spawn new mierdas on old hit
