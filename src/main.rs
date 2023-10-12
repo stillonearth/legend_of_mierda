@@ -4,6 +4,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier2d::prelude::*;
+use components::Mierda;
 use pecs::prelude::*;
 
 mod ai;
@@ -14,10 +15,18 @@ mod ldtk;
 mod physics;
 mod sprites;
 mod ui;
+mod utils;
 
 fn main() {
-    App::new()
-        .add_plugins(DefaultPlugins)
+    let mut app = App::new();
+
+    {
+        let registry = app.world.resource_mut::<AppTypeRegistry>();
+        let mut wr = registry.write();
+        wr.register::<Mierda>();
+    }
+
+    app.add_plugins(DefaultPlugins)
         .add_plugins(PecsPlugin)
         .add_plugins(WorldInspectorPlugin::new())
         .add_systems(Startup, setup)
@@ -49,6 +58,14 @@ fn main() {
         .add_systems(
             Update,
             (ai::mierda_activity, ai::update_mierdas_move_direction),
+        )
+        // Housekeeping
+        .add_systems(
+            Update,
+            (
+                ldtk::hide_dummy_mierdas,
+                components::fix_missing_mierda_compontents,
+            ),
         )
         // Sprites
         .init_resource::<sprites::PlayerSpritesheets>()
@@ -85,8 +102,10 @@ fn main() {
         .add_event::<events::PlayerHitEvent>()
         .add_event::<events::GameOverEvent>()
         .add_event::<events::MierdaHitEvent>()
-        .add_event::<events::SpawnMierdaEvent>()
-        .run();
+        .add_event::<events::SpawnMierdaEvent>();
+
+    app.run();
+    // .run();
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {

@@ -1,4 +1,3 @@
-use rand;
 use std::time::Duration;
 
 use bevy::prelude::*;
@@ -38,16 +37,17 @@ impl From<&EntityInstance> for ColliderBundle {
     }
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component, Reflect)]
 pub struct Player {
     pub health: u8,
 }
 
-#[derive(Clone, PartialEq, Debug, Default, Component)]
+#[derive(Clone, PartialEq, Debug, Default, Component, Reflect)]
 pub struct Mierda {
     pub move_direction: Vec2,
     pub health: u8,
     pub hit_at: Option<Timer>,
+    pub is_dummy: bool,
 }
 
 #[derive(Clone, Default, Bundle)]
@@ -60,7 +60,7 @@ pub struct PlayerBundle {
     pub active_events: ActiveEvents,
 }
 
-#[derive(Component, Clone, Default)]
+#[derive(Component, Clone, Default, Reflect)]
 pub struct DirectionUpdateTime {
     /// track when the bomb should explode (non-repeating timer)
     pub timer: Timer,
@@ -77,6 +77,7 @@ pub struct MierdaBundle {
 pub fn create_mierda_bundle(
     asset_server: &AssetServer,
     texture_atlasses: &mut Assets<TextureAtlas>,
+    is_dummy: bool,
 ) -> MierdaBundle {
     let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
@@ -115,6 +116,7 @@ pub fn create_mierda_bundle(
         }
         .normalize(),
         hit_at: None,
+        is_dummy,
     };
 
     MierdaBundle {
@@ -182,5 +184,24 @@ impl FromWorld for PlayerSpritesheets {
             player_atlas_2,
             mierda_atlas,
         }
+    }
+}
+
+pub(crate) fn fix_missing_mierda_compontents(
+    asset_server: Res<AssetServer>,
+    texture_atlasses: ResMut<Assets<TextureAtlas>>,
+    mut commands: Commands,
+    los_mierdas: Query<(Entity, &Mierda), Without<Collider>>,
+) {
+    let asset_server = asset_server.into_inner();
+    let texture_atlasses = texture_atlasses.into_inner();
+
+    for (e, _) in los_mierdas.iter().filter(|(_, m)| !m.is_dummy) {
+        let bundle = create_mierda_bundle(asset_server, texture_atlasses, false);
+        commands.entity(e).insert((
+            bundle.collider_bundle,
+            bundle.direction_update_time,
+            Visibility::Visible,
+        ));
     }
 }
