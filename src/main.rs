@@ -1,8 +1,9 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
-use bevy::prelude::*;
+use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+// use bevy_nine_slice_ui::*;
 use bevy_rapier2d::prelude::*;
 use components::Mierda;
 use pecs::prelude::*;
@@ -28,7 +29,9 @@ fn main() {
 
     app.add_plugins(DefaultPlugins)
         .add_plugins(PecsPlugin)
-        .add_plugins(WorldInspectorPlugin::new())
+        .add_plugins(
+            WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
+        )
         .add_systems(Startup, setup)
         // UI
         .add_systems(Startup, ui::draw_ui)
@@ -105,7 +108,6 @@ fn main() {
         .add_event::<events::SpawnMierdaEvent>();
 
     app.run();
-    // .run();
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {

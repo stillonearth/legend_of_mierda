@@ -3,6 +3,8 @@ use bevy_ecs_ldtk::{LdtkLevel, LevelSelection};
 use bevy_rapier2d::prelude::Velocity;
 use pecs::prelude::*;
 
+use rand::Rng;
+
 use crate::{
     components::{Mierda, Player},
     sprites::{AnimationDirection, CharacterAnimation, FlashingTimer},
@@ -37,10 +39,17 @@ pub fn event_spawn_mierda(
     level_selection: Res<LevelSelection>,
     level_handles: Query<(Entity, &Handle<LdtkLevel>)>,
     level_assets: Res<Assets<LdtkLevel>>,
-    _texture_atlasses: ResMut<Assets<TextureAtlas>>,
-    los_mierdas: Query<(Entity, &Parent, &mut Visibility, &Mierda)>,
+    los_mierdas: Query<(Entity, &Parent, &Mierda)>,
     levels: Query<(Entity, &Handle<LdtkLevel>)>,
+    q_player_query: Query<(Entity, &Transform, &Player)>,
 ) {
+    if q_player_query.iter().count() == 0 {
+        return;
+    }
+
+    let mut rng = rand::thread_rng();
+    let player_translation = q_player_query.single().1.translation;
+
     for ev_spawn in ev_spawn_mierda.iter() {
         for (_, level_handle) in level_handles.iter() {
             let level = &level_assets.get(level_handle).unwrap().level;
@@ -52,9 +61,7 @@ pub fn event_spawn_mierda(
                     .unwrap();
 
                 for _i in 0..ev_spawn.count {
-                    for (mierda_entity, mierda_parent, _mierda_visibility, mierda) in
-                        los_mierdas.iter()
-                    {
+                    for (mierda_entity, mierda_parent, mierda) in los_mierdas.iter() {
                         if !mierda.is_dummy {
                             continue;
                         }
@@ -73,6 +80,22 @@ pub fn event_spawn_mierda(
                             new_entity = Some(ne);
                         });
 
+                        // generate random position
+
+                        let mut offset_position = Vec3::new(0.0, 0.0, 0.);
+                        let mut mierda_position = player_translation + offset_position;
+
+                        while (player_translation - mierda_position).length() < 50.0 {
+                            let x = rng.gen_range(-100.0..100.0);
+                            let y = rng.gen_range(-100.0..100.0);
+
+                            offset_position = Vec3::new(x, y, 0.);
+                            mierda_position = player_translation + offset_position;
+                        }
+
+                        let transform = Transform::from_translation(mierda_position)
+                            .with_scale(Vec3::ONE * 0.5);
+
                         let new_entity = new_entity.unwrap();
                         commands.entity(new_entity).insert(Mierda {
                             is_dummy: false,
@@ -85,6 +108,8 @@ pub fn event_spawn_mierda(
                             source: mierda_entity,
                             destination: new_entity,
                         });
+
+                        commands.entity(new_entity).insert(transform);
                     }
                 }
             }

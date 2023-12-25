@@ -20,7 +20,6 @@ pub(crate) fn mierda_activity(
                 mierda.hit_at = None;
             }
         }
-
         v.linvel = Vec2::new(
             mierda.move_direction.x * rotation_angle.cos()
                 - mierda.move_direction.y * rotation_angle.sin(),
@@ -46,7 +45,7 @@ pub(crate) fn update_mierdas_move_direction(
     {
         direction_update_timer.timer.tick(time.delta());
 
-        if direction_update_timer.timer.finished() {
+        if direction_update_timer.timer.finished() || mierda.move_direction == Vec2::ZERO {
             let mierda_position = mierda_position.translation;
             mierda.move_direction = Vec2::new(
                 player_position.x - mierda_position.x,
