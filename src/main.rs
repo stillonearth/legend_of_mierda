@@ -3,7 +3,7 @@
 use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-// use bevy_nine_slice_ui::*;
+use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
 use components::Mierda;
 use pecs::prelude::*;
@@ -13,6 +13,7 @@ mod components;
 mod controls;
 mod events;
 mod ldtk;
+mod particles;
 mod physics;
 mod sprites;
 mod ui;
@@ -32,6 +33,7 @@ fn main() {
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         )
+        .add_plugins(ParticleSystemPlugin::default())
         .add_systems(Startup, setup)
         // UI
         .add_systems(Startup, ui::draw_ui)
@@ -81,6 +83,8 @@ fn main() {
             gravity: Vec2::new(0.0, 0.0),
             ..Default::default()
         })
+        // Particles
+        .add_systems(Update, (particles::fix_particle_transform_z))
         // Events
         .add_systems(
             Update,

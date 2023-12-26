@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{LdtkLevel, LevelSelection};
+use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::Velocity;
 use pecs::prelude::*;
 
@@ -203,13 +204,15 @@ pub fn event_mierda_hit(
 }
 
 pub fn event_player_hit(
+    mut commands: Commands,
     mut ev_player_hit_reader: EventReader<PlayerHitEvent>,
     mut ev_game_over: EventWriter<GameOverEvent>,
-    mut q_player: Query<(Entity, &mut Player)>,
+    mut q_player: Query<(Entity, &GlobalTransform, &mut Player)>,
     mut q_ui_healthbar: Query<(Entity, &mut Style, &ui::UiPlayerHealth)>,
+    asset_server: Res<AssetServer>,
 ) {
     for ev in ev_player_hit_reader.iter() {
-        let (_, mut player) = q_player.get_mut(ev.entity).unwrap();
+        let (_, player_transform, mut player) = q_player.get_mut(ev.entity).unwrap();
 
         if player.health < 10 {
             ev_game_over.send(GameOverEvent);
@@ -220,6 +223,36 @@ pub fn event_player_hit(
             for (_, mut style, _) in q_ui_healthbar.iter_mut() {
                 style.width = Val::Percent(player.health as f32);
             }
+
+            // particle effects
+
+            // continue;
+
+            commands.spawn((
+                ParticleSystemBundle {
+                    transform: player_transform.clone().into(),
+                    particle_system: ParticleSystem {
+                        spawn_rate_per_second: 0.0.into(),
+                        texture: ParticleTexture::Sprite(asset_server.load("px.png")),
+                        max_particles: 5_000,
+                        initial_speed: (0.0..300.0).into(),
+                        scale: 1.0.into(),
+                        velocity_modifiers: vec![
+                            VelocityModifier::Drag(0.001.into()),
+                            VelocityModifier::Vector(Vec3::new(0.0, -400.0, 0.0).into()),
+                        ],
+                        color: (Color::RED..Color::rgba(1.0, 0.0, 0.0, 0.0)).into(),
+                        bursts: vec![ParticleBurst {
+                            time: 0.0,
+                            count: 1000,
+                        }],
+                        looping: false,
+                        ..ParticleSystem::default()
+                    },
+                    ..default()
+                },
+                Playing,
+            ));
         }
     }
 }

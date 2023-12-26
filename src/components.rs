@@ -3,6 +3,8 @@ use std::time::Duration;
 use bevy::prelude::*;
 
 use bevy_ecs_ldtk::prelude::*;
+use bevy_particle_systems::ParticleSystemBundle;
+// use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::sprites::*;
@@ -11,7 +13,7 @@ use crate::sprites::*;
 pub struct ColliderBundle {
     pub collider: Collider,
     pub rigid_body: RigidBody,
-    pub velocity: Velocity,
+    pub velocity: bevy_rapier2d::dynamics::Velocity,
     pub rotation_constraints: LockedAxes,
     pub gravity_scale: GravityScale,
     pub friction: Friction,
@@ -50,7 +52,7 @@ pub struct Mierda {
     pub is_dummy: bool,
 }
 
-#[derive(Clone, Default, Bundle)]
+#[derive(Default, Bundle)]
 pub struct PlayerBundle {
     pub sprite_bundle: SpriteSheetBundle,
     pub character_animation: CharacterAnimation,
@@ -58,6 +60,7 @@ pub struct PlayerBundle {
     pub player: Player,
     pub collider_bundle: ColliderBundle,
     pub active_events: ActiveEvents,
+    // pub particle_system_bundle: ParticleSystemBundle,
 }
 
 #[derive(Component, Clone, Default, Reflect)]
