@@ -91,7 +91,12 @@ pub fn event_spawn_mierda(
                         let mut offset_position = Vec3::new(0.0, 0.0, 0.);
                         let mut mierda_position = player_translation + offset_position;
 
-                        while (player_translation - mierda_position).length() < 50.0 {
+                        while (player_translation - mierda_position).length() < 50.0
+                            || mierda_position.x < 0.0 + 24.0
+                            || mierda_position.x > (level.px_wid as f32) - 24.0
+                            || mierda_position.y < 0.0 + 24.0
+                            || mierda_position.y > (level.px_hei as f32) - 24.0
+                        {
                             let x = rng.gen_range(-100.0..100.0);
                             let y = rng.gen_range(-100.0..100.0);
 
@@ -200,7 +205,7 @@ pub fn event_mierda_hit(
                     asyn!(state, mut commands: Commands, asset_server: Res<AssetServer>, q_mierdas: Query<(Entity, &GlobalTransform)> => {
                                 
                                 let mierda_transform = q_mierdas.get(state.value).unwrap().1.clone();
-                                                             
+
                                 commands.spawn((
                                     ParticleSystemBundle {
                                         transform: (mierda_transform).into(),
@@ -222,6 +227,9 @@ pub fn event_mierda_hit(
                                             looping: false,
                                             ..ParticleSystem::default()
                                         },
+
+
+                                        
                                         ..default()
                                     },
                                     Playing,
@@ -323,6 +331,4 @@ pub fn event_on_pizza_step_over(
             commands.entity(e_pizza).despawn_recursive();
         }
     }
-
-
 }

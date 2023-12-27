@@ -302,24 +302,6 @@ impl LdtkEntity for PlayerBundle {
             collider_bundle,
             active_events: ActiveEvents::COLLISION_EVENTS,
             player: Player { health: 100 },
-            // particle_system_bundle: ParticleSystemBundle {
-            //     particle_system: ParticleSystem {
-            //         max_particles: 10_000,
-            //         texture: ParticleTexture::Sprite(asset_server.load("my_particle.png")),
-            //         spawn_rate_per_second: 25.0.into(),
-            //         initial_speed: JitteredValue::jittered(3.0, -1.0..1.0),
-            //         lifetime: JitteredValue::jittered(8.0, -2.0..2.0),
-            //         color: ColorOverTime::Gradient(Curve::new(vec![
-            //             CurvePoint::new(Color::PURPLE, 0.0),
-            //             CurvePoint::new(Color::RED, 0.5),
-            //             CurvePoint::new(Color::rgba(0.0, 0.0, 1.0, 0.0), 1.0),
-            //         ])),
-            //         looping: true,
-            //         system_duration_seconds: 10.0,
-            //         ..ParticleSystem::default()
-            //     },
-            //     ..ParticleSystemBundle::default()
-            // },
         }
     }
 }
@@ -342,7 +324,7 @@ impl LdtkEntity for MierdaBundle {
 
 impl LdtkEntity for PizzaBundle {
     fn bundle_entity(
-        entity_instance: &EntityInstance,
+        _entity_instance: &EntityInstance,
         _layer_instance: &LayerInstance,
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
