@@ -1,10 +1,13 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct UiPlayerHealth;
+pub struct UIPlayerHealth;
 
 #[derive(Component)]
-pub struct UiGameOver;
+pub struct UIGameOver;
+
+#[derive(Component)]
+pub struct UIGameplayWave;
 
 pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     // alextime face
@@ -71,7 +74,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     background_color: Color::RED.into(),
                     ..default()
                 },))
-                .insert(UiPlayerHealth);
+                .insert(UIPlayerHealth);
         });
     // game over
     commands
@@ -88,7 +91,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 visibility: Visibility::Hidden,
                 ..default()
             },
-            UiGameOver,
+            UIGameOver,
             Name::new("ui game over"),
         ))
         .with_children(|parent| {
@@ -99,6 +102,38 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     font_size: 100.0,
                     color: Color::WHITE,
                 },
+            ));
+        });
+
+    // game over
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    position_type: PositionType::Absolute,
+                    justify_content: JustifyContent::FlexStart,
+                    top: Val::Px(20.0),
+                    left: Val::Px(20.0),
+                    align_items: AlignItems::FlexStart,
+                    ..default()
+                },
+                // visibility: Visibility::Hidden,
+                ..default()
+            },
+            Name::new("Wave Text"),
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                TextBundle::from_section(
+                    "ui wave text",
+                    TextStyle {
+                        font: asset_server.load("fonts/PixeloidMono-d94EV.ttf"),
+                        font_size: 20.0,
+                        color: Color::WHITE,
+                    },
+                ),
+                UIGameplayWave,
             ));
         });
 }

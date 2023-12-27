@@ -11,7 +11,7 @@
 	"iid": "a3386460-7820-11ed-b6fd-157a63b4d02d",
 	"jsonVersion": "1.4.1",
 	"appBuildId": 471199,
-	"nextUid": 205,
+	"nextUid": 207,
 	"identifierStyle": "Capitalize",
 	"toc": [ {
 		"identifier": "Player",
@@ -23,50 +23,12 @@
 		}]
 	}, {
 		"identifier": "Pizza",
-		"instances": [
-			{
-				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
-				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
-				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
-				"entityIid": "c6b57b80-8990-11ee-8ad8-b33d237df335"
-			},
-			{
-				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
-				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
-				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
-				"entityIid": "53b84490-8990-11ee-8ad8-0b6c426d4712"
-			},
-			{
-				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
-				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
-				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
-				"entityIid": "5411d640-8990-11ee-8ad8-abdfc525960b"
-			},
-			{
-				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
-				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
-				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
-				"entityIid": "547504e0-8990-11ee-8ad8-c95933037ae2"
-			},
-			{
-				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
-				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
-				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
-				"entityIid": "54ba2430-8990-11ee-8ad8-f553a5e35853"
-			},
-			{
-				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
-				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
-				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
-				"entityIid": "551c1a50-8990-11ee-8ad8-0de5b3c7c42d"
-			},
-			{
-				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
-				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
-				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
-				"entityIid": "555f64e0-8990-11ee-8ad8-29339d822866"
-			}
-		]
+		"instances": [{
+			"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+			"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+			"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+			"entityIid": "54ba2430-8990-11ee-8ad8-f553a5e35853"
+		}]
 	} ],
 	"worldLayout": null,
 	"worldGridWidth": null,
@@ -1026,7 +988,43 @@
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0.5,
 			"pivotY": 0.5,
-			"fieldDefs": []
+			"fieldDefs": [
+				{
+					"identifier": "is_dummy",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 206,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		}
 	], "tilesets": [
 		{
@@ -1166,7 +1164,43 @@
 		{ "id": "KeyA", "tileRect": { "tilesetUid": 104, "x": 272, "y": 112, "w": 16, "h": 16 }, "color": 10066329 },
 		{ "id": "KeyB", "tileRect": { "tilesetUid": 104, "x": 288, "y": 112, "w": 16, "h": 16 }, "color": 8939059 },
 		{ "id": "Gold", "tileRect": { "tilesetUid": 104, "x": 0, "y": 416, "w": 16, "h": 16 }, "color": 15389866 }
-	], "iconTilesetUid": 104, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [] },
+	], "iconTilesetUid": 104, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [
+		{
+			"identifier": "LevelID",
+			"doc": null,
+			"__type": "Int",
+			"uid": 205,
+			"type": "F_Int",
+			"isArray": false,
+			"canBeNull": true,
+			"arrayMinLength": null,
+			"arrayMaxLength": null,
+			"editorDisplayMode": "Hidden",
+			"editorDisplayScale": 1,
+			"editorDisplayPos": "Above",
+			"editorLinkStyle": "StraightArrow",
+			"editorDisplayColor": null,
+			"editorAlwaysShow": false,
+			"editorShowInWorld": true,
+			"editorCutLongValues": true,
+			"editorTextSuffix": null,
+			"editorTextPrefix": null,
+			"useForSmartColor": false,
+			"min": null,
+			"max": null,
+			"regex": null,
+			"acceptFileTypes": null,
+			"defaultOverride": null,
+			"textLanguageMode": null,
+			"symmetricalRef": false,
+			"autoChainRef": true,
+			"allowOutOfLevelRef": true,
+			"allowedRefs": "OnlySame",
+			"allowedRefsEntityUid": null,
+			"allowedRefTags": [],
+			"tilesetUid": null
+		}
+	] },
 	"levels": [],
 	"worlds": [{ "iid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9", "identifier": "World", "defaultLevelWidth": 256, "defaultLevelHeight": 256, "worldGridWidth": 256, "worldGridHeight": 256, "worldLayout": "GridVania", "levels": [
 		{
@@ -1188,7 +1222,7 @@
 			"__smartColor": "#9697A2",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "LevelID", "__type": "Int", "__value": 1, "__tile": null, "defUid": 205, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -1251,70 +1285,6 @@
 						},
 						{
 							"__identifier": "Pizza",
-							"__grid": [11,4],
-							"__pivot": [0.5,0.5],
-							"__tags": ["environment"],
-							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
-							"__smartColor": "#03CB7C",
-							"__worldX": 440,
-							"__worldY": 72,
-							"iid": "c6b57b80-8990-11ee-8ad8-b33d237df335",
-							"width": 8,
-							"height": 8,
-							"defUid": 201,
-							"px": [184,72],
-							"fieldInstances": []
-						},
-						{
-							"__identifier": "Pizza",
-							"__grid": [9,8],
-							"__pivot": [0.5,0.5],
-							"__tags": ["environment"],
-							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
-							"__smartColor": "#03CB7C",
-							"__worldX": 408,
-							"__worldY": 136,
-							"iid": "53b84490-8990-11ee-8ad8-0b6c426d4712",
-							"width": 8,
-							"height": 8,
-							"defUid": 201,
-							"px": [152,136],
-							"fieldInstances": []
-						},
-						{
-							"__identifier": "Pizza",
-							"__grid": [15,12],
-							"__pivot": [0.5,0.5],
-							"__tags": ["environment"],
-							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
-							"__smartColor": "#03CB7C",
-							"__worldX": 504,
-							"__worldY": 200,
-							"iid": "5411d640-8990-11ee-8ad8-abdfc525960b",
-							"width": 8,
-							"height": 8,
-							"defUid": 201,
-							"px": [248,200],
-							"fieldInstances": []
-						},
-						{
-							"__identifier": "Pizza",
-							"__grid": [17,4],
-							"__pivot": [0.5,0.5],
-							"__tags": ["environment"],
-							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
-							"__smartColor": "#03CB7C",
-							"__worldX": 536,
-							"__worldY": 72,
-							"iid": "547504e0-8990-11ee-8ad8-c95933037ae2",
-							"width": 8,
-							"height": 8,
-							"defUid": 201,
-							"px": [280,72],
-							"fieldInstances": []
-						},
-						{
-							"__identifier": "Pizza",
 							"__grid": [27,9],
 							"__pivot": [0.5,0.5],
 							"__tags": ["environment"],
@@ -1327,39 +1297,10 @@
 							"height": 8,
 							"defUid": 201,
 							"px": [440,152],
-							"fieldInstances": []
-						},
-						{
-							"__identifier": "Pizza",
-							"__grid": [3,6],
-							"__pivot": [0.5,0.5],
-							"__tags": ["environment"],
-							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
-							"__smartColor": "#03CB7C",
-							"__worldX": 312,
-							"__worldY": 104,
-							"iid": "551c1a50-8990-11ee-8ad8-0de5b3c7c42d",
-							"width": 8,
-							"height": 8,
-							"defUid": 201,
-							"px": [56,104],
-							"fieldInstances": []
-						},
-						{
-							"__identifier": "Pizza",
-							"__grid": [7,11],
-							"__pivot": [0.5,0.5],
-							"__tags": ["environment"],
-							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
-							"__smartColor": "#03CB7C",
-							"__worldX": 376,
-							"__worldY": 184,
-							"iid": "555f64e0-8990-11ee-8ad8-29339d822866",
-							"width": 8,
-							"height": 8,
-							"defUid": 201,
-							"px": [120,184],
-							"fieldInstances": []
+							"fieldInstances": [{ "__identifier": "is_dummy", "__type": "Bool", "__value": true, "__tile": null, "defUid": 206, "realEditorValues": [{
+								"id": "V_Bool",
+								"params": [ true ]
+							}] }]
 						}
 					]
 				},
@@ -2266,7 +2207,7 @@
 			"__smartColor": "#9697A2",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "LevelID", "__type": "Int", "__value": null, "__tile": null, "defUid": 205, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -3013,7 +2954,7 @@
 			"__smartColor": "#9697A2",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "LevelID", "__type": "Int", "__value": null, "__tile": null, "defUid": 205, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -3847,7 +3788,7 @@
 			"__smartColor": "#9697A2",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "LevelID", "__type": "Int", "__value": null, "__tile": null, "defUid": 205, "realEditorValues": [] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",

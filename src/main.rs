@@ -5,19 +5,33 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
-use components::*;
 use pecs::prelude::*;
+
+use components::*;
+use loading::*;
+use menu::*;
 
 mod ai;
 mod components;
 mod controls;
 mod events;
+mod gameplay;
 mod ldtk;
+mod loading;
+mod menu;
 mod particles;
 mod physics;
 mod sprites;
 mod ui;
 mod utils;
+
+#[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
+enum GameState {
+    #[default]
+    Loading,
+    Menu,
+    Gameplay,
+}
 
 fn main() {
     let mut app = App::new();
@@ -29,15 +43,19 @@ fn main() {
         wr.register::<Pizza>();
     }
 
-    app.add_plugins(DefaultPlugins)
+    app.add_state::<GameState>()
+        .add_plugins(DefaultPlugins)
+        .add_plugins(LoadingPlugin)
+        .add_plugins(MenuPlugin)
         .add_plugins(PecsPlugin)
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         )
         .add_plugins(ParticleSystemPlugin)
-        .add_systems(Startup, setup)
-        // UI
-        .add_systems(Startup, ui::draw_ui)
+        .add_systems(
+            OnEnter(GameState::Gameplay),
+            (spawn_game_world, ui::draw_ui),
+        )
         // LDTK
         .add_plugins(LdtkPlugin)
         .insert_resource(LdtkSettings {
@@ -70,8 +88,9 @@ fn main() {
         .add_systems(
             Update,
             (
-                ldtk::hide_dummy_mierdas,
+                ldtk::hide_dummy_entities,
                 components::fix_missing_mierda_compontents,
+                components::fix_missing_pizza_compontents,
             ),
         )
         // Sprites
@@ -96,7 +115,10 @@ fn main() {
                 events::event_game_over,
                 events::event_mierda_hit,
                 events::event_spawn_mierda,
+                events::event_spawn_pizza,
                 events::event_on_pizza_step_over,
+                gameplay::event_on_level_change,
+                gameplay::event_wave,
             ),
         )
         // Events: Collisions
@@ -108,20 +130,25 @@ fn main() {
                 physics::handle_player_pizza_collision,
             ),
         )
+        // Resources
+        .init_resource::<gameplay::GameplayState>()
+        .regi::<gameplay::WaveEventTimer>()
+        .init_resource::<gameplay::WaveTimer>()
         // App Events
         .add_event::<events::PlayerAttackEvent>()
         .add_event::<events::PlayerHitEvent>()
         .add_event::<events::GameOverEvent>()
         .add_event::<events::MierdaHitEvent>()
         .add_event::<events::SpawnMierdaEvent>()
+        .add_event::<events::SpawnPizzaEvent>()
+        .add_event::<events::LevelChangeEvent>()
+        .add_event::<events::WaveEvent>()
         .add_event::<events::PizzaStepOverEvent>();
 
     app.run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2dBundle::default());
-
+fn spawn_game_world(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(LdtkWorldBundle {
         ldtk_handle: asset_server.load("levels/example.ldtk"),
         ..Default::default()

@@ -53,7 +53,9 @@ pub struct Mierda {
 }
 
 #[derive(Clone, PartialEq, Debug, Default, Component, Reflect)]
-pub struct Pizza;
+pub struct Pizza {
+    pub is_dummy: bool,
+}
 
 #[derive(Default, Bundle)]
 pub struct PlayerBundle {
@@ -91,6 +93,7 @@ pub struct PizzaBundle {
 pub fn create_pizza_bundle(
     asset_server: &AssetServer,
     texture_atlasses: &mut Assets<TextureAtlas>,
+    is_dummy: bool,
 ) -> PizzaBundle {
     let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
@@ -124,7 +127,7 @@ pub fn create_pizza_bundle(
     PizzaBundle {
         sprite_bundle,
         collider_bundle,
-        pizza: Pizza {},
+        pizza: Pizza { is_dummy },
         sensor: Sensor {},
     }
 }
@@ -251,6 +254,25 @@ pub(crate) fn fix_missing_mierda_compontents(
     let texture_atlasses = texture_atlasses.into_inner();
 
     for (e, _) in los_mierdas.iter().filter(|(_, m)| !m.is_dummy) {
+        let bundle = create_mierda_bundle(asset_server, texture_atlasses, false);
+        commands.entity(e).insert((
+            bundle.collider_bundle,
+            bundle.direction_update_time,
+            Visibility::Visible,
+        ));
+    }
+}
+
+pub(crate) fn fix_missing_pizza_compontents(
+    asset_server: Res<AssetServer>,
+    texture_atlasses: ResMut<Assets<TextureAtlas>>,
+    mut commands: Commands,
+    los_pizzas: Query<(Entity, &Pizza), Without<Collider>>,
+) {
+    let asset_server = asset_server.into_inner();
+    let texture_atlasses = texture_atlasses.into_inner();
+
+    for (e, _) in los_pizzas.iter().filter(|(_, m)| !m.is_dummy) {
         let bundle = create_mierda_bundle(asset_server, texture_atlasses, false);
         commands.entity(e).insert((
             bundle.collider_bundle,

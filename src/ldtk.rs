@@ -6,7 +6,7 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::components::*;
-use crate::events::SpawnMierdaEvent;
+use crate::events::*;
 use crate::sprites::*;
 
 const ASPECT_RATIO: f32 = 16. / 9.;
@@ -16,6 +16,7 @@ pub fn update_level_selection(
     player_query: Query<&GlobalTransform, With<Player>>,
     mut level_selection: ResMut<LevelSelection>,
     ldtk_levels: Res<Assets<LdtkLevel>>,
+    mut ew_level_change: EventWriter<LevelChangeEvent>,
 ) {
     for (level_handle, level_transform) in &level_query {
         if let Some(ldtk_level) = ldtk_levels.get(level_handle) {
@@ -38,6 +39,13 @@ pub fn update_level_selection(
                     let new_level = LevelSelection::Iid(ldtk_level.level.iid.clone());
                     if *level_selection != new_level {
                         *level_selection = new_level;
+
+                        let level = &ldtk_levels.get(level_handle).unwrap().level;
+                        let level_id = level.get_int_field("LevelID");
+                        if level_id.is_ok() {
+                            let level_id = *level_id.unwrap() as usize;
+                            ew_level_change.send(LevelChangeEvent { level_id });
+                        }
                     }
                 }
             }
@@ -324,33 +332,43 @@ impl LdtkEntity for MierdaBundle {
 
 impl LdtkEntity for PizzaBundle {
     fn bundle_entity(
-        _entity_instance: &EntityInstance,
+        entity_instance: &EntityInstance,
         _layer_instance: &LayerInstance,
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
         asset_server: &AssetServer,
         texture_atlasses: &mut Assets<TextureAtlas>,
     ) -> PizzaBundle {
-        create_pizza_bundle(asset_server, texture_atlasses)
+        let is_dummy = *entity_instance
+            .get_bool_field("is_dummy")
+            .expect("expected entity to have non-nullable name string field");
+        create_pizza_bundle(asset_server, texture_atlasses, is_dummy)
     }
 }
 
-pub(crate) fn hide_dummy_mierdas(
+pub(crate) fn hide_dummy_entities(
     mut commands: Commands,
     level_selection: Res<LevelSelection>,
-    mut los_mierdas: Query<(Entity, &mut Visibility, &Mierda)>,
-    mut ev_spawn_mierda: EventWriter<SpawnMierdaEvent>,
+    mut set: ParamSet<(
+        Query<(Entity, &mut Visibility, &Mierda)>,
+        Query<(Entity, &mut Visibility, &Pizza)>,
+    )>,
 ) {
     if !level_selection.is_changed() {
         return;
     }
 
-    for (entity, mut visibility, mierda) in los_mierdas.iter_mut() {
+    for (entity, mut visibility, mierda) in set.p0().iter_mut() {
         if mierda.is_dummy {
             *visibility = Visibility::Hidden;
             commands.entity(entity).remove::<Collider>();
+        }
+    }
 
-            ev_spawn_mierda.send(SpawnMierdaEvent { count: 3 });
+    for (entity, mut visibility, mierda) in set.p1().iter_mut() {
+        if mierda.is_dummy {
+            *visibility = Visibility::Hidden;
+            commands.entity(entity).remove::<Collider>();
         }
     }
 }
