@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-use bevy_particle_systems::*;
+
 use bevy_rapier2d::prelude::*;
 
 use crate::components::*;
@@ -337,6 +337,19 @@ impl LdtkEntity for MierdaBundle {
             .get_bool_field("is_dummy")
             .expect("expected entity to have non-nullable name string field");
         create_mierda_bundle(asset_server, texture_atlasses, is_dummy)
+    }
+}
+
+impl LdtkEntity for PizzaBundle {
+    fn bundle_entity(
+        entity_instance: &EntityInstance,
+        _layer_instance: &LayerInstance,
+        _: Option<&Handle<Image>>,
+        _: Option<&TilesetDefinition>,
+        asset_server: &AssetServer,
+        texture_atlasses: &mut Assets<TextureAtlas>,
+    ) -> PizzaBundle {
+        create_pizza_bundle(asset_server, texture_atlasses)
     }
 }
 

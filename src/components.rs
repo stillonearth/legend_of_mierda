@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 
 use bevy_ecs_ldtk::prelude::*;
-use bevy_particle_systems::ParticleSystemBundle;
+
 // use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
 
@@ -52,6 +52,9 @@ pub struct Mierda {
     pub is_dummy: bool,
 }
 
+#[derive(Clone, PartialEq, Debug, Default, Component, Reflect)]
+pub struct Pizza;
+
 #[derive(Default, Bundle)]
 pub struct PlayerBundle {
     pub sprite_bundle: SpriteSheetBundle,
@@ -75,6 +78,55 @@ pub struct MierdaBundle {
     pub mierda: Mierda,
     pub collider_bundle: ColliderBundle,
     pub direction_update_time: DirectionUpdateTime,
+}
+
+#[derive(Clone, Default, Bundle)]
+pub struct PizzaBundle {
+    pub sprite_bundle: SpriteSheetBundle,
+    pub pizza: Pizza,
+    pub collider_bundle: ColliderBundle,
+    pub sensor: Sensor,
+}
+
+pub fn create_pizza_bundle(
+    asset_server: &AssetServer,
+    texture_atlasses: &mut Assets<TextureAtlas>,
+) -> PizzaBundle {
+    let rotation_constraints = LockedAxes::ROTATION_LOCKED;
+
+    let collider_bundle = ColliderBundle {
+        collider: Collider::cuboid(8., 8.),
+        rigid_body: RigidBody::Dynamic,
+        friction: Friction {
+            coefficient: 20.0,
+            combine_rule: CoefficientCombineRule::Min,
+        },
+        rotation_constraints,
+        ..Default::default()
+    };
+
+    let atlas_handle = load_texture_atlas(
+        PIZZA_ASSET_SHEET,
+        asset_server,
+        1,
+        1,
+        None,
+        16.,
+        texture_atlasses,
+    );
+
+    let sprite_bundle = SpriteSheetBundle {
+        texture_atlas: atlas_handle,
+        sprite: TextureAtlasSprite::new(0),
+        ..default()
+    };
+
+    PizzaBundle {
+        sprite_bundle,
+        collider_bundle,
+        pizza: Pizza {},
+        sensor: Sensor {},
+    }
 }
 
 pub fn create_mierda_bundle(
@@ -129,7 +181,6 @@ pub fn create_mierda_bundle(
         direction_update_time: DirectionUpdateTime {
             timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
         },
-        ..default()
     }
 }
 

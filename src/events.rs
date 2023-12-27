@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{LdtkLevel, LevelSelection};
 use bevy_particle_systems::*;
@@ -7,7 +9,7 @@ use pecs::prelude::*;
 use rand::Rng;
 
 use crate::{
-    components::{Mierda, Player},
+    components::{Mierda, Pizza, Player},
     sprites::{AnimationDirection, CharacterAnimation, FlashingTimer},
     ui::{self, UiGameOver},
     utils::CloneEntity,
@@ -28,6 +30,9 @@ pub struct GameOverEvent;
 
 #[derive(Event, Clone)]
 pub struct MierdaHitEvent(pub Entity);
+
+#[derive(Event, Clone)]
+pub struct PizzaStepOverEvent(pub Entity);
 
 #[derive(Event, Clone)]
 pub struct SpawnMierdaEvent {
@@ -191,10 +196,41 @@ pub fn event_mierda_hit(
                 .then(asyn!(state => {
                     state.asyn().timeout(0.3)
                 }))
-                .then(asyn!(state, mut commands: Commands  => {
-                    commands.entity(state.value).despawn_recursive();
+                .then(
+                    asyn!(state, mut commands: Commands, asset_server: Res<AssetServer>, q_mierdas: Query<(Entity, &GlobalTransform)> => {
+                                
+                                let mierda_transform = q_mierdas.get(state.value).unwrap().1.clone();
+                                                             
+                                commands.spawn((
+                                    ParticleSystemBundle {
+                                        transform: (mierda_transform).into(),
+                                        particle_system: ParticleSystem {
+                                            spawn_rate_per_second: 0.0.into(),
+                                            texture: ParticleTexture::Sprite(asset_server.load("px.png")),
+                                            max_particles: 1_00,
+                                            initial_speed: (0.0..10.0).into(),
+                                            scale: 1.0.into(),
+                                            velocity_modifiers: vec![
+                                                VelocityModifier::Drag(0.001.into()),
+                                                VelocityModifier::Vector(Vec3::new(0.0, -100.0, 0.0).into()),
+                                            ],
+                                            color: (Color::BLUE..Color::AQUAMARINE).into(),
+                                            bursts: vec![ParticleBurst {
+                                                time: 0.0,
+                                                count: 20,
+                                            }],
+                                            looping: false,
+                                            ..ParticleSystem::default()
+                                        },
+                                        ..default()
+                                    },
+                                    Playing,
+                                ));
 
-                }));
+                                commands.entity(state.value).despawn_recursive();   
+
+                            }),
+                );
 
             if los_mierdas_count < 256 {
                 ev_mierda_spawn.send(SpawnMierdaEvent { count: 2 });
@@ -214,6 +250,32 @@ pub fn event_player_hit(
     for ev in ev_player_hit_reader.iter() {
         let (_, player_transform, mut player) = q_player.get_mut(ev.entity).unwrap();
 
+        commands.spawn((
+            ParticleSystemBundle {
+                transform: (*player_transform).into(),
+                particle_system: ParticleSystem {
+                    spawn_rate_per_second: 0.0.into(),
+                    texture: ParticleTexture::Sprite(asset_server.load("px.png")),
+                    max_particles: 5_000,
+                    initial_speed: (0.0..300.0).into(),
+                    scale: 1.0.into(),
+                    velocity_modifiers: vec![
+                        VelocityModifier::Drag(0.001.into()),
+                        VelocityModifier::Vector(Vec3::new(0.0, -400.0, 0.0).into()),
+                    ],
+                    color: (Color::RED..Color::rgba(1.0, 0.0, 0.0, 0.0)).into(),
+                    bursts: vec![ParticleBurst {
+                        time: 0.0,
+                        count: 1000,
+                    }],
+                    looping: false,
+                    ..ParticleSystem::default()
+                },
+                ..default()
+            },
+            Playing,
+        ));
+
         if player.health < 10 {
             ev_game_over.send(GameOverEvent);
             continue;
@@ -223,36 +285,6 @@ pub fn event_player_hit(
             for (_, mut style, _) in q_ui_healthbar.iter_mut() {
                 style.width = Val::Percent(player.health as f32);
             }
-
-            // particle effects
-
-            // continue;
-
-            commands.spawn((
-                ParticleSystemBundle {
-                    transform: player_transform.clone().into(),
-                    particle_system: ParticleSystem {
-                        spawn_rate_per_second: 0.0.into(),
-                        texture: ParticleTexture::Sprite(asset_server.load("px.png")),
-                        max_particles: 5_000,
-                        initial_speed: (0.0..300.0).into(),
-                        scale: 1.0.into(),
-                        velocity_modifiers: vec![
-                            VelocityModifier::Drag(0.001.into()),
-                            VelocityModifier::Vector(Vec3::new(0.0, -400.0, 0.0).into()),
-                        ],
-                        color: (Color::RED..Color::rgba(1.0, 0.0, 0.0, 0.0)).into(),
-                        bursts: vec![ParticleBurst {
-                            time: 0.0,
-                            count: 1000,
-                        }],
-                        looping: false,
-                        ..ParticleSystem::default()
-                    },
-                    ..default()
-                },
-                Playing,
-            ));
         }
     }
 }
@@ -266,4 +298,31 @@ pub fn event_game_over(
             *visibility = Visibility::Visible;
         }
     }
+}
+
+pub fn event_on_pizza_step_over(
+    mut commands: Commands,
+    mut er_pizza_step_over: EventReader<PizzaStepOverEvent>,
+    mut q_pizzas: Query<(Entity, &Pizza)>,
+    mut q_player: Query<(Entity, &mut Player)>,
+    mut q_ui_healthbar: Query<(Entity, &mut Style, &ui::UiPlayerHealth)>,
+) {
+    for e in er_pizza_step_over.iter() {
+        for (_, mut player) in q_player.iter_mut() {
+            player.health = min(player.health + 10, 100);
+
+            for (_, mut style, _) in q_ui_healthbar.iter_mut() {
+                style.width = Val::Percent(player.health as f32);
+            }
+        }
+
+        for (e_pizza, _) in q_pizzas.iter_mut() {
+            if e_pizza != e.0 {
+                continue;
+            }
+            commands.entity(e_pizza).despawn_recursive();
+        }
+    }
+
+
 }

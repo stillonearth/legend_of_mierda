@@ -11,9 +11,9 @@
 	"iid": "a3386460-7820-11ed-b6fd-157a63b4d02d",
 	"jsonVersion": "1.4.1",
 	"appBuildId": 471199,
-	"nextUid": 195,
+	"nextUid": 205,
 	"identifierStyle": "Capitalize",
-	"toc": [{
+	"toc": [ {
 		"identifier": "Player",
 		"instances": [{
 			"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
@@ -21,7 +21,53 @@
 			"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
 			"entityIid": "e4dca6f0-1460-11ee-a704-2d63a9394e3e"
 		}]
-	}],
+	}, {
+		"identifier": "Pizza",
+		"instances": [
+			{
+				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+				"entityIid": "c6b57b80-8990-11ee-8ad8-b33d237df335"
+			},
+			{
+				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+				"entityIid": "53b84490-8990-11ee-8ad8-0b6c426d4712"
+			},
+			{
+				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+				"entityIid": "5411d640-8990-11ee-8ad8-abdfc525960b"
+			},
+			{
+				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+				"entityIid": "547504e0-8990-11ee-8ad8-c95933037ae2"
+			},
+			{
+				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+				"entityIid": "54ba2430-8990-11ee-8ad8-f553a5e35853"
+			},
+			{
+				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+				"entityIid": "551c1a50-8990-11ee-8ad8-0de5b3c7c42d"
+			},
+			{
+				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+				"entityIid": "555f64e0-8990-11ee-8ad8-29339d822866"
+			}
+		]
+	} ],
 	"worldLayout": null,
 	"worldGridWidth": null,
 	"worldGridHeight": null,
@@ -947,6 +993,40 @@
 					"tilesetUid": null
 				}
 			]
+		},
+		{
+			"identifier": "Pizza",
+			"uid": 201,
+			"tags": ["environment"],
+			"exportToToc": true,
+			"doc": null,
+			"width": 8,
+			"height": 8,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#03CB7C",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 204,
+			"tileRenderMode": "Stretch",
+			"tileRect": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerWorld",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0.5,
+			"pivotY": 0.5,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -1057,6 +1137,25 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "00000", "averageColors": "ac73cb73c642b772bd64" }
+		},
+		{
+			"__cWid": 1,
+			"__cHei": 1,
+			"identifier": "Pizza",
+			"uid": 204,
+			"relPath": "../sprites/pizza.png",
+			"embedAtlas": null,
+			"pxWid": 16,
+			"pxHei": 16,
+			"tileGridSize": 16,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "bda4" }
 		}
 	], "enums": [{ "identifier": "Item", "uid": 66, "values": [
 		{ "id": "Wood", "tileRect": { "tilesetUid": 104, "x": 192, "y": 944, "w": 16, "h": 16 }, "color": 11171669 },
@@ -1149,6 +1248,118 @@
 							"defUid": 192,
 							"px": [328,120],
 							"fieldInstances": [{ "__identifier": "is_dummy", "__type": "Bool", "__value": true, "__tile": null, "defUid": 194, "realEditorValues": [] }]
+						},
+						{
+							"__identifier": "Pizza",
+							"__grid": [11,4],
+							"__pivot": [0.5,0.5],
+							"__tags": ["environment"],
+							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#03CB7C",
+							"__worldX": 440,
+							"__worldY": 72,
+							"iid": "c6b57b80-8990-11ee-8ad8-b33d237df335",
+							"width": 8,
+							"height": 8,
+							"defUid": 201,
+							"px": [184,72],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Pizza",
+							"__grid": [9,8],
+							"__pivot": [0.5,0.5],
+							"__tags": ["environment"],
+							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#03CB7C",
+							"__worldX": 408,
+							"__worldY": 136,
+							"iid": "53b84490-8990-11ee-8ad8-0b6c426d4712",
+							"width": 8,
+							"height": 8,
+							"defUid": 201,
+							"px": [152,136],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Pizza",
+							"__grid": [15,12],
+							"__pivot": [0.5,0.5],
+							"__tags": ["environment"],
+							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#03CB7C",
+							"__worldX": 504,
+							"__worldY": 200,
+							"iid": "5411d640-8990-11ee-8ad8-abdfc525960b",
+							"width": 8,
+							"height": 8,
+							"defUid": 201,
+							"px": [248,200],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Pizza",
+							"__grid": [17,4],
+							"__pivot": [0.5,0.5],
+							"__tags": ["environment"],
+							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#03CB7C",
+							"__worldX": 536,
+							"__worldY": 72,
+							"iid": "547504e0-8990-11ee-8ad8-c95933037ae2",
+							"width": 8,
+							"height": 8,
+							"defUid": 201,
+							"px": [280,72],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Pizza",
+							"__grid": [27,9],
+							"__pivot": [0.5,0.5],
+							"__tags": ["environment"],
+							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#03CB7C",
+							"__worldX": 696,
+							"__worldY": 152,
+							"iid": "54ba2430-8990-11ee-8ad8-f553a5e35853",
+							"width": 8,
+							"height": 8,
+							"defUid": 201,
+							"px": [440,152],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Pizza",
+							"__grid": [3,6],
+							"__pivot": [0.5,0.5],
+							"__tags": ["environment"],
+							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#03CB7C",
+							"__worldX": 312,
+							"__worldY": 104,
+							"iid": "551c1a50-8990-11ee-8ad8-0de5b3c7c42d",
+							"width": 8,
+							"height": 8,
+							"defUid": 201,
+							"px": [56,104],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Pizza",
+							"__grid": [7,11],
+							"__pivot": [0.5,0.5],
+							"__tags": ["environment"],
+							"__tile": { "tilesetUid": 204, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#03CB7C",
+							"__worldX": 376,
+							"__worldY": 184,
+							"iid": "555f64e0-8990-11ee-8ad8-29339d822866",
+							"width": 8,
+							"height": 8,
+							"defUid": 201,
+							"px": [120,184],
+							"fieldInstances": []
 						}
 					]
 				},

@@ -5,7 +5,7 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
-use components::Mierda;
+use components::*;
 use pecs::prelude::*;
 
 mod ai;
@@ -26,6 +26,7 @@ fn main() {
         let registry = app.world.resource_mut::<AppTypeRegistry>();
         let mut wr = registry.write();
         wr.register::<Mierda>();
+        wr.register::<Pizza>();
     }
 
     app.add_plugins(DefaultPlugins)
@@ -33,7 +34,7 @@ fn main() {
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         )
-        .add_plugins(ParticleSystemPlugin::default())
+        .add_plugins(ParticleSystemPlugin)
         .add_systems(Startup, setup)
         // UI
         .add_systems(Startup, ui::draw_ui)
@@ -59,6 +60,7 @@ fn main() {
         .register_ldtk_int_cell::<components::WallBundle>(1)
         .register_ldtk_entity::<components::PlayerBundle>("Player")
         .register_ldtk_entity::<components::MierdaBundle>("Mierda")
+        .register_ldtk_entity::<components::PizzaBundle>("Pizza")
         // Enemy AI
         .add_systems(
             Update,
@@ -84,7 +86,7 @@ fn main() {
             ..Default::default()
         })
         // Particles
-        .add_systems(Update, (particles::fix_particle_transform_z))
+        .add_systems(Update, particles::fix_particle_transform_z)
         // Events
         .add_systems(
             Update,
@@ -94,6 +96,7 @@ fn main() {
                 events::event_game_over,
                 events::event_mierda_hit,
                 events::event_spawn_mierda,
+                events::event_on_pizza_step_over,
             ),
         )
         // Events: Collisions
@@ -102,6 +105,7 @@ fn main() {
             (
                 physics::handle_mierda_wall_collisions,
                 physics::handle_player_mierda_collisions,
+                physics::handle_player_pizza_collision,
             ),
         )
         // App Events
@@ -109,7 +113,8 @@ fn main() {
         .add_event::<events::PlayerHitEvent>()
         .add_event::<events::GameOverEvent>()
         .add_event::<events::MierdaHitEvent>()
-        .add_event::<events::SpawnMierdaEvent>();
+        .add_event::<events::SpawnMierdaEvent>()
+        .add_event::<events::PizzaStepOverEvent>();
 
     app.run();
 }

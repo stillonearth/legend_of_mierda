@@ -65,6 +65,7 @@ pub struct PlayerSpritesheets {
 pub const PLAYER_ASSET_SHEET_1: &str = "sprites/alextime-1.png";
 pub const PLAYER_ASSET_SHEET_2: &str = "sprites/alextime-2.png";
 pub const MIERDA_ASSET_SHEET: &str = "sprites/mierda.png";
+pub const PIZZA_ASSET_SHEET: &str = "sprites/pizza.png";
 
 pub fn load_texture_atlas(
     path: &str,
