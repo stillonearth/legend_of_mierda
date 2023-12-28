@@ -119,6 +119,8 @@ fn main() {
                 events::event_on_pizza_step_over,
                 gameplay::event_on_level_change,
                 gameplay::event_wave,
+                gameplay::ui_wave_info_text,
+                gameplay::handle_timers,
             ),
         )
         // Events: Collisions
@@ -132,8 +134,6 @@ fn main() {
         )
         // Resources
         .init_resource::<gameplay::GameplayState>()
-        .regi::<gameplay::WaveEventTimer>()
-        .init_resource::<gameplay::WaveTimer>()
         // App Events
         .add_event::<events::PlayerAttackEvent>()
         .add_event::<events::PlayerHitEvent>()
@@ -142,7 +142,7 @@ fn main() {
         .add_event::<events::SpawnMierdaEvent>()
         .add_event::<events::SpawnPizzaEvent>()
         .add_event::<events::LevelChangeEvent>()
-        .add_event::<events::WaveEvent>()
+        .add_event::<gameplay::WaveEvent>()
         .add_event::<events::PizzaStepOverEvent>();
 
     app.run();

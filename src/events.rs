@@ -50,12 +50,6 @@ pub struct LevelChangeEvent {
     pub(crate) level_id: usize,
 }
 
-#[derive(Event, Clone)]
-pub struct WaveEvent {
-    pub wave_number: usize,
-    pub wave_entry: WaveEntry,
-}
-
 pub fn event_spawn_pizza(
     mut commands: Commands,
     mut ev_spawn_pizza: EventReader<SpawnPizzaEvent>,
@@ -74,8 +68,6 @@ pub fn event_spawn_pizza(
     let player_translation = q_player_query.single().1.translation;
 
     for ev_spawn in ev_spawn_pizza.iter() {
-        println!("!!!spawn pizza");
-
         for (_, level_handle) in level_handles.iter() {
             let level = &level_assets.get(level_handle).unwrap().level;
 

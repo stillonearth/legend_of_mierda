@@ -85,7 +85,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     position_type: PositionType::Absolute,
                     justify_content: JustifyContent::Center,
                     top: Val::Percent(33.0),
-                    align_items: AlignItems::FlexStart,
+                    align_items: AlignItems::Center,
                     ..default()
                 },
                 visibility: Visibility::Hidden,
@@ -96,7 +96,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         ))
         .with_children(|parent| {
             parent.spawn(TextBundle::from_section(
-                "GAME\nOVER",
+                "        JUEGO\nTERMINADO",
                 TextStyle {
                     font: asset_server.load("fonts/Mexicana.ttf"),
                     font_size: 100.0,
