@@ -2,7 +2,6 @@ use crate::GameState;
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 
-
 pub struct LoadingPlugin;
 
 impl Plugin for LoadingPlugin {
@@ -18,6 +17,7 @@ impl Plugin for LoadingPlugin {
         app.add_collection_to_loading_state::<_, AvatarAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, CutsceneAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, FontAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, SpritesheetImageAssets>(GameState::Loading);
 
         app.init_resource::<MaterialAssets>();
         app.init_resource::<MeshAssets>();
@@ -56,6 +56,18 @@ pub struct AvatarAssets {
 pub struct CutsceneAssets {
     #[asset(path = "cutscenes/phone-call-1.png")]
     pub phone_call_1: Handle<Image>,
+}
+
+#[derive(AssetCollection, Resource)]
+pub struct SpritesheetImageAssets {
+    #[asset(path = "sprites/alextime-1.png")]
+    pub alextime_1: Handle<Image>,
+    #[asset(path = "sprites/alextime-2.png")]
+    pub alextime_2: Handle<Image>,
+    #[asset(path = "sprites/mierda.png")]
+    pub mierda: Handle<Image>,
+    #[asset(path = "sprites/pizza.png")]
+    pub pizza: Handle<Image>,
 }
 
 #[derive(Resource)]

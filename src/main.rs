@@ -8,16 +8,16 @@ use bevy_rapier2d::prelude::*;
 use cutscene::CutscenePlugin;
 use pecs::prelude::*;
 
-use components::*;
 use loading::*;
 use menu::*;
 
-mod ai;
 mod components;
 mod controls;
 mod cutscene;
+mod enemies;
 mod events;
 mod gameplay;
+mod items;
 mod ldtk;
 mod loading;
 mod menu;
@@ -42,8 +42,8 @@ fn main() {
     {
         let registry = app.world.resource_mut::<AppTypeRegistry>();
         let mut wr = registry.write();
-        wr.register::<Mierda>();
-        wr.register::<Pizza>();
+        wr.register::<enemies::Mierda>();
+        wr.register::<items::Pizza>();
     }
 
     app.add_state::<GameState>()
@@ -81,24 +81,27 @@ fn main() {
         .insert_resource(LevelSelection::Index(0))
         .register_ldtk_int_cell::<components::WallBundle>(1)
         .register_ldtk_entity::<components::PlayerBundle>("Player")
-        .register_ldtk_entity::<components::MierdaBundle>("Mierda")
-        .register_ldtk_entity::<components::PizzaBundle>("Pizza")
+        .register_ldtk_entity::<enemies::MierdaBundle>("Mierda")
+        .register_ldtk_entity::<items::PizzaBundle>("Pizza")
         // Enemy AI
         .add_systems(
             Update,
-            (ai::mierda_activity, ai::update_mierdas_move_direction),
+            (
+                enemies::mierda_activity,
+                enemies::update_mierdas_move_direction,
+            ),
         )
         // Housekeeping
         .add_systems(
             Update,
             (
                 ldtk::hide_dummy_entities,
-                components::fix_missing_mierda_compontents,
-                components::fix_missing_pizza_compontents,
+                enemies::fix_missing_mierda_compontents,
+                items::fix_missing_pizza_compontents,
             ),
         )
         // Sprites
-        .init_resource::<sprites::PlayerSpritesheets>()
+        .init_resource::<sprites::SpritesheetAssets>()
         .add_systems(Update, (sprites::animate_sprite, sprites::flash_sprite))
         // Controls
         .add_systems(Update, controls::controls)
@@ -116,7 +119,7 @@ fn main() {
             (
                 events::event_player_attack,
                 events::event_player_hit,
-                events::event_game_over,
+                // events::event_game_over,
                 events::event_mierda_hit,
                 events::event_spawn_mierda,
                 events::event_spawn_pizza,

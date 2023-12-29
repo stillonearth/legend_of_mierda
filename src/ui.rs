@@ -30,8 +30,8 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn((
                 NodeBundle {
                     style: Style {
-                        width: Val::Px(125.0),
-                        height: Val::Px(125.0),
+                        width: Val::Px(256.0),
+                        height: Val::Px(256.0),
                         margin: UiRect::top(Val::VMin(5.)),
                         ..default()
                     },

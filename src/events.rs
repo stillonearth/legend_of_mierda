@@ -9,7 +9,9 @@ use pecs::prelude::*;
 use rand::Rng;
 
 use crate::{
-    components::{Mierda, Pizza, Player},
+    components::Player,
+    enemies::Mierda,
+    items::Pizza,
     sprites::{AnimationDirection, CharacterAnimation, FlashingTimer},
     ui::{self, UIGameOver},
     utils::CloneEntity,

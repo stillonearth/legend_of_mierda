@@ -1,6 +1,4 @@
-
-
-use crate::loading::{TextureAssets};
+use crate::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
 // use rand::Rng;
@@ -77,7 +75,7 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
                         ..Default::default()
                     },
                     button_colors,
-                    ChangeState(GameState::Cutscene),
+                    ChangeState(GameState::Gameplay),
                 ))
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(

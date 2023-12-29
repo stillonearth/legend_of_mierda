@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::{components::*, events::*};
+use crate::{components::*, enemies::Mierda, events::*, items::Pizza};
 
 pub(crate) fn handle_mierda_wall_collisions(
     mut collision_events: EventReader<CollisionEvent>,

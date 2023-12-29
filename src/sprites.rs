@@ -56,7 +56,7 @@ pub struct FlashingTimer {
 pub struct AnimationTimer(pub Timer);
 
 #[derive(Resource)]
-pub struct PlayerSpritesheets {
+pub struct SpritesheetAssets {
     pub player_atlas_1: Handle<TextureAtlas>,
     pub player_atlas_2: Handle<TextureAtlas>,
     pub mierda_atlas: Handle<TextureAtlas>,
@@ -68,16 +68,13 @@ pub const MIERDA_ASSET_SHEET: &str = "sprites/mierda.png";
 pub const PIZZA_ASSET_SHEET: &str = "sprites/pizza.png";
 
 pub fn load_texture_atlas(
-    path: &str,
-    asset_server: &AssetServer,
+    texture_handle: Handle<Image>,
     sheet_columns: usize,
     sheet_rows: usize,
     padding: Option<Vec2>,
     sprite_size: f32,
     texture_atlasses: &mut Assets<TextureAtlas>,
 ) -> Handle<TextureAtlas> {
-    let texture_handle = asset_server.load(path);
-
     let atlas = TextureAtlas::from_grid(
         texture_handle,
         Vec2::ONE * sprite_size,
@@ -102,7 +99,7 @@ pub fn animate_sprite(
         ),
         With<Player>,
     >,
-    spritesheets: Res<PlayerSpritesheets>,
+    spritesheets: Res<SpritesheetAssets>,
 ) {
     for (mut texture_atlas, mut character_animation, mut timer, mut sprite, mut _transform) in
         &mut query
