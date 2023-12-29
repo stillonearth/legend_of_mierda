@@ -5,6 +5,7 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
+use cutscene::CutscenePlugin;
 use pecs::prelude::*;
 
 use components::*;
@@ -14,6 +15,7 @@ use menu::*;
 mod ai;
 mod components;
 mod controls;
+mod cutscene;
 mod events;
 mod gameplay;
 mod ldtk;
@@ -30,6 +32,7 @@ enum GameState {
     #[default]
     Loading,
     Menu,
+    Cutscene,
     Gameplay,
 }
 
@@ -44,9 +47,10 @@ fn main() {
     }
 
     app.add_state::<GameState>()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(LoadingPlugin)
         .add_plugins(MenuPlugin)
+        .add_plugins(CutscenePlugin)
         .add_plugins(PecsPlugin)
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),

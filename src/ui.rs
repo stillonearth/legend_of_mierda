@@ -38,7 +38,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     background_color: Color::WHITE.into(),
                     ..default()
                 },
-                UiImage::new(asset_server.load("face.png")),
+                UiImage::new(asset_server.load("avatars/alextime.png")),
             ));
         });
     // health bar

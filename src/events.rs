@@ -10,9 +10,8 @@ use rand::Rng;
 
 use crate::{
     components::{Mierda, Pizza, Player},
-    gameplay::{get_level_1_waves, GameplayState, WaveEntry},
     sprites::{AnimationDirection, CharacterAnimation, FlashingTimer},
-    ui::{self, UIGameOver, UIGameplayWave},
+    ui::{self, UIGameOver},
     utils::CloneEntity,
 };
 
