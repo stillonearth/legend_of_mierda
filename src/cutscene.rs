@@ -71,35 +71,17 @@ fn setup_cutscene(
                     ..default()
                 },
                 background_color: Color::BLACK.into(),
-
                 ..default()
             },
             Cutscene,
-            Name::new("cutscene node"),
+            Name::new("cutscene dialog container"),
         ))
         .with_children(|parent| {
             parent.spawn((
                 NodeBundle {
                     style: Style {
-                        width: Val::Percent(100.0),
-                        height: Val::Percent(100.0),
-                        margin: UiRect::top(Val::VMin(5.)),
-                        position_type: PositionType::Absolute,
-                        left: Val::Px(20.0),
-                        ..default()
-                    },
-                    background_color: Color::WHITE.into(),
-                    ..default()
-                },
-                UiImage::new(cutscene_assets.phone_call_1.clone()),
-            ));
-
-            parent.spawn((
-                NodeBundle {
-                    style: Style {
                         width: Val::Px(320.0),
                         height: Val::Px(320.0),
-                        margin: UiRect::top(Val::VMin(5.)),
                         position_type: PositionType::Absolute,
                         left: Val::Px(20.0),
                         ..default()
@@ -117,7 +99,6 @@ fn setup_cutscene(
                     style: Style {
                         width: Val::Px(320.0),
                         height: Val::Px(320.0),
-                        margin: UiRect::top(Val::VMin(5.)),
                         position_type: PositionType::Absolute,
                         right: Val::Px(20.0),
                         ..default()
@@ -134,7 +115,8 @@ fn setup_cutscene(
                 .spawn((
                     NodeBundle {
                         style: Style {
-                            margin: UiRect::bottom(Val::Px(30.)),
+                            position_type: PositionType::Absolute,
+                            margin: UiRect::bottom(Val::Percent(5.)),
                             ..default()
                         },
                         ..default()
@@ -144,7 +126,7 @@ fn setup_cutscene(
                 .with_children(|parent| {
                     parent.spawn((
                         TextBundle::from_section(
-                            "ui wave text",
+                            "cutscene dialog text",
                             TextStyle {
                                 font: font_assets.pixeloid_mono.clone(),
                                 font_size: 30.0,
@@ -163,7 +145,7 @@ fn setup_cutscene(
                     flex_direction: FlexDirection::Row,
                     align_items: AlignItems::Center,
                     justify_content: JustifyContent::SpaceAround,
-                    top: Val::Px(20.),
+                    top: Val::Percent(5.),
                     width: Val::Percent(100.),
                     position_type: PositionType::Absolute,
                     ..default()
@@ -173,19 +155,54 @@ fn setup_cutscene(
             },
             CutsceneDialogText,
             Cutscene,
-            Name::new("dialog title text"),
+            Name::new("cutscene title container"),
         ))
         .with_children(|parent| {
             parent.spawn((
                 TextBundle::from_section(
-                    "PRISON CPS 17 <<MICHOACAN>> MEXICO",
+                    "   PRISON CPS 17\n   <<MICHOACAN>>\nMEXICO, BUENAVISTA",
                     TextStyle {
                         font: font_assets.pixeloid_mono.clone(),
-                        font_size: 60.0,
+                        font_size: 40.0,
                         color: Color::WHITE,
                     },
                 ),
                 CutsceneTitleText,
+            ));
+        });
+
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    position_type: PositionType::Absolute,
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..default()
+                },
+                // background_color: Color::BLACK.into(),
+                ..default()
+            },
+            Cutscene,
+            Name::new("cutscene image container"),
+        ))
+        .with_children(|parent| {
+            // bevy logo (image)
+            // A `NodeBundle` is used to display the logo the image as an `ImageBundle` can't automatically
+            // size itself with a child node present.
+            parent.spawn((
+                NodeBundle {
+                    style: Style {
+                        width: Val::Px(512.0),
+                        height: Val::Px(512.0),
+                        ..default()
+                    },
+                    background_color: Color::WHITE.into(),
+                    ..default()
+                },
+                UiImage::new(cutscene_assets.phone_call_1.clone()),
             ));
         });
 }
