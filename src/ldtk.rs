@@ -5,12 +5,16 @@ use bevy_ecs_ldtk::prelude::*;
 
 use bevy_rapier2d::prelude::*;
 
-use crate::{
-    entities::{enemies::*, items::*, player::Player},
-    events::*,
-};
+use crate::entities::{enemies::*, items::*, player::Player};
 
 const ASPECT_RATIO: f32 = 16. / 9.;
+
+// Events
+
+#[derive(Event, Clone)]
+pub struct LevelChangeEvent {
+    pub(crate) level_id: usize,
+}
 
 // Entities
 

@@ -9,6 +9,11 @@ pub const SHEET_2_ROWS: usize = 4;
 pub const N_FRAMES_WALK: usize = 8;
 pub const N_FRAMES_ATTACK: usize = 5;
 
+pub const PLAYER_ASSET_SHEET_1: &str = "sprites/alextime-1.png";
+pub const PLAYER_ASSET_SHEET_2: &str = "sprites/alextime-2.png";
+pub const MIERDA_ASSET_SHEET: &str = "sprites/mierda.png";
+pub const PIZZA_ASSET_SHEET: &str = "sprites/pizza.png";
+
 #[allow(dead_code)]
 #[derive(Component, Clone, Default, Debug, Reflect)]
 pub struct AnimationIndices {
@@ -109,11 +114,6 @@ impl FromWorld for PlayerSpritesheets {
         }
     }
 }
-
-pub const PLAYER_ASSET_SHEET_1: &str = "sprites/alextime-1.png";
-pub const PLAYER_ASSET_SHEET_2: &str = "sprites/alextime-2.png";
-pub const MIERDA_ASSET_SHEET: &str = "sprites/mierda.png";
-pub const PIZZA_ASSET_SHEET: &str = "sprites/pizza.png";
 
 pub fn load_texture_atlas(
     path: &str,

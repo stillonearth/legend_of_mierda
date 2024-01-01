@@ -8,7 +8,7 @@ use bevy_rapier2d::prelude::*;
 use pecs::prelude::*;
 use rand::Rng;
 
-use crate::{components::ColliderBundle, sprites::*, utils::*};
+use crate::{physics::ColliderBundle, sprites::*, utils::*};
 
 use super::player::Player;
 

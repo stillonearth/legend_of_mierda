@@ -11,7 +11,7 @@ use bevy_rapier2d::prelude::*;
 use rand::Rng;
 
 use crate::{
-    components::ColliderBundle,
+    physics::ColliderBundle,
     sprites::{load_texture_atlas, PIZZA_ASSET_SHEET},
     ui,
     utils::*,

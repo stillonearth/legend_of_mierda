@@ -11,16 +11,15 @@ use cutscene::*;
 use loading::*;
 use menu::*;
 
-mod components;
 mod controls;
 mod cutscene;
 mod entities;
-mod events;
 mod gameplay;
 mod ldtk;
 mod loading;
 mod menu;
 mod particles;
+mod physics;
 mod sprites;
 mod ui;
 mod utils;
@@ -48,11 +47,17 @@ fn main() {
         )
         .add_plugins(ParticleSystemPlugin)
         // Game Plugins
-        .add_plugins(entities::EntitiesPlugin)
+        .add_plugins((entities::EntitiesPlugin, gameplay::GameplayPlugin))
         .add_systems(
             OnEnter(GameState::Gameplay),
             (spawn_game_world, ui::draw_ui),
         )
+        // Physics
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+        .insert_resource(RapierConfiguration {
+            gravity: Vec2::new(0.0, 0.0),
+            ..Default::default()
+        })
         // LDTK
         .add_plugins(LdtkPlugin)
         .insert_resource(LdtkSettings {
@@ -84,31 +89,10 @@ fn main() {
         )
         // Controls
         .add_systems(Update, controls::controls)
-        // Physics
-        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-        .insert_resource(RapierConfiguration {
-            gravity: Vec2::new(0.0, 0.0),
-            ..Default::default()
-        })
         // Particles
         .add_systems(Update, particles::fix_particle_transform_z)
-        // Events
-        .add_systems(
-            Update,
-            (
-                events::event_game_over,
-                gameplay::event_on_level_change,
-                gameplay::event_wave,
-                gameplay::ui_wave_info_text,
-                gameplay::handle_timers,
-            ),
-        )
-        // Resources
-        .init_resource::<gameplay::GameplayState>()
         // App Events
-        .add_event::<events::GameOverEvent>()
-        .add_event::<events::LevelChangeEvent>()
-        .add_event::<gameplay::WaveEvent>();
+        .add_event::<ldtk::LevelChangeEvent>();
 
     app.run();
 }

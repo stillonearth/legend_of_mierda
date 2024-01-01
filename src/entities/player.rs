@@ -4,7 +4,9 @@ use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::Velocity;
 use bevy_rapier2d::prelude::*;
 
-use crate::{components::ColliderBundle, events::GameOverEvent, sprites::*, ui::UIPlayerHealth};
+use crate::{
+    gameplay::gameover::GameOverEvent, physics::ColliderBundle, sprites::*, ui::UIPlayerHealth,
+};
 
 use super::enemies::{Mierda, MierdaHitEvent};
 
