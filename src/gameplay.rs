@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::{events::*, ui::*};
+use crate::{enemies::SpawnMierdaEvent, events::*, items::SpawnPizzaEvent, ui::*};
 
 #[derive(Clone)]
 pub enum WaveEntry {
@@ -124,6 +124,7 @@ pub fn handle_timers(
     }
 }
 
+#[allow(clippy::single_match)]
 pub fn event_on_level_change(
     mut er_on_level_change: EventReader<LevelChangeEvent>,
     mut gameplay_state: ResMut<GameplayState>,

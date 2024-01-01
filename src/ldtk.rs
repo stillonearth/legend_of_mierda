@@ -6,7 +6,9 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::components::*;
+use crate::enemies::*;
 use crate::events::*;
+use crate::items::*;
 use crate::sprites::*;
 
 const ASPECT_RATIO: f32 = 16. / 9.;
@@ -311,38 +313,6 @@ impl LdtkEntity for PlayerBundle {
             active_events: ActiveEvents::COLLISION_EVENTS,
             player: Player { health: 100 },
         }
-    }
-}
-
-impl LdtkEntity for MierdaBundle {
-    fn bundle_entity(
-        entity_instance: &EntityInstance,
-        _layer_instance: &LayerInstance,
-        _: Option<&Handle<Image>>,
-        _: Option<&TilesetDefinition>,
-        asset_server: &AssetServer,
-        texture_atlasses: &mut Assets<TextureAtlas>,
-    ) -> MierdaBundle {
-        let is_dummy = *entity_instance
-            .get_bool_field("is_dummy")
-            .expect("expected entity to have non-nullable name string field");
-        create_mierda_bundle(asset_server, texture_atlasses, is_dummy)
-    }
-}
-
-impl LdtkEntity for PizzaBundle {
-    fn bundle_entity(
-        entity_instance: &EntityInstance,
-        _layer_instance: &LayerInstance,
-        _: Option<&Handle<Image>>,
-        _: Option<&TilesetDefinition>,
-        asset_server: &AssetServer,
-        texture_atlasses: &mut Assets<TextureAtlas>,
-    ) -> PizzaBundle {
-        let is_dummy = *entity_instance
-            .get_bool_field("is_dummy")
-            .expect("expected entity to have non-nullable name string field");
-        create_pizza_bundle(asset_server, texture_atlasses, is_dummy)
     }
 }
 

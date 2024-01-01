@@ -215,12 +215,11 @@ fn cleanup_cutscene(mut commands: Commands, menu: Query<Entity, With<Cutscene>>)
 
 fn handle_cutscene_termination(
     mut next_state: ResMut<NextState<GameState>>,
-    mut cutscene_state: ResMut<CutsceneState>,
+    cutscene_state: ResMut<CutsceneState>,
 ) {
     let cutscene_text = get_cutscene_dialog_text();
     if cutscene_text.len() <= cutscene_state.timer_count {
         next_state.set(GameState::Gameplay);
-        return;
     }
 }
 
