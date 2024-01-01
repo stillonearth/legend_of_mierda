@@ -1,6 +1,6 @@
 use bevy::{prelude::*, sprite::Anchor};
 
-use crate::components::Player;
+use crate::entities::player::Player;
 
 pub const SHEET_1_COLUMNS: usize = 13;
 pub const SHEET_1_ROWS: usize = 21;
@@ -62,6 +62,54 @@ pub struct PlayerSpritesheets {
     pub mierda_atlas: Handle<TextureAtlas>,
 }
 
+impl FromWorld for PlayerSpritesheets {
+    fn from_world(world: &mut World) -> Self {
+        let world = world.cell();
+
+        let asset_server_world_borrow = world.get_resource::<AssetServer>();
+        let asset_server = asset_server_world_borrow.as_deref().unwrap();
+
+        let mut texture_atlasses_world_borrow = world.get_resource_mut::<Assets<TextureAtlas>>();
+        let texture_atlasses = texture_atlasses_world_borrow.as_deref_mut().unwrap();
+
+        let player_atlas_1 = load_texture_atlas(
+            PLAYER_ASSET_SHEET_1,
+            asset_server,
+            SHEET_1_COLUMNS,
+            SHEET_1_ROWS,
+            None,
+            64.,
+            texture_atlasses,
+        );
+
+        let player_atlas_2 = load_texture_atlas(
+            PLAYER_ASSET_SHEET_2,
+            asset_server,
+            SHEET_2_COLUMNS,
+            SHEET_2_ROWS,
+            None,
+            64. * 3.,
+            texture_atlasses,
+        );
+
+        let mierda_atlas = load_texture_atlas(
+            MIERDA_ASSET_SHEET,
+            asset_server,
+            5,
+            1,
+            None,
+            16.0,
+            texture_atlasses,
+        );
+
+        PlayerSpritesheets {
+            player_atlas_1,
+            player_atlas_2,
+            mierda_atlas,
+        }
+    }
+}
+
 pub const PLAYER_ASSET_SHEET_1: &str = "sprites/alextime-1.png";
 pub const PLAYER_ASSET_SHEET_2: &str = "sprites/alextime-2.png";
 pub const MIERDA_ASSET_SHEET: &str = "sprites/mierda.png";
@@ -90,7 +138,7 @@ pub fn load_texture_atlas(
     texture_atlasses.add(atlas)
 }
 
-pub fn animate_sprite(
+pub fn animate_player_sprite(
     time: Res<Time>,
     mut query: Query<
         (

@@ -3,7 +3,9 @@ use std::time::Duration;
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::{enemies::SpawnMierdaEvent, events::*, items::SpawnPizzaEvent, ui::*};
+use crate::{
+    entities::enemies::SpawnMierdaEvent, entities::items::SpawnPizzaEvent, events::*, ui::*,
+};
 
 #[derive(Clone)]
 pub enum WaveEntry {

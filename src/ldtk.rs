@@ -5,13 +5,23 @@ use bevy_ecs_ldtk::prelude::*;
 
 use bevy_rapier2d::prelude::*;
 
-use crate::components::*;
-use crate::enemies::*;
-use crate::events::*;
-use crate::items::*;
-use crate::sprites::*;
+use crate::{
+    entities::{enemies::*, items::*, player::Player},
+    events::*,
+};
 
 const ASPECT_RATIO: f32 = 16. / 9.;
+
+// Entities
+
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
+pub struct Wall;
+
+#[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
+pub struct WallBundle {
+    wall: Wall,
+    sensor: Sensor,
+}
 
 pub fn update_level_selection(
     level_query: Query<(&Handle<LdtkLevel>, &Transform), Without<Player>>,
@@ -267,56 +277,7 @@ pub fn spawn_wall_collision(
     }
 }
 
-impl LdtkEntity for PlayerBundle {
-    fn bundle_entity(
-        _entity_instance: &EntityInstance,
-        _layer_instance: &LayerInstance,
-        _: Option<&Handle<Image>>,
-        _: Option<&TilesetDefinition>,
-        asset_server: &AssetServer,
-        texture_atlasses: &mut Assets<TextureAtlas>,
-    ) -> PlayerBundle {
-        let rotation_constraints = LockedAxes::ROTATION_LOCKED;
-
-        let collider_bundle = ColliderBundle {
-            collider: Collider::cuboid(8., 26.),
-            rigid_body: RigidBody::Dynamic,
-            friction: Friction {
-                coefficient: 0.0,
-                combine_rule: CoefficientCombineRule::Min,
-            },
-            rotation_constraints,
-            ..Default::default()
-        };
-
-        let atlas_handle = load_texture_atlas(
-            PLAYER_ASSET_SHEET_1,
-            asset_server,
-            SHEET_1_COLUMNS,
-            SHEET_1_ROWS,
-            None,
-            64.,
-            texture_atlasses,
-        );
-
-        let sprite_bundle = SpriteSheetBundle {
-            texture_atlas: atlas_handle,
-            sprite: TextureAtlasSprite::new(0),
-            ..default()
-        };
-
-        PlayerBundle {
-            character_animation: CharacterAnimation { ..default() },
-            animation_timer: AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-            sprite_bundle,
-            collider_bundle,
-            active_events: ActiveEvents::COLLISION_EVENTS,
-            player: Player { health: 100 },
-        }
-    }
-}
-
-pub(crate) fn hide_dummy_entities(
+pub fn hide_dummy_entities(
     mut commands: Commands,
     level_selection: Res<LevelSelection>,
     mut set: ParamSet<(
@@ -340,5 +301,32 @@ pub(crate) fn hide_dummy_entities(
             *visibility = Visibility::Hidden;
             commands.entity(entity).remove::<Collider>();
         }
+    }
+}
+
+pub fn fix_missing_ldtk_entities(
+    asset_server: Res<AssetServer>,
+    texture_atlasses: ResMut<Assets<TextureAtlas>>,
+    mut commands: Commands,
+    los_mierdas: Query<(Entity, &Mierda), Without<Collider>>,
+    los_pizzas: Query<(Entity, &Pizza), Without<Collider>>,
+) {
+    let asset_server = asset_server.into_inner();
+    let texture_atlasses = texture_atlasses.into_inner();
+
+    for (e, _) in los_mierdas.iter().filter(|(_, m)| !m.is_dummy) {
+        let bundle = create_mierda_bundle(asset_server, texture_atlasses, false);
+        commands.entity(e).insert((
+            bundle.collider_bundle,
+            bundle.direction_update_time,
+            Visibility::Visible,
+        ));
+    }
+
+    for (e, _) in los_pizzas.iter().filter(|(_, m)| !m.is_dummy) {
+        let bundle = create_pizza_bundle(asset_server, texture_atlasses, false);
+        commands
+            .entity(e)
+            .insert((bundle.collider_bundle, Visibility::Visible));
     }
 }

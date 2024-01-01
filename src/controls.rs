@@ -2,7 +2,10 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use pecs::prelude::*;
 
-use crate::{components::*, events::*, sprites::*};
+use crate::{
+    entities::player::{Player, PlayerAttackEvent},
+    sprites::*,
+};
 
 pub fn controls(
     mut commands: Commands,
