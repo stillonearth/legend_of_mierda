@@ -11,10 +11,7 @@ use bevy_rapier2d::prelude::*;
 use rand::Rng;
 
 use crate::{
-    physics::ColliderBundle,
-    sprites::{load_texture_atlas, PIZZA_ASSET_SHEET},
-    ui,
-    utils::*,
+    loading::load_texture_atlas, physics::ColliderBundle, sprites::PIZZA_ASSET_SHEET, ui, utils::*,
 };
 
 use super::player::Player;
@@ -159,10 +156,11 @@ pub fn event_spawn_pizza(
                             || mierda_position.y < 0.0 + 24.0
                             || mierda_position.y > (level.px_hei as f32) - 24.0
                         {
-                            let x = rng.gen_range(-100.0..100.0);
-                            let y = rng.gen_range(-100.0..100.0);
+                            let r = rng.gen_range(0.0..1000.0);
+                            let angle = rng.gen_range(0.0..std::f32::consts::PI * 2.0);
 
-                            offset_position = Vec3::new(x, y, 0.);
+                            offset_position =
+                                Vec3::new(r * f32::sin(angle), r * f32::cos(angle), 0.);
                             mierda_position = player_translation + offset_position;
                         }
 

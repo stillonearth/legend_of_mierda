@@ -8,7 +8,7 @@ use bevy_rapier2d::prelude::*;
 use pecs::prelude::*;
 use rand::Rng;
 
-use crate::{physics::ColliderBundle, sprites::*, utils::*};
+use crate::{loading::load_texture_atlas, physics::ColliderBundle, sprites::*, utils::*};
 
 use super::player::Player;
 
@@ -259,10 +259,11 @@ pub fn handle_spawn_mierda(
                             || mierda_position.y < 0.0 + 24.0
                             || mierda_position.y > (level.px_hei as f32) - 24.0
                         {
-                            let x = rng.gen_range(-100.0..100.0);
-                            let y = rng.gen_range(-100.0..100.0);
+                            let r = rng.gen_range(0.0..1000.0);
+                            let angle = rng.gen_range(0.0..std::f32::consts::PI * 2.0);
 
-                            offset_position = Vec3::new(x, y, 0.);
+                            offset_position =
+                                Vec3::new(r * f32::sin(angle), r * f32::cos(angle), 0.);
                             mierda_position = player_translation + offset_position;
                         }
 

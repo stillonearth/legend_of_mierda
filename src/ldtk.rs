@@ -5,7 +5,12 @@ use bevy_ecs_ldtk::prelude::*;
 
 use bevy_rapier2d::prelude::*;
 
-use crate::entities::{enemies::*, items::*, player::Player};
+use crate::entities::{
+    items::*,
+    mierda::*,
+    pendejo::{create_pendejo_bundle, Pendejo},
+    player::Player,
+};
 
 const ASPECT_RATIO: f32 = 16. / 9.;
 
@@ -98,7 +103,6 @@ pub fn camera_fit_inside_current_level(
         if let Some(ldtk_level) = ldtk_levels.get(level_handle) {
             let level = &ldtk_level.level;
             if level_selection.is_match(&0, level) {
-                // println!("level: {}", level.iid);
                 let level_ratio = level.px_wid as f32 / ldtk_level.level.px_hei as f32;
                 orthographic_projection.viewport_origin = Vec2::ZERO;
                 if level_ratio > ASPECT_RATIO {
@@ -287,6 +291,7 @@ pub fn hide_dummy_entities(
     mut set: ParamSet<(
         Query<(Entity, &mut Visibility, &Mierda)>,
         Query<(Entity, &mut Visibility, &Pizza)>,
+        Query<(Entity, &mut Visibility, &Pendejo)>,
     )>,
 ) {
     if !level_selection.is_changed() {
@@ -306,6 +311,13 @@ pub fn hide_dummy_entities(
             commands.entity(entity).remove::<Collider>();
         }
     }
+
+    for (entity, mut visibility, pendejo) in set.p2().iter_mut() {
+        if pendejo.is_dummy {
+            *visibility = Visibility::Hidden;
+            commands.entity(entity).remove::<Collider>();
+        }
+    }
 }
 
 pub fn fix_missing_ldtk_entities(
@@ -314,6 +326,7 @@ pub fn fix_missing_ldtk_entities(
     mut commands: Commands,
     los_mierdas: Query<(Entity, &Mierda), Without<Collider>>,
     los_pizzas: Query<(Entity, &Pizza), Without<Collider>>,
+    los_pendejos: Query<(Entity, &Pendejo), Without<Collider>>,
 ) {
     let asset_server = asset_server.into_inner();
     let texture_atlasses = texture_atlasses.into_inner();
@@ -323,6 +336,19 @@ pub fn fix_missing_ldtk_entities(
         commands.entity(e).insert((
             bundle.collider_bundle,
             bundle.direction_update_time,
+            Visibility::Visible,
+        ));
+    }
+
+    for (e, _) in los_pendejos.iter().filter(|(_, m)| !m.is_dummy) {
+        let bundle = create_pendejo_bundle(asset_server, texture_atlasses, false);
+        commands.entity(e).insert((
+            bundle.collider_bundle,
+            bundle.direction_update_time,
+            bundle.animated_character_sprite,
+            bundle.character_animation,
+            bundle.animation_timer,
+            // bundle.sprite_bundle,
             Visibility::Visible,
         ));
     }

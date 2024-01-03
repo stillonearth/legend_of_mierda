@@ -4,6 +4,7 @@ use pecs::prelude::*;
 
 use crate::{
     entities::player::{Player, PlayerAttackEvent},
+    loading::CharacterSpritesheets,
     sprites::*,
 };
 
@@ -20,7 +21,7 @@ pub fn controls(
         ),
         With<Player>,
     >,
-    spritesheets: Res<PlayerSpritesheets>,
+    spritesheets: Res<CharacterSpritesheets>,
 ) {
     for (entity, mut texture_atlas, mut velocity, mut char_animation, mut sprite) in &mut query {
         // no control during attack phase
