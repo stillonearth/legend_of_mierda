@@ -75,7 +75,7 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
                         ..Default::default()
                     },
                     button_colors,
-                    ChangeState(GameState::Gameplay),
+                    ChangeState(GameState::Cutscene),
                 ))
                 .with_children(|parent| {
                     parent.spawn(TextBundle::from_section(
