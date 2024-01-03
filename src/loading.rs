@@ -57,6 +57,8 @@ pub struct AvatarAssets {
 pub struct CutsceneAssets {
     #[asset(path = "cutscenes/phone-call-1.png")]
     pub phone_call_1: Handle<Image>,
+    #[asset(path = "cutscenes/main-menu.png")]
+    pub main_menu: Handle<Image>,
 }
 
 #[derive(Resource)]

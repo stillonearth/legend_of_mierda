@@ -1,7 +1,7 @@
 use crate::loading::TextureAssets;
+use crate::CutsceneAssets;
 use crate::GameState;
 use bevy::prelude::*;
-// use rand::Rng;
 
 pub struct MenuPlugin;
 
@@ -39,10 +39,49 @@ impl Default for ButtonColors {
 #[derive(Component)]
 struct Menu;
 
-fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
+fn setup_menu(
+    mut commands: Commands,
+    textures: Res<TextureAssets>,
+    cutscene_assets: Res<CutsceneAssets>,
+) {
     info!("menu");
 
     commands.spawn(Camera2dBundle::default());
+
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                    position_type: PositionType::Absolute,
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..default()
+                },
+                // background_color: Color::BLACK.into(),
+                ..default()
+            },
+            Menu,
+            Name::new("cutscene image container"),
+        ))
+        .with_children(|parent| {
+            // bevy logo (image)
+            // A `NodeBundle` is used to display the logo the image as an `ImageBundle` can't automatically
+            // size itself with a child node present.
+            parent.spawn((
+                NodeBundle {
+                    style: Style {
+                        width: Val::Px(512.0),
+                        height: Val::Px(512.0),
+                        ..default()
+                    },
+                    background_color: Color::WHITE.into(),
+                    ..default()
+                },
+                UiImage::new(cutscene_assets.main_menu.clone()),
+            ));
+        });
 
     commands
         .spawn((
@@ -88,6 +127,7 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
                     ));
                 });
         });
+
     commands
         .spawn((
             NodeBundle {
