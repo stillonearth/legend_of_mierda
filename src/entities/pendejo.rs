@@ -98,7 +98,7 @@ pub fn create_pendejo_bundle(
         }
         .normalize(),
         hit_at: None,
-        is_dummy: is_dummy,
+        is_dummy,
     };
 
     PendejoBundle {
@@ -195,7 +195,7 @@ pub fn update_pendejos_move_direction(
             let angle = pendejo.move_direction.x.atan2(pendejo.move_direction.y)
                 - std::f32::consts::FRAC_PI_4;
 
-            let degree_angle = angle * 180. / std::f32::consts::PI;
+            let _degree_angle = angle * 180. / std::f32::consts::PI;
 
             let mut normalized_angle = angle / std::f32::consts::FRAC_PI_2;
             if normalized_angle < 0.0 {

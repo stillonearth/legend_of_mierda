@@ -107,17 +107,17 @@ pub fn animate_player_sprite(
         );
 
         if timer.just_finished() {
-            let spritesheet = match animated_character_sprite.animated_character_type {
-                AnimatedCharacterType::Player => spritesheets.player_atlas_1.clone(),
-                AnimatedCharacterType::Pendejo1 => spritesheets.pendejo_atlas_1.clone(),
-                AnimatedCharacterType::Pendejo2 => spritesheets.pendejo_atlas_2.clone(),
-            };
-
             sprite.index = if (sprite.index >= indices.last) || (sprite.index < indices.first) {
                 // if attacking animation finished, go back to standing
                 if character_animation.animation_type == AnimationType::Attack
                     && (sprite.index >= indices.last)
                 {
+                    let spritesheet = match animated_character_sprite.animated_character_type {
+                        AnimatedCharacterType::Player => spritesheets.player_atlas_1.clone(),
+                        AnimatedCharacterType::Pendejo1 => spritesheets.pendejo_atlas_1.clone(),
+                        AnimatedCharacterType::Pendejo2 => spritesheets.pendejo_atlas_2.clone(),
+                    };
+
                     character_animation.animation_type = AnimationType::Stand;
                     texture_atlas.clone_from(&spritesheet);
                 }

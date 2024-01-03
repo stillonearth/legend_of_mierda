@@ -9,9 +9,9 @@ use crate::{entities::items::SpawnPizzaEvent, entities::mierda::SpawnMierdaEvent
 
 #[derive(Clone)]
 pub enum WaveEntry {
-    SpawnMierda { count: usize },
-    SpawnPizza { count: usize },
-    SpawnPendejo { count: usize },
+    Mierda { count: usize },
+    Pizza { count: usize },
+    Pendejo { count: usize },
 }
 
 #[derive(Clone)]
@@ -173,17 +173,17 @@ pub fn event_wave(
 ) {
     for event in er_on_wave_change.iter() {
         match event.wave_entry {
-            WaveEntry::SpawnMierda { count } => {
+            WaveEntry::Mierda { count } => {
                 ev_mierda_spawn.send(SpawnMierdaEvent {
                     count: count as u32,
                 });
             }
-            WaveEntry::SpawnPizza { count } => {
+            WaveEntry::Pizza { count } => {
                 ev_pizza_spawn.send(SpawnPizzaEvent {
                     count: count as u32,
                 });
             }
-            WaveEntry::SpawnPendejo { count } => {
+            WaveEntry::Pendejo { count } => {
                 ev_pendejo_spawn.send(SpawnPendejoEvent {
                     count: count as u32,
                 });
@@ -221,33 +221,33 @@ pub fn get_level_1_waves() -> Vec<Wave> {
     vec![
         Wave {
             events: vec![
-                WaveEntry::SpawnPendejo { count: 15 },
-                WaveEntry::SpawnMierda { count: 15 },
+                WaveEntry::Pendejo { count: 15 },
+                WaveEntry::Mierda { count: 15 },
             ],
             event_duration: Duration::from_secs(10),
             wave_duration: Duration::from_secs(30),
         },
         Wave {
             events: vec![
-                WaveEntry::SpawnMierda { count: 100 },
-                WaveEntry::SpawnMierda { count: 100 },
-                WaveEntry::SpawnMierda { count: 100 },
+                WaveEntry::Mierda { count: 100 },
+                WaveEntry::Mierda { count: 100 },
+                WaveEntry::Mierda { count: 100 },
             ],
             event_duration: Duration::from_secs(20),
             wave_duration: Duration::from_secs(60),
         },
         Wave {
             events: vec![
-                WaveEntry::SpawnMierda { count: 200 },
-                WaveEntry::SpawnPizza { count: 3 },
-                WaveEntry::SpawnPendejo { count: 200 },
-                WaveEntry::SpawnMierda { count: 200 },
-                WaveEntry::SpawnPizza { count: 3 },
-                WaveEntry::SpawnPendejo { count: 200 },
-                WaveEntry::SpawnMierda { count: 200 },
-                WaveEntry::SpawnPizza { count: 3 },
-                WaveEntry::SpawnPendejo { count: 200 },
-                WaveEntry::SpawnPizza { count: 3 },
+                WaveEntry::Mierda { count: 200 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Pendejo { count: 200 },
+                WaveEntry::Mierda { count: 200 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Pendejo { count: 200 },
+                WaveEntry::Mierda { count: 200 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Pendejo { count: 200 },
+                WaveEntry::Pizza { count: 3 },
             ],
             event_duration: Duration::from_secs(20),
             wave_duration: Duration::from_secs(200),
