@@ -105,7 +105,7 @@ fn setup_menu(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            width: Val::Px(128.0),
+                            width: Val::Px(318.0),
                             height: Val::Px(50.0),
                             justify_content: JustifyContent::Center,
                             align_items: AlignItems::Center,
@@ -120,9 +120,9 @@ fn setup_menu(
                 .with_children(|parent| {
                     parent.spawn((
                         TextBundle::from_section(
-                            "START",
+                            "start game",
                             TextStyle {
-                                font_size: 88.0,
+                                font_size: 50.0,
                                 font: font_assets.pixeloid_mono.clone(),
                                 color: Color::WHITE.into(),
                                 ..default()

@@ -46,7 +46,7 @@ fn main() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "I am a window!".into(),
+                        title: "Legend of Mierda".into(),
                         resolution: (1024., 1024.).into(),
                         present_mode: PresentMode::AutoVsync,
                         // Tells wasm to resize the window according to the available canvas
