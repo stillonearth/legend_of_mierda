@@ -182,16 +182,12 @@ fn setup_cutscene(
                     align_items: AlignItems::Center,
                     ..default()
                 },
-                // background_color: Color::BLACK.into(),
                 ..default()
             },
             Cutscene,
             Name::new("cutscene image container"),
         ))
         .with_children(|parent| {
-            // bevy logo (image)
-            // A `NodeBundle` is used to display the logo the image as an `ImageBundle` can't automatically
-            // size itself with a child node present.
             parent.spawn((
                 NodeBundle {
                     style: Style {

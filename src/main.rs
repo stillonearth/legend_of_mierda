@@ -1,6 +1,10 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
-use bevy::{input::common_conditions::input_toggle_active, prelude::*};
+use bevy::{
+    input::common_conditions::input_toggle_active,
+    prelude::*,
+    window::{PresentMode, WindowTheme},
+};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_particle_systems::*;
@@ -37,7 +41,27 @@ fn main() {
     let mut app = App::new();
 
     app.add_state::<GameState>()
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        // .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()).set())
+        .add_plugins((
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "I am a window!".into(),
+                        resolution: (1024., 1024.).into(),
+                        present_mode: PresentMode::AutoVsync,
+                        // Tells wasm to resize the window according to the available canvas
+                        fit_canvas_to_parent: true,
+                        // Tells wasm not to override default event handling, like F5, Ctrl+R etc.
+                        prevent_default_event_handling: false,
+                        window_theme: Some(WindowTheme::Dark),
+                        ..default()
+                    }),
+                    ..default()
+                })
+                .set(ImagePlugin::default_nearest()),
+            // LogDiagnosticsPlugin::default(),
+            // FrameTimeDiagnosticsPlugin,
+        ))
         .add_plugins(LoadingPlugin)
         .add_plugins(MenuPlugin)
         .add_plugins(CutscenePlugin)

@@ -1,3 +1,4 @@
+use crate::loading::FontAssets;
 use crate::loading::TextureAssets;
 use crate::CutsceneAssets;
 use crate::GameState;
@@ -30,8 +31,8 @@ struct ButtonColors {
 impl Default for ButtonColors {
     fn default() -> Self {
         ButtonColors {
-            normal: Color::rgb(0.15, 0.15, 0.15),
-            hovered: Color::rgb(0.25, 0.25, 0.25),
+            normal: Color::WHITE,
+            hovered: Color::BLACK,
         }
     }
 }
@@ -39,10 +40,13 @@ impl Default for ButtonColors {
 #[derive(Component)]
 struct Menu;
 
+#[derive(Component)]
+struct StartGameButton;
+
 fn setup_menu(
     mut commands: Commands,
-    textures: Res<TextureAssets>,
     cutscene_assets: Res<CutsceneAssets>,
+    font_assets: Res<FontAssets>,
 ) {
     info!("menu");
 
@@ -59,21 +63,17 @@ fn setup_menu(
                     align_items: AlignItems::Center,
                     ..default()
                 },
-                // background_color: Color::BLACK.into(),
                 ..default()
             },
             Menu,
             Name::new("cutscene image container"),
         ))
         .with_children(|parent| {
-            // bevy logo (image)
-            // A `NodeBundle` is used to display the logo the image as an `ImageBundle` can't automatically
-            // size itself with a child node present.
             parent.spawn((
                 NodeBundle {
                     style: Style {
-                        width: Val::Px(512.0),
-                        height: Val::Px(512.0),
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
                         ..default()
                     },
                     background_color: Color::WHITE.into(),
@@ -90,8 +90,9 @@ fn setup_menu(
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                     flex_direction: FlexDirection::Column,
-                    align_items: AlignItems::Center,
+                    align_items: AlignItems::FlexEnd,
                     justify_content: JustifyContent::Center,
+                    margin: UiRect::right(Val::Percent(20.0)),
                     ..default()
                 },
                 ..default()
@@ -104,122 +105,31 @@ fn setup_menu(
                 .spawn((
                     ButtonBundle {
                         style: Style {
-                            width: Val::Px(256.0),
+                            width: Val::Px(128.0),
                             height: Val::Px(50.0),
                             justify_content: JustifyContent::Center,
                             align_items: AlignItems::Center,
                             ..Default::default()
                         },
-                        background_color: button_colors.normal.into(),
+                        background_color: Color::rgba_u8(0, 0, 0, 0).into(),
                         ..Default::default()
                     },
                     button_colors,
                     ChangeState(GameState::Cutscene),
                 ))
                 .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "Matando Mierdas",
-                        TextStyle {
-                            font_size: 30.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                            ..default()
-                        },
+                    parent.spawn((
+                        TextBundle::from_section(
+                            "START",
+                            TextStyle {
+                                font_size: 88.0,
+                                font: font_assets.pixeloid_mono.clone(),
+                                color: Color::WHITE.into(),
+                                ..default()
+                            },
+                        ),
+                        StartGameButton,
                     ));
-                });
-        });
-
-    commands
-        .spawn((
-            NodeBundle {
-                style: Style {
-                    flex_direction: FlexDirection::Row,
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::SpaceAround,
-                    bottom: Val::Px(5.),
-                    width: Val::Percent(100.),
-                    position_type: PositionType::Absolute,
-                    ..default()
-                },
-                ..default()
-            },
-            Menu,
-        ))
-        .with_children(|children| {
-            children
-                .spawn((
-                    ButtonBundle {
-                        style: Style {
-                            width: Val::Px(170.0),
-                            height: Val::Px(50.0),
-                            justify_content: JustifyContent::SpaceAround,
-                            align_items: AlignItems::Center,
-                            padding: UiRect::all(Val::Px(5.)),
-                            ..Default::default()
-                        },
-                        background_color: Color::NONE.into(),
-                        ..Default::default()
-                    },
-                    ButtonColors {
-                        normal: Color::NONE,
-                        ..default()
-                    },
-                    OpenLink("https://bevyengine.org"),
-                ))
-                .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "Made with Bevy",
-                        TextStyle {
-                            font_size: 15.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                            ..default()
-                        },
-                    ));
-                    parent.spawn(ImageBundle {
-                        image: textures.bevy.clone().into(),
-                        style: Style {
-                            width: Val::Px(32.),
-                            ..default()
-                        },
-                        ..default()
-                    });
-                });
-            children
-                .spawn((
-                    ButtonBundle {
-                        style: Style {
-                            width: Val::Px(170.0),
-                            height: Val::Px(50.0),
-                            justify_content: JustifyContent::SpaceAround,
-                            align_items: AlignItems::Center,
-                            padding: UiRect::all(Val::Px(5.)),
-                            ..default()
-                        },
-                        background_color: Color::NONE.into(),
-                        ..Default::default()
-                    },
-                    ButtonColors {
-                        normal: Color::NONE,
-                        hovered: Color::rgb(0.25, 0.25, 0.25),
-                    },
-                    OpenLink("https://github.com/stillonearth/legend_of_mierda"),
-                ))
-                .with_children(|parent| {
-                    parent.spawn(TextBundle::from_section(
-                        "Open source",
-                        TextStyle {
-                            font_size: 15.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                            ..default()
-                        },
-                    ));
-                    parent.spawn(ImageBundle {
-                        image: textures.github.clone().into(),
-                        style: Style {
-                            width: Val::Px(32.),
-                            ..default()
-                        },
-                        ..default()
-                    });
                 });
         });
 }
@@ -227,38 +137,30 @@ fn setup_menu(
 #[derive(Component)]
 struct ChangeState(GameState);
 
-#[derive(Component)]
-struct OpenLink(&'static str);
-
 fn click_play_button(
     mut next_state: ResMut<NextState<GameState>>,
     mut interaction_query: Query<
-        (
-            &Interaction,
-            &mut BackgroundColor,
-            &ButtonColors,
-            Option<&ChangeState>,
-            Option<&OpenLink>,
-        ),
+        (&Interaction, &ButtonColors, Option<&ChangeState>),
         (Changed<Interaction>, With<Button>),
     >,
+    mut start_game_button: Query<(&mut Text, &StartGameButton)>,
 ) {
-    for (interaction, mut color, button_colors, change_state, open_link) in &mut interaction_query {
+    for (interaction, button_colors, change_state) in &mut interaction_query {
         match *interaction {
             Interaction::Pressed => {
                 if let Some(state) = change_state {
                     next_state.set(state.0.clone());
-                } else if let Some(link) = open_link {
-                    if let Err(error) = webbrowser::open(link.0) {
-                        warn!("Failed to open link {error:?}");
-                    }
                 }
             }
             Interaction::Hovered => {
-                *color = button_colors.hovered.into();
+                for (mut text, _) in start_game_button.iter_mut() {
+                    text.sections[0].style.color = button_colors.hovered.clone().into();
+                }
             }
             Interaction::None => {
-                *color = button_colors.normal.into();
+                for (mut text, _) in start_game_button.iter_mut() {
+                    text.sections[0].style.color = button_colors.normal.clone().into();
+                }
             }
         }
     }
