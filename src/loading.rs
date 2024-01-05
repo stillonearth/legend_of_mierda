@@ -18,6 +18,8 @@ impl Plugin for LoadingPlugin {
         app.add_collection_to_loading_state::<_, AvatarAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, CutsceneAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, FontAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, SceneAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, AnimationAssets>(GameState::Loading);
 
         app.init_resource::<MaterialAssets>();
         app.init_resource::<MeshAssets>();
@@ -29,6 +31,18 @@ impl Plugin for LoadingPlugin {
 pub struct AudioAssets {
     // #[asset(path = "audio/neural.mp3")]
     // pub neural: Handle<AudioSource>,
+}
+
+#[derive(AssetCollection, Resource)]
+pub struct SceneAssets {
+    #[asset(path = "models/biboran.glb#Scene0")]
+    pub biboran: Handle<Scene>,
+}
+
+#[derive(AssetCollection, Resource, Clone)]
+pub struct AnimationAssets {
+    #[asset(path = "models/biboran.glb#Animation0")]
+    pub biboran: Handle<AnimationClip>,
 }
 
 #[derive(AssetCollection, Resource)]

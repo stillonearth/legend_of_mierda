@@ -1,12 +1,18 @@
 use std::cmp::min;
 
-use bevy::prelude::*;
+use bevy::{
+    core_pipeline::clear_color::ClearColorConfig, pbr::CascadeShadowConfigBuilder, prelude::*,
+};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 use rand::Rng;
+use std::f32::consts::PI;
 
 use crate::{
-    loading::load_texture_atlas, physics::ColliderBundle, sprites::BIBORAN_ASSET_SHEET, ui,
+    loading::{load_texture_atlas, AnimationAssets, SceneAssets},
+    physics::ColliderBundle,
+    sprites::BIBORAN_ASSET_SHEET,
+    ui,
     utils::*,
 };
 
@@ -240,6 +246,67 @@ pub(crate) fn handle_player_biboran_collision(
     }
 }
 
+// ------------
+// 3D Animation
+// ------------
+
+#[derive(Resource)]
+struct Animations(Handle<AnimationClip>);
+
+pub fn setup_biboran_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // Animation
+    commands.insert_resource(Animations(
+        asset_server.load("models/biboran.glb#Animation0"),
+    ));
+
+    // Camera
+    commands.spawn(Camera3dBundle {
+        transform: Transform::from_xyz(20.0, 20.0, 20.0)
+            .looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y)
+            .with_scale(Vec3::ONE * 10.0),
+        camera: Camera {
+            order: 1,
+            ..default()
+        },
+        camera_3d: Camera3d {
+            clear_color: ClearColorConfig::None,
+            ..default()
+        },
+        ..default()
+    });
+
+    // Light
+    commands.spawn(DirectionalLightBundle {
+        transform: Transform::from_rotation(Quat::from_euler(EulerRot::ZYX, 0.0, 1.0, -PI / 4.)),
+        directional_light: DirectionalLight {
+            shadows_enabled: true,
+            ..default()
+        },
+        cascade_shadow_config: CascadeShadowConfigBuilder {
+            first_cascade_far_bound: 200.0,
+            maximum_distance: 400.0,
+            ..default()
+        }
+        .into(),
+        ..default()
+    });
+
+    // Biboran
+    commands.spawn(SceneBundle {
+        scene: asset_server.load("models/biboran.glb#Scene0"),
+        ..default()
+    });
+}
+
+fn play_biboran_animation(
+    animations: Res<Animations>,
+    mut players: Query<&mut AnimationPlayer, Added<AnimationPlayer>>,
+) {
+    for mut player in &mut players {
+        player.play(animations.0.clone_weak()).repeat();
+    }
+}
+
 // ------
 // Plugin
 // ------
@@ -252,6 +319,8 @@ impl Plugin for BiboranPlugin {
             // Event Handlers
             .add_event::<SpawnBiboranEvent>()
             .add_event::<BiboranStepOverEvent>()
+            .add_systems(Startup, setup_biboran_scene)
+            .add_systems(Update, play_biboran_animation)
             // Event Handlers
             .add_systems(
                 Update,
