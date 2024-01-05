@@ -116,7 +116,7 @@ fn setup_cutscene(
                     NodeBundle {
                         style: Style {
                             position_type: PositionType::Absolute,
-                            margin: UiRect::bottom(Val::Percent(5.)),
+                            margin: UiRect::bottom(Val::Percent(10.)),
                             ..default()
                         },
                         ..default()
@@ -145,7 +145,7 @@ fn setup_cutscene(
                     flex_direction: FlexDirection::Row,
                     align_items: AlignItems::Center,
                     justify_content: JustifyContent::SpaceAround,
-                    top: Val::Percent(5.),
+                    top: Val::Percent(10.),
                     width: Val::Percent(100.),
                     position_type: PositionType::Absolute,
                     ..default()
@@ -182,16 +182,12 @@ fn setup_cutscene(
                     align_items: AlignItems::Center,
                     ..default()
                 },
-                // background_color: Color::BLACK.into(),
                 ..default()
             },
             Cutscene,
             Name::new("cutscene image container"),
         ))
         .with_children(|parent| {
-            // bevy logo (image)
-            // A `NodeBundle` is used to display the logo the image as an `ImageBundle` can't automatically
-            // size itself with a child node present.
             parent.spawn((
                 NodeBundle {
                     style: Style {
@@ -266,20 +262,23 @@ fn handle_cutscene_text(
 fn get_cutscene_dialog_text() -> Vec<(usize, String)> {
     vec![
         (0, "ALLO GENNADIY?".to_string()),
-        (1, "da-da".to_string()),
-        (0, "Yeah, hi. So, Shapka the First. Shapka.".to_string()),
-        (0, "I am Alexey Viktorovich Makeev, AlexTime".to_string()),
-        (0, "Date of birth 08/22/1974".to_string()),
-        (0, "Citizen of Russia, citizen of Mexico".to_string()),
-        (0, "Received political asylum in Mexico.".to_string()),
-        (
-            0,
-            "I am under the international protection of the UN, the United Nations.".to_string(),
-        ),
+        (1, "Da Da, Gennadiy!".to_string()),
+        (0, "Yeah, hi.".to_string()),
+        (0, "So, Shapka the First.".to_string()),
+        (0, "Shapka.".to_string()),
+        (0, "I am".to_string()),
+        (0, "Alexey Viktorovich Makeev".to_string()),
+        (0, "AlexTime".to_string()),
+        (0, "Date of birth".to_string()),
+        (0, "08/22/1974".to_string()),
+        (0, "Citizen of Russia".to_string()),
+        (0, "Citizen of Mexico".to_string()),
+        (0, "Received".to_string()),
+        (0, "political asylum".to_string()),
+        (0, "I am under the international protection ".to_string()),
+        (0, "of the UN, the United Nations.".to_string()),
         (0, "wikipedia.org/en/alextime".to_string()),
-        (
-            0,
-            "From Mexican prison number 17. CPS. Michoacan.".to_string(),
-        ),
+        (0, "From Mexican prison number 17.".to_string()),
+        (0, "CPS. Michoacan.".to_string()),
     ]
 }

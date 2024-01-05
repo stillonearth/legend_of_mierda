@@ -12,7 +12,7 @@ use crate::entities::{
     player::Player,
 };
 
-const ASPECT_RATIO: f32 = 16. / 9.;
+const ASPECT_RATIO: f32 = 1. / 1.;
 
 // Events
 
