@@ -106,7 +106,7 @@ fn setup_menu(
                     ButtonBundle {
                         style: Style {
                             width: Val::Px(318.0),
-                            height: Val::Px(50.0),
+                            height: Val::Px(100.0),
                             justify_content: JustifyContent::Center,
                             align_items: AlignItems::Center,
                             ..Default::default()
@@ -115,14 +115,14 @@ fn setup_menu(
                         ..Default::default()
                     },
                     button_colors,
-                    ChangeState(GameState::Cutscene),
+                    ChangeState(GameState::Gameplay),
                 ))
                 .with_children(|parent| {
                     parent.spawn((
                         TextBundle::from_section(
-                            "start game",
+                            "START",
                             TextStyle {
-                                font_size: 50.0,
+                                font_size: 100.0,
                                 font: font_assets.pixeloid_mono.clone(),
                                 color: Color::WHITE.into(),
                                 ..default()

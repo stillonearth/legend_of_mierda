@@ -1,0 +1,11 @@
+Model Information:
+* title:	Old Magical Book
+* source:	https://sketchfab.com/3d-models/old-magical-book-326cf7653c7c4ec19d2672f5a7a33578
+* author:	Akiko.Tomiyoshi (https://sketchfab.com/Akiko.Tomiyoshi)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Old Magical Book" (https://sketchfab.com/3d-models/old-magical-book-326cf7653c7c4ec19d2672f5a7a33578) by Akiko.Tomiyoshi (https://sketchfab.com/Akiko.Tomiyoshi) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

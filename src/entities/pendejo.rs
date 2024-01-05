@@ -142,23 +142,23 @@ impl LdtkEntity for PendejoBundle {
 // ---------
 
 pub fn pendejo_activity(time: Res<Time>, mut los_pendejos: Query<(&mut Velocity, &mut Pendejo)>) {
-    for (mut v, mut mierda) in los_pendejos.iter_mut().filter(|(_, m)| !m.is_dummy) {
+    for (mut v, mut pendejo) in los_pendejos.iter_mut().filter(|(_, m)| !m.is_dummy) {
         let rotation_angle = time.elapsed_seconds().cos() * std::f32::consts::FRAC_PI_4;
 
-        if mierda.hit_at.is_some() {
-            let timer = mierda.hit_at.as_mut().unwrap();
+        if pendejo.hit_at.is_some() {
+            let timer = pendejo.hit_at.as_mut().unwrap();
             timer.tick(time.delta());
             if !timer.finished() {
                 continue;
             } else {
-                mierda.hit_at = None;
+                pendejo.hit_at = None;
             }
         }
         v.linvel = Vec2::new(
-            mierda.move_direction.x * rotation_angle.cos()
-                - mierda.move_direction.y * rotation_angle.sin(),
-            mierda.move_direction.x * rotation_angle.sin()
-                + mierda.move_direction.y * rotation_angle.cos(),
+            pendejo.move_direction.x * rotation_angle.cos()
+                - pendejo.move_direction.y * rotation_angle.sin(),
+            pendejo.move_direction.x * rotation_angle.sin()
+                + pendejo.move_direction.y * rotation_angle.cos(),
         ) * 30.0;
     }
 }
@@ -279,23 +279,23 @@ pub fn handle_spawn_pendejo(
                         // generate random position
 
                         let mut offset_position = Vec3::new(0.0, 0.0, 0.);
-                        let mut mierda_position = player_translation + offset_position;
+                        let mut pendejo_position = player_translation + offset_position;
 
-                        while (player_translation - mierda_position).length() < 50.0
-                            || mierda_position.x < 0.0 + 24.0
-                            || mierda_position.x > (level.px_wid as f32) - 24.0
-                            || mierda_position.y < 0.0 + 24.0
-                            || mierda_position.y > (level.px_hei as f32) - 24.0
+                        while (player_translation - pendejo_position).length() < 50.0
+                            || pendejo_position.x < 0.0 + 24.0
+                            || pendejo_position.x > (level.px_wid as f32) - 24.0
+                            || pendejo_position.y < 0.0 + 24.0
+                            || pendejo_position.y > (level.px_hei as f32) - 24.0
                         {
                             let r = rng.gen_range(0.0..1000.0);
                             let angle = rng.gen_range(0.0..std::f32::consts::PI * 2.0);
 
                             offset_position =
                                 Vec3::new(r * f32::sin(angle), r * f32::cos(angle), 0.);
-                            mierda_position = player_translation + offset_position;
+                            pendejo_position = player_translation + offset_position;
                         }
 
-                        let transform = Transform::from_translation(mierda_position)
+                        let transform = Transform::from_translation(pendejo_position)
                             .with_scale(Vec3::ONE * 0.5);
 
                         let new_entity = new_entity.unwrap();

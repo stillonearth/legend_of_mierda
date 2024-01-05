@@ -1,8 +1,9 @@
 use bevy::prelude::*;
 
-pub mod items;
+pub mod biboran;
 pub mod mierda;
 pub mod pendejo;
+pub mod pizza;
 pub mod player;
 
 pub struct EntitiesPlugin;
@@ -13,15 +14,16 @@ impl Plugin for EntitiesPlugin {
             let registry = app.world.resource_mut::<AppTypeRegistry>();
             let mut wr = registry.write();
             wr.register::<mierda::Mierda>();
-            wr.register::<items::Pizza>();
+            wr.register::<pizza::Pizza>();
             wr.register::<player::Player>();
         }
 
         app.add_plugins((
             mierda::EnemyPlugin,
-            items::ItemsPlugin,
+            pizza::PizzaPlugin,
             player::PlayerPlugin,
             pendejo::PendejoPlugin,
+            biboran::BiboranPlugin,
         ));
     }
 }

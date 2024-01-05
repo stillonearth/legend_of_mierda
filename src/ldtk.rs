@@ -6,13 +6,14 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::entities::{
-    items::*,
+    biboran::{create_biboran_bundle, Biboran},
     mierda::*,
     pendejo::{create_pendejo_bundle, Pendejo},
+    pizza::*,
     player::Player,
 };
 
-const ASPECT_RATIO: f32 = 1. / 1.;
+const ASPECT_RATIO: f32 = 1.0;
 
 // Events
 
@@ -115,16 +116,28 @@ pub fn camera_fit_inside_current_level(
                         (player_translation.x - level_transform.translation.x - width / 2.)
                             .clamp(0., level.px_wid as f32 - width);
                     camera_transform.translation.y = 0.;
+
+                    println!("dead branch");
                 } else {
                     // level is taller than the screen
-                    let width = (level.px_wid as f32 / 16.).round() * 16.;
-                    let height = width / ASPECT_RATIO;
+                    let mut width = (level.px_wid as f32 / 16.).round() * 16.;
+                    let mut height = width / ASPECT_RATIO;
+
+                    width *= 0.5;
+                    height *= 0.5;
+
                     orthographic_projection.scaling_mode =
-                        bevy::render::camera::ScalingMode::Fixed { width, height };
+                        bevy::render::camera::ScalingMode::Fixed {
+                            width: width,
+                            height: height,
+                        };
                     camera_transform.translation.y =
                         (player_translation.y - level_transform.translation.y - height / 2.)
                             .clamp(0., level.px_hei as f32 - height);
-                    camera_transform.translation.x = 0.;
+                    // camera_transform.translation.x = 0.;
+                    camera_transform.translation.x =
+                        (player_translation.x - level_transform.translation.x - width / 2.)
+                            .clamp(0., level.px_wid as f32 - width);
                 }
 
                 camera_transform.translation.x += level_transform.translation.x;
@@ -292,6 +305,7 @@ pub fn hide_dummy_entities(
         Query<(Entity, &mut Visibility, &Mierda)>,
         Query<(Entity, &mut Visibility, &Pizza)>,
         Query<(Entity, &mut Visibility, &Pendejo)>,
+        Query<(Entity, &mut Visibility, &Biboran)>,
     )>,
 ) {
     if !level_selection.is_changed() {
@@ -318,6 +332,13 @@ pub fn hide_dummy_entities(
             commands.entity(entity).remove::<Collider>();
         }
     }
+
+    for (entity, mut visibility, pendejo) in set.p3().iter_mut() {
+        if pendejo.is_dummy {
+            *visibility = Visibility::Hidden;
+            commands.entity(entity).remove::<Collider>();
+        }
+    }
 }
 
 pub fn fix_missing_ldtk_entities(
@@ -327,6 +348,7 @@ pub fn fix_missing_ldtk_entities(
     los_mierdas: Query<(Entity, &Mierda), Without<Collider>>,
     los_pizzas: Query<(Entity, &Pizza), Without<Collider>>,
     los_pendejos: Query<(Entity, &Pendejo), Without<Collider>>,
+    biborans: Query<(Entity, &Biboran), Without<Collider>>,
 ) {
     let asset_server = asset_server.into_inner();
     let texture_atlasses = texture_atlasses.into_inner();
@@ -355,6 +377,13 @@ pub fn fix_missing_ldtk_entities(
 
     for (e, _) in los_pizzas.iter().filter(|(_, m)| !m.is_dummy) {
         let bundle = create_pizza_bundle(asset_server, texture_atlasses, false);
+        commands
+            .entity(e)
+            .insert((bundle.collider_bundle, Visibility::Visible));
+    }
+
+    for (e, _) in biborans.iter().filter(|(_, m)| !m.is_dummy) {
+        let bundle = create_biboran_bundle(asset_server, texture_atlasses, false);
         commands
             .entity(e)
             .insert((bundle.collider_bundle, Visibility::Visible));
