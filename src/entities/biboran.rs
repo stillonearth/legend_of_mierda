@@ -39,6 +39,9 @@ use super::player::Player;
 #[derive(Component)]
 pub struct BiboranSprite;
 
+#[derive(Component)]
+pub struct BiboranBookScene;
+
 #[derive(Clone, PartialEq, Debug, Default, Component, Reflect)]
 pub struct Biboran {
     pub is_dummy: bool,
@@ -148,7 +151,7 @@ pub struct SpawnBiboranEvent {
 
 pub fn event_spawn_biboran(
     mut commands: Commands,
-    mut ev_spawn_biboran: EventReader<SpawnBiboranEvent>,
+    mut er_spawn_biboran: EventReader<SpawnBiboranEvent>,
     level_selection: Res<LevelSelection>,
     level_handles: Query<(Entity, &Handle<LdtkLevel>)>,
     level_assets: Res<Assets<LdtkLevel>>,
@@ -163,7 +166,7 @@ pub fn event_spawn_biboran(
     let mut rng = rand::thread_rng();
     let player_translation = q_player_query.single().1.translation;
 
-    for ev_spawn in ev_spawn_biboran.iter() {
+    for ev_spawn in er_spawn_biboran.iter() {
         for (_, level_handle) in level_handles.iter() {
             let level = &level_assets.get(level_handle).unwrap().level;
 
@@ -174,12 +177,12 @@ pub fn event_spawn_biboran(
                     .unwrap();
 
                 for _i in 0..ev_spawn.count {
-                    for (pizza_entity, mierda_parent, pizza) in biborans.iter() {
+                    for (pizza_entity, biboran_parent, pizza) in biborans.iter() {
                         if !pizza.is_dummy {
                             continue;
                         }
 
-                        let pizza_parent = mierda_parent.get();
+                        let pizza_parent = biboran_parent.get();
 
                         if parent_entity != pizza_parent {
                             continue;
@@ -196,23 +199,23 @@ pub fn event_spawn_biboran(
                         // generate random position
 
                         let mut offset_position = Vec3::new(0.0, 0.0, 0.);
-                        let mut mierda_position = player_translation + offset_position;
+                        let mut biboran_position = player_translation + offset_position;
 
-                        while (player_translation - mierda_position).length() < 50.0
-                            || mierda_position.x < 0.0 + 24.0
-                            || mierda_position.x > (level.px_wid as f32) - 24.0
-                            || mierda_position.y < 0.0 + 24.0
-                            || mierda_position.y > (level.px_hei as f32) - 24.0
+                        while (player_translation - biboran_position).length() < 50.0
+                            || biboran_position.x < 0.0 + 24.0
+                            || biboran_position.x > (level.px_wid as f32) - 24.0
+                            || biboran_position.y < 0.0 + 24.0
+                            || biboran_position.y > (level.px_hei as f32) - 24.0
                         {
                             let r = rng.gen_range(0.0..1000.0);
                             let angle = rng.gen_range(0.0..std::f32::consts::PI * 2.0);
 
                             offset_position =
                                 Vec3::new(r * f32::sin(angle), r * f32::cos(angle), 0.);
-                            mierda_position = player_translation + offset_position;
+                            biboran_position = player_translation + offset_position;
                         }
 
-                        let transform = Transform::from_translation(mierda_position)
+                        let transform = Transform::from_translation(biboran_position)
                             .with_scale(Vec3::ONE * 0.5);
 
                         let new_entity = new_entity.unwrap();
@@ -241,7 +244,7 @@ pub fn event_on_biboran_step_over(
     mut q_biboran_animations: Query<(&mut Visibility, &BiboranSprite)>, // mut q_ui_healthbar: Query<(Entity, &mut Style, &ui::UIPlayerHealth)>,
     mut biboran_timer: ResMut<BiboranTimer>,
     animations: Res<Animations>,
-    mut players: Query<&mut AnimationPlayer>,
+    mut players: Query<(&mut AnimationPlayer, &BiboranBookScene)>,
     audio: Res<BiboranPrayer>,
     mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
@@ -264,7 +267,7 @@ pub fn event_on_biboran_step_over(
             }
         }
 
-        for mut player in &mut players {
+        for (mut player, _) in &mut players {
             player.play(animations.0.clone_weak()).repeat();
         }
 
@@ -393,19 +396,22 @@ pub fn setup_biboran_scene(
     ));
 
     // Biboran
-    commands.spawn(HookedSceneBundle {
-        scene: SceneBundle {
-            scene: asset_server.load("models/biboran.glb#Scene0"),
-            ..default()
+    commands.spawn((
+        HookedSceneBundle {
+            scene: SceneBundle {
+                scene: asset_server.load("models/biboran.glb#Scene0"),
+                ..default()
+            },
+            hook: SceneHook::new(|_, cmds| {
+                cmds.insert(RenderLayers::layer(1)).insert(BiboranBookScene);
+            }),
         },
-        hook: SceneHook::new(|_, cmds| {
-            cmds.insert(RenderLayers::layer(1));
-        }),
-    });
+        BiboranBookScene,
+    ));
 }
 
 fn biboran_holy_effect(
-    mut players: Query<&mut AnimationPlayer>,
+    mut _players: Query<(&mut AnimationPlayer, &BiboranBookScene)>,
     mut q_biboran_sprite: Query<(&mut Visibility, &BiboranSprite)>,
     mut biboran_animation_timer: ResMut<BiboranTimer>,
     time: Res<Time>,
@@ -415,10 +421,6 @@ fn biboran_holy_effect(
     biboran_animation_timer.0.tick(time.delta());
 
     if biboran_animation_timer.0.just_finished() {
-        for mut player in &mut players {
-            player.pause();
-        }
-
         for (mut v, _) in q_biboran_sprite.iter_mut() {
             if biboran_animation_timer.0.just_finished() {
                 *v = Visibility::Hidden;
