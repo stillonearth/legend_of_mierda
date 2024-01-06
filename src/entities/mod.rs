@@ -16,6 +16,7 @@ impl Plugin for EntitiesPlugin {
             wr.register::<mierda::Mierda>();
             wr.register::<pizza::Pizza>();
             wr.register::<player::Player>();
+            wr.register::<biboran::Biboran>();
         }
 
         app.add_plugins((

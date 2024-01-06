@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
+use bevy_kira_audio::AudioSource;
 
 use crate::{sprites::*, GameState};
 
@@ -7,8 +8,6 @@ pub struct LoadingPlugin;
 
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
-        info!("here!");
-
         app.add_loading_state(
             LoadingState::new(GameState::Loading).continue_to_state(GameState::Menu),
         );
@@ -29,8 +28,8 @@ impl Plugin for LoadingPlugin {
 
 #[derive(AssetCollection, Resource)]
 pub struct AudioAssets {
-    // #[asset(path = "audio/neural.mp3")]
-    // pub neural: Handle<AudioSource>,
+    #[asset(path = "audio/biboran.ogg")]
+    pub biboran: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection, Resource)]

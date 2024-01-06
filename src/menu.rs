@@ -3,6 +3,7 @@ use crate::loading::TextureAssets;
 use crate::CutsceneAssets;
 use crate::GameState;
 use bevy::prelude::*;
+use bevy::render::view::RenderLayers;
 
 pub struct MenuPlugin;
 
@@ -50,7 +51,7 @@ fn setup_menu(
 ) {
     info!("menu");
 
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((Camera2dBundle::default()));
 
     commands
         .spawn((

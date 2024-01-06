@@ -43,6 +43,7 @@ bevy_asset_loader = "0.17"
 bevy_kira_audio = "0.16"
 webbrowser = { version = "0.8", features = ["hardened"] }
 ffmpeg-next = "6.1"
+bevy-scene-hook = "8.0"
 
 [profile.dev.package."*"]
 opt-level = 3
@@ -54,7 +55,6 @@ opt-level = 1
 lto = true
 codegen-units = 1
 
-# The profile that 'cargo dist' will build with
 [profile.dist]
 inherits = "release"
 lto = "thin"

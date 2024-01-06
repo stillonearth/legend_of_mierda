@@ -1,5 +1,6 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
+use bevy::log::LogPlugin;
 use bevy::{
     input::common_conditions::input_toggle_active,
     prelude::*,
@@ -7,8 +8,10 @@ use bevy::{
 };
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_kira_audio::prelude::*;
 use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
+use bevy_scene_hook::HookPlugin;
 use pecs::prelude::*;
 
 use cutscene::*;
@@ -58,10 +61,13 @@ fn main() {
                     }),
                     ..default()
                 })
-                .set(ImagePlugin::default_nearest()),
-            // LogDiagnosticsPlugin::default(),
-            // FrameTimeDiagnosticsPlugin,
-        ))
+                .set(ImagePlugin::default_nearest())
+                .set(LogPlugin {
+                    filter: "info,wgpu_core=warn,wgpu_hal=warn,legend_of_mierda=debug,bevy_animation=error".into(),
+                    level: bevy::log::Level::DEBUG,
+                }),
+            AudioPlugin))
+        .add_plugins(HookPlugin)
         .add_plugins(LoadingPlugin)
         .add_plugins(MenuPlugin)
         .add_plugins(CutscenePlugin)
