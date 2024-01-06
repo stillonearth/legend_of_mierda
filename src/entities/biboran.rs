@@ -54,7 +54,7 @@ pub struct Biboran {
 #[derive(Clone, Default, Bundle)]
 pub struct BiboranBundle {
     pub sprite_bundle: SpriteSheetBundle,
-    pub pizza: Biboran,
+    pub biboran: Biboran,
     pub collider_bundle: ColliderBundle,
     pub sensor: Sensor,
 }
@@ -96,7 +96,7 @@ pub fn create_biboran_bundle(
     BiboranBundle {
         sprite_bundle,
         collider_bundle,
-        pizza: Biboran { is_dummy },
+        biboran: Biboran { is_dummy },
         sensor: Sensor {},
     }
 }
@@ -177,18 +177,18 @@ pub fn event_spawn_biboran(
                     .unwrap();
 
                 for _i in 0..ev_spawn.count {
-                    for (pizza_entity, biboran_parent, pizza) in biborans.iter() {
+                    for (biboran_entity, biboran_parent, pizza) in biborans.iter() {
                         if !pizza.is_dummy {
                             continue;
                         }
 
-                        let pizza_parent = biboran_parent.get();
+                        let biboran_parent = biboran_parent.get();
 
-                        if parent_entity != pizza_parent {
+                        if parent_entity != biboran_parent {
                             continue;
                         }
 
-                        let mut parent = commands.entity(pizza_parent);
+                        let mut parent = commands.entity(biboran_parent);
 
                         let mut new_entity: Option<Entity> = None;
                         parent.with_children(|cm| {
@@ -224,7 +224,7 @@ pub fn event_spawn_biboran(
                             .insert(Biboran { is_dummy: false });
 
                         commands.add(CloneEntity {
-                            source: pizza_entity,
+                            source: biboran_entity,
                             destination: new_entity,
                         });
 
@@ -239,7 +239,7 @@ pub fn event_spawn_biboran(
 pub fn event_on_biboran_step_over(
     mut commands: Commands,
     mut er_biboran_step_over: EventReader<BiboranStepOverEvent>,
-    mut q_pizzas: Query<(Entity, &Biboran)>,
+    mut q_biborans: Query<(Entity, &Biboran)>,
     mut q_player: Query<(Entity, &mut Player)>,
     mut q_biboran_animations: Query<(&mut Visibility, &BiboranSprite)>, // mut q_ui_healthbar: Query<(Entity, &mut Style, &ui::UIPlayerHealth)>,
     mut biboran_timer: ResMut<BiboranTimer>,
@@ -271,11 +271,11 @@ pub fn event_on_biboran_step_over(
             player.play(animations.0.clone_weak()).repeat();
         }
 
-        for (e_pizza, _) in q_pizzas.iter_mut() {
-            if e_pizza != e.0 {
+        for (e_biboran, _) in q_biborans.iter_mut() {
+            if e_biboran != e.0 {
                 continue;
             }
-            commands.entity(e_pizza).despawn_recursive();
+            commands.entity(e_biboran).despawn_recursive();
         }
     }
 }
@@ -286,21 +286,21 @@ pub fn event_on_biboran_step_over(
 
 pub(crate) fn handle_player_biboran_collision(
     mut collision_events: EventReader<CollisionEvent>,
-    mut q_pizzas: Query<(Entity, &Biboran)>,
+    mut q_q_biborans: Query<(Entity, &Biboran)>,
     q_player: Query<(Entity, &mut Player)>,
     mut ev_biboran_step_over: EventWriter<BiboranStepOverEvent>,
 ) {
     for (player_entity, _) in q_player.iter() {
         for event in collision_events.iter() {
-            for (e_pizza, _) in q_pizzas.iter_mut() {
+            for (e_biboran, _) in q_q_biborans.iter_mut() {
                 if let CollisionEvent::Started(e1, e2, _) = event {
-                    if e1.index() == e_pizza.index() && e2.index() == player_entity.index() {
-                        ev_biboran_step_over.send(BiboranStepOverEvent(e_pizza));
+                    if e1.index() == e_biboran.index() && e2.index() == player_entity.index() {
+                        ev_biboran_step_over.send(BiboranStepOverEvent(e_biboran));
                         return;
                     }
 
-                    if e2.index() == e_pizza.index() && e1.index() == player_entity.index() {
-                        ev_biboran_step_over.send(BiboranStepOverEvent(e_pizza));
+                    if e2.index() == e_biboran.index() && e1.index() == player_entity.index() {
+                        ev_biboran_step_over.send(BiboranStepOverEvent(e_biboran));
                         return;
                     }
                 }

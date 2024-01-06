@@ -30,6 +30,8 @@ impl Plugin for LoadingPlugin {
 pub struct AudioAssets {
     #[asset(path = "audio/biboran.ogg")]
     pub biboran: Handle<AudioSource>,
+    #[asset(path = "audio/mierda.ogg")]
+    pub mierda: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection, Resource)]

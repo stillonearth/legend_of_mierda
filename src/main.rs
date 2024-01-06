@@ -18,6 +18,7 @@ use cutscene::*;
 use loading::*;
 use menu::*;
 
+mod audio;
 mod controls;
 mod cutscene;
 mod entities;
@@ -70,6 +71,7 @@ fn main() {
         .add_plugins(HookPlugin)
         .add_plugins(LoadingPlugin)
         .add_plugins(MenuPlugin)
+        .add_plugins(audio::InternalAudioPlugin)
         .add_plugins(CutscenePlugin)
         .add_plugins(PecsPlugin)
         .add_plugins(
