@@ -128,8 +128,8 @@ pub fn camera_fit_inside_current_level(
 
                     orthographic_projection.scaling_mode =
                         bevy::render::camera::ScalingMode::Fixed {
-                            width: width,
-                            height: height,
+                            width,
+                            height,
                         };
                     camera_transform.translation.y =
                         (player_translation.y - level_transform.translation.y - height / 2.)

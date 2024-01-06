@@ -1,4 +1,4 @@
-use std::{cmp::min, time::Duration};
+use std::time::Duration;
 
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
@@ -14,6 +14,8 @@ use bevy::{
 };
 
 use bevy_ecs_ldtk::prelude::*;
+use bevy_kira_audio::prelude::*;
+use bevy_kira_audio::AudioInstance;
 use bevy_rapier2d::prelude::*;
 use bevy_scene_hook::{HookedSceneBundle, SceneHook};
 
@@ -21,7 +23,11 @@ use rand::Rng;
 use std::f32::consts::PI;
 
 use crate::{
-    loading::load_texture_atlas, physics::ColliderBundle, sprites::BIBORAN_ASSET_SHEET, utils::*,
+    loading::{load_texture_atlas, AudioAssets},
+    physics::ColliderBundle,
+    sprites::BIBORAN_ASSET_SHEET,
+    utils::*,
+    GameState,
 };
 
 use super::player::Player;
@@ -120,6 +126,9 @@ pub struct BiboranRenderImage(Handle<Image>);
 
 #[derive(Resource, Default)]
 pub struct BiboranTimer(pub Timer);
+
+#[derive(Resource, Default)]
+pub struct BiboranPrayer(Handle<AudioInstance>);
 
 // ------
 // Events
@@ -232,18 +241,30 @@ pub fn event_on_biboran_step_over(
     mut q_biboran_animations: Query<(&mut Visibility, &BiboranSprite)>, // mut q_ui_healthbar: Query<(Entity, &mut Style, &ui::UIPlayerHealth)>,
     mut biboran_timer: ResMut<BiboranTimer>,
     animations: Res<Animations>,
-    mut players: Query<(&mut AnimationPlayer)>,
+    mut players: Query<&mut AnimationPlayer>,
+    audio: Res<BiboranPrayer>,
+    mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
     for e in er_biboran_step_over.iter() {
         for (_, mut _player) in q_player.iter_mut() {
-            biboran_timer.0 = Timer::new(Duration::from_secs(13), TimerMode::Once);
+            biboran_timer.0 = Timer::new(Duration::from_secs(14), TimerMode::Once);
 
             for (mut v, _) in q_biboran_animations.iter_mut() {
                 *v = Visibility::Visible;
             }
         }
 
-        for (mut player) in &mut players {
+        if let Some(instance) = audio_instances.get_mut(&audio.0) {
+            match instance.state() {
+                PlaybackState::Paused { .. } => {
+                    instance.seek_to(0.0);
+                    instance.resume(AudioTween::default());
+                }
+                _ => {}
+            }
+        }
+
+        for mut player in &mut players {
             player.play(animations.0.clone_weak()).repeat();
         }
 
@@ -384,22 +405,34 @@ pub fn setup_biboran_scene(
 }
 
 fn biboran_holy_effect(
-    animations: Res<Animations>,
-    mut players: Query<(&mut AnimationPlayer)>,
+    mut players: Query<&mut AnimationPlayer>,
     mut q_biboran_sprite: Query<(&mut Visibility, &BiboranSprite)>,
     mut biboran_animation_timer: ResMut<BiboranTimer>,
     time: Res<Time>,
+    audio: Res<BiboranPrayer>,
+    mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
     biboran_animation_timer.0.tick(time.delta());
 
     if biboran_animation_timer.0.just_finished() {
-        for (mut player) in &mut players {
+        for mut player in &mut players {
             player.pause();
         }
 
         for (mut v, _) in q_biboran_sprite.iter_mut() {
             if biboran_animation_timer.0.just_finished() {
                 *v = Visibility::Hidden;
+            }
+        }
+    }
+
+    if biboran_animation_timer.0.finished() {
+        if let Some(instance) = audio_instances.get_mut(&audio.0) {
+            match instance.state() {
+                PlaybackState::Playing { .. } => {
+                    instance.pause(AudioTween::default());
+                }
+                _ => {}
             }
         }
     }
@@ -438,6 +471,19 @@ fn ineject_biboran_render_sprite(
     }
 }
 
+// -----
+// Audio
+// -----
+
+fn setup_biboran_prayer(mut commands: Commands, audio_assets: Res<AudioAssets>, audio: Res<Audio>) {
+    let handle = audio
+        .play(audio_assets.biboran.clone())
+        .looped()
+        .with_volume(0.8)
+        .handle();
+    commands.insert_resource(BiboranPrayer(handle));
+}
+
 // ------
 // Plugin
 // ------
@@ -449,9 +495,11 @@ impl Plugin for BiboranPlugin {
         app.register_ldtk_entity::<BiboranBundle>("Biboran")
             .init_resource::<BiboranRenderImage>()
             .init_resource::<BiboranTimer>()
+            .init_resource::<BiboranPrayer>()
             // Event Handlers
             .add_event::<SpawnBiboranEvent>()
             .add_event::<BiboranStepOverEvent>()
+            .add_systems(OnEnter(GameState::Gameplay), setup_biboran_prayer)
             .add_systems(Startup, setup_biboran_scene)
             .add_systems(Update, biboran_holy_effect)
             // Event Handlers

@@ -1,9 +1,9 @@
 use crate::loading::FontAssets;
-use crate::loading::TextureAssets;
+
 use crate::CutsceneAssets;
 use crate::GameState;
 use bevy::prelude::*;
-use bevy::render::view::RenderLayers;
+
 
 pub struct MenuPlugin;
 
@@ -51,7 +51,7 @@ fn setup_menu(
 ) {
     info!("menu");
 
-    commands.spawn((Camera2dBundle::default()));
+    commands.spawn(Camera2dBundle::default());
 
     commands
         .spawn((
@@ -125,7 +125,7 @@ fn setup_menu(
                             TextStyle {
                                 font_size: 100.0,
                                 font: font_assets.pixeloid_mono.clone(),
-                                color: Color::WHITE.into(),
+                                color: Color::WHITE,
                                 ..default()
                             },
                         ),
@@ -155,12 +155,12 @@ fn click_play_button(
             }
             Interaction::Hovered => {
                 for (mut text, _) in start_game_button.iter_mut() {
-                    text.sections[0].style.color = button_colors.hovered.clone().into();
+                    text.sections[0].style.color = button_colors.hovered;
                 }
             }
             Interaction::None => {
                 for (mut text, _) in start_game_button.iter_mut() {
-                    text.sections[0].style.color = button_colors.normal.clone().into();
+                    text.sections[0].style.color = button_colors.normal;
                 }
             }
         }
