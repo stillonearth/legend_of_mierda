@@ -1,4 +1,4 @@
-# Legend of Mierda - Design Document
+# Legend of Mierda
 
 ![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/d467acd9-6b76-44be-9013-494beb9478f5)
 ![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/f7ce3ac4-bc30-4241-87a2-7eea49b09a56)
@@ -48,7 +48,3 @@ Controls will be designed to be intuitive and responsive, accommodating both key
 The game caters to action-adventure enthusiasts who enjoy interner meme culture and Vampire Survivors-like games.
 
 The target audience includes fans of the Vampire Survivors, players intrigued by Mexican culture and mythology, and schizophrenics as well as interested in Internet meme culture.
-
-# Legend of Mierda - Tech Document
-
-Game is developed with Bevy engine and levels are designed with LDTK.
