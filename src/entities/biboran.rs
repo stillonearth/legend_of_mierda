@@ -177,8 +177,8 @@ pub fn event_spawn_biboran(
                     .unwrap();
 
                 for _i in 0..ev_spawn.count {
-                    for (biboran_entity, biboran_parent, pizza) in biborans.iter() {
-                        if !pizza.is_dummy {
+                    for (biboran_entity, biboran_parent, biboran) in biborans.iter() {
+                        if !biboran.is_dummy {
                             continue;
                         }
 

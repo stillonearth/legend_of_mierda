@@ -38,7 +38,7 @@ pub struct Pendejo {
 
 #[derive(Default, Bundle)]
 pub struct PendejoBundle {
-    pub sprite_bundle: SpriteSheetBundle,
+    pub spritesheet_bundle: SpriteSheetBundle,
     pub character_animation: CharacterAnimation,
     pub animation_timer: AnimationTimer,
     pub pendejo: Pendejo,
@@ -60,7 +60,7 @@ pub fn create_pendejo_bundle(
     let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
     let collider_bundle = ColliderBundle {
-        collider: Collider::cuboid(8., 26.),
+        collider: Collider::cuboid(4., 13.),
         rigid_body: RigidBody::Dynamic,
         friction: Friction {
             coefficient: 0.0,
@@ -80,7 +80,7 @@ pub fn create_pendejo_bundle(
         SHEET_1_COLUMNS,
         SHEET_1_ROWS,
         None,
-        64.,
+        32.,
         texture_atlasses,
     );
 
@@ -108,7 +108,7 @@ pub fn create_pendejo_bundle(
             animation_type: AnimationType::Walk,
         },
         animation_timer: AnimationTimer(Timer::from_seconds(0.2, TimerMode::Repeating)),
-        sprite_bundle,
+        spritesheet_bundle: sprite_bundle,
         collider_bundle,
         active_events: ActiveEvents::COLLISION_EVENTS,
         pendejo,
@@ -238,6 +238,9 @@ pub fn handle_spawn_pendejo(
     los_pendejos: Query<(Entity, &Parent, &Pendejo)>,
     levels: Query<(Entity, &Handle<LdtkLevel>)>,
     q_player_query: Query<(Entity, &Transform, &Player)>,
+
+    _asset_server: Res<AssetServer>,
+    _texture_atlasses: ResMut<Assets<TextureAtlas>>,
 ) {
     if q_player_query.iter().count() == 0 {
         return;
@@ -310,6 +313,9 @@ pub fn handle_spawn_pendejo(
                             source: mierda_entity,
                             destination: new_entity,
                         });
+
+                        // let ta = texture_atlasses.as_mut();
+                        // let pendejo_bundle = create_pendejo_bundle(&asset_server, ta, false);
 
                         commands.entity(new_entity).insert(transform);
                     }

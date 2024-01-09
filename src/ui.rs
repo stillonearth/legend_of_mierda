@@ -1,4 +1,6 @@
-use bevy::{prelude::*};
+use bevy::prelude::*;
+
+use crate::loading::FontAssets;
 
 #[derive(Component)]
 pub struct UIPlayerHealth;
@@ -9,7 +11,11 @@ pub struct UIGameOver;
 #[derive(Component)]
 pub struct UIGameplayWave;
 
-pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub(crate) fn draw_ui(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    font_assets: Res<FontAssets>,
+) {
     // alextime face
     commands
         .spawn((
@@ -84,7 +90,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     width: Val::Percent(100.0),
                     position_type: PositionType::Absolute,
                     justify_content: JustifyContent::Center,
-                    top: Val::Percent(33.0),
+                    height: Val::Percent(100.0),
                     align_items: AlignItems::Center,
                     ..default()
                 },
@@ -96,9 +102,9 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         ))
         .with_children(|parent| {
             parent.spawn(TextBundle::from_section(
-                "        JUEGO\nTERMINADO",
+                "  JUEGO\nTERMINADO",
                 TextStyle {
-                    font: asset_server.load("fonts/Mexicana.ttf"),
+                    font: font_assets.pixeloid_mono.clone(),
                     font_size: 100.0,
                     color: Color::WHITE,
                 },

@@ -4,7 +4,6 @@ use crate::CutsceneAssets;
 use crate::GameState;
 use bevy::prelude::*;
 
-
 pub struct MenuPlugin;
 
 impl Plugin for MenuPlugin {
@@ -116,7 +115,7 @@ fn setup_menu(
                         ..Default::default()
                     },
                     button_colors,
-                    ChangeState(GameState::Gameplay),
+                    ChangeState(GameState::Cutscene),
                 ))
                 .with_children(|parent| {
                     parent.spawn((

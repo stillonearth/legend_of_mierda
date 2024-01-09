@@ -127,10 +127,7 @@ pub fn camera_fit_inside_current_level(
                     height *= 0.5;
 
                     orthographic_projection.scaling_mode =
-                        bevy::render::camera::ScalingMode::Fixed {
-                            width,
-                            height,
-                        };
+                        bevy::render::camera::ScalingMode::Fixed { width, height };
                     camera_transform.translation.y =
                         (player_translation.y - level_transform.translation.y - height / 2.)
                             .clamp(0., level.px_hei as f32 - height);
@@ -333,8 +330,8 @@ pub fn hide_dummy_entities(
         }
     }
 
-    for (entity, mut visibility, pendejo) in set.p3().iter_mut() {
-        if pendejo.is_dummy {
+    for (entity, mut visibility, biboran) in set.p3().iter_mut() {
+        if biboran.is_dummy {
             *visibility = Visibility::Hidden;
             commands.entity(entity).remove::<Collider>();
         }
