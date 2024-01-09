@@ -1,50 +1,35 @@
 # Legend of Mierda
+menu | cutscene | gameplay
+--- | --- | ---
+![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/d467acd9-6b76-44be-9013-494beb9478f5) | ![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/f7ce3ac4-bc30-4241-87a2-7eea49b09a56) | ![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/e115dff6-85f3-497a-9fa6-439bd7682a14)
 
-![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/d467acd9-6b76-44be-9013-494beb9478f5)
-![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/f7ce3ac4-bc30-4241-87a2-7eea49b09a56)
-![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/e115dff6-85f3-497a-9fa6-439bd7682a14)
+# 1. Overview
 
+## 1.1. Overview
 
-## 1. Overview
+"Legend of Mierda" is an action-adventure game inspired by Vampire Survivors. It follows Alextime, a brave person with a machete, as they battle mischievous Mierdas in Mexico. Players explore levels inspired by SNES Zelda games, fight, and try to get rid of these pesky creatures.
+## 1.2. Gameplay Mechanics
 
-"Legend of Mierda" is an action-adventure game heavily inspired by Vampire Survivors. The game follows the thrilling journey of Alextime, a courageous schizophrenic armed with a machete, as he battles against a horde of mischievous Mierdas in Mexico. Players will explore a set of levels inspired by SNES-generation of Zelda games, engage in intense combat, and embark on a quest to rid the land of these pesky creatures.
+The game has levels in Mexico, Russia, and Egypt with jungles, deserts, ruins, cities, prisons, and asylums.
 
-## 2. Gameplay Mechanics
+Players fight Mierdas using Alextime's machete. As they progress, they unlock perks like more damage. Items like healing pizza and holy biboran help them.
 
-### 2.1. Exploration and Open World:
+## 1.3. Art Style and Visuals
 
-The game will feature a set of levels in diverse landscapes of Mexico, Russia and Egypt encompassing lush jungles, scorching deserts, ancient ruins, tourist cities, Mexican prisons and Russian psychiatric asylums.
+The game uses AI-generated pixel art, refined by hand, and some public domain assets. All music is AI-generated.
 
-Game will feature a set of levels inspired by these locations.
+## 1.4. Narrative and Storyline
 
-### 2.2. Combat and Abilities:
+The story follows Alextime, a brave person protecting Mexico from mischievous Mierdas. As the quest deepens, the game reveals the Mierdas' origins and dark forces behind them. Players uncover truths connected to Mexican folklore in locations like Electrostal and Egypt.
 
-Players will engage in fast-paced, real-time combat against waves of mischievous Mierdas, utilizing Alextime's machete as their primary weapon.
+## 1.5. Platforms and Controls
 
-As players progress through the levels various perks will unlock such as improved damage. Various items will spawn to aid the player, such as health-restoring pizza and holy biboran to purge the level.
+"Legend of Mierda" will be for Linux and Windows. Controls work with keyboards and gamepads for a smooth experience.
 
-## 3. Art Style and Visuals
+## 1.6. Target Audience
 
-Game uses AI-generated pixel art refined by hand. Some of the assests are from public domain and all music is AI generated.
+The game is for action-adventure fans who like internet memes and games like Vampire Survivors. It appeals to fans of Vampire Survivors, those interested in Mexican culture/mythology, and people intrigued by internet meme culture.
 
-## 4. Narrative and Storyline
+# 2. Technical
 
-The game's narrative centers around Alextime, a fearless schizophrenic who embarks on a mission to protect Mexico from the mischievous Mierdas that plague the land.
-
-As Alextime ventures deeper into his quest, he uncovers the origins of the Mierdas and the dark forces behind their sudden proliferation.
-
-Players will uncover the truth behind the Mierdas and their connection to Mexican folklore, unraveling a captivating storyline filled with unexpected twists and discoveries.
-
-Some of the locations with shed light on history context such as Russian city of Electrostal and Egypt.
-
-## 5. Platforms and Controls
-
-"Legend of Mierda" will be developed for Linux and Windows platoforms primarily.
-
-Controls will be designed to be intuitive and responsive, accommodating both keyboard and gamepad inputs as well as gamepad controllers for a seamless gameplay experience.
-
-## 6. Target Audience
-
-The game caters to action-adventure enthusiasts who enjoy interner meme culture and Vampire Survivors-like games.
-
-The target audience includes fans of the Vampire Survivors, players intrigued by Mexican culture and mythology, and schizophrenics as well as interested in Internet meme culture.
+The game uses 2D pixel art like 1990s console games and is written in Rust on the Bevy engine.
