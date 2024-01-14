@@ -1,74 +1,37 @@
-# Legend of Mierda - Design Document
+# Legend of Mierda
+menu | cutscene | gameplay
+--- | --- | ---
+![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/d467acd9-6b76-44be-9013-494beb9478f5) | ![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/f7ce3ac4-bc30-4241-87a2-7eea49b09a56) | ![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/e115dff6-85f3-497a-9fa6-439bd7682a14)
 
-## 1. Overview
+This is Work-In-Progress. The pace is "when mood is right", so there may be long periods of inactivity.
 
-"Legend of Mierda" is an action-adventure game heavily inspired by the renowned Legend of Zelda series. The game follows the thrilling journey of Alextime, a courageous schizophrenic armed with a machete, as he battles against a horde of mischievous Mierdas in Mexico. Players will explore a set of levels inspired by SNES-generation of Zelda games, solve puzzles, engage in intense combat, and embark on a quest to rid the land of these pesky creatures.
+# 1. Overview
 
-## 2. Gameplay Mechanics
+## 1.1. Overview
 
-### 2.1. Exploration and Open World:
+"Legend of Mierda" is an action-adventure game inspired by Vampire Survivors. It follows Alextime, a brave person with a machete, as they battle mischievous Mierdas in Mexico. Players explore levels inspired by SNES Zelda games, fight, and try to get rid of these pesky creatures.
+## 1.2. Gameplay Mechanics
 
-The game will feature an expansive open world set in the diverse landscapes of Mexico, encompassing lush jungles, scorching deserts, ancient ruins, tourist cities and Mexican prisons.
+The game has levels in Mexico, Russia, and Egypt with jungles, deserts, ruins, cities, prisons, and asylums.
 
-Players will have the freedom to explore the world at their own pace, uncovering hidden treasures, discovering side quests, and encountering a variety of non-playable characters (NPCs) who offer assistance or valuable information.
+Players fight Mierdas using Alextime's machete. As they progress, they unlock perks like more damage. Items like healing pizza and holy biboran help them.
 
-The world will be divided into distinct regions, each with its own distinct visual style and unique challenges.
+## 1.3. Art Style and Visuals
 
-### 2.2. Combat and Abilities:
+The game uses AI-generated pixel art, refined by hand, and some public domain assets. All music is AI-generated.
 
-Players will engage in fast-paced, real-time combat against waves of mischievous Mierdas, utilizing Alextime's machete as their primary weapon.
+## 1.4. Narrative and Storyline
 
-The machete will be upgradable with various enhancements, enabling players to unleash devastating combos and special attacks on their foes.
+The story follows Alextime, a brave person protecting Mexico from mischievous Mierdas. As the quest deepens, the game reveals the Mierdas' origins and dark forces behind them. Players uncover truths connected to Mexican folklore in locations like Electrostal and Egypt.
 
-As players progress, they will unlock new combat maneuvers and abilities that enhance Alextime's agility, strength, and defense.
+## 1.5. Platforms and Controls
 
-### 2.3. Puzzles and Dungeons:
+"Legend of Mierda" will be for Linux and Windows. Controls work with keyboards and gamepads for a smooth experience.
 
-The game will present players with intricate puzzles and challenging dungeons inspired by Mexican culture and folklore.
+## 1.6. Target Audience
 
-Players will need to solve environmental puzzles, manipulate objects, and harness their acquired abilities to navigate through dungeons and uncover hidden rewards.
+The game is for action-adventure fans who like internet memes and games like Vampire Survivors. It appeals to fans of Vampire Survivors, those interested in Mexican culture/mythology, and people intrigued by internet meme culture.
 
-Each dungeon will culminate in an epic boss battle, testing players' combat prowess and strategic thinking.
+# 2. Technical
 
-### 2.4. Side Quests and Character Interactions:
-
-Players can embark on engaging side quests and interact with NPCs, delving deeper into the lore of Mierdas and the world around them.
-
-Completing side quests will reward players with unique items, powerful machete upgrades, and valuable insights that aid in their journey.
-
-## 3. Art Style and Visuals
-
-The game will boast a visually striking art style that draws inspiration from Mexican folk art, featuring vibrant colors, intricate patterns, and lively environments.
-
-The world will be meticulously crafted, depicting diverse locales that authentically represent Mexico's rich cultural and geographical diversity.
-
-Character and enemy designs will fuse elements of fantasy and Mexican mythology, bringing to life the whimsical and formidable Mierdas.
-
-## 4. Narrative and Storyline
-
-The game's narrative centers around Alextime, a fearless schizophrenic who embarks on a mission to protect Mexico from the mischievous Mierdas that plague the land.
-
-As Alextime ventures deeper into his quest, he uncovers the origins of the Mierdas and the dark forces behind their sudden proliferation.
-
-Players will uncover the truth behind the Mierdas and their connection to Mexican folklore, unraveling a captivating storyline filled with unexpected twists and discoveries.
-
-## 5. Platforms and Controls
-
-"Legend of Mierda" will be developed for Linux and Windows platoforms primarily.
-
-Controls will be designed to be intuitive and responsive, accommodating both keyboard and mouse inputs as well as gamepad controllers for a seamless gameplay experience.
-
-## 6. Target Audience
-
-The game caters to action-adventure enthusiasts who enjoy retro Zelda games, challenging puzzles, and thrilling combat experiences.
-
-The target audience includes fans of the Legend of Zelda series, players intrigued by Mexican culture and mythology, and schizophrenics as well as interested in Internet meme culture.
-
-# Legend of Mierda - Tech Document
-
-Game is developed with Bevy engine and levels are designed with LDTK.
-
-
-## Acknowledgements
-
-font: https://www.dafont.com/mexicana.font
+The game uses 2D pixel art like 1990s console games and is written in Rust on the Bevy engine.
