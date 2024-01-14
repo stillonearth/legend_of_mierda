@@ -118,6 +118,7 @@ pub fn event_spawn_pizza(
     for ev_spawn in ev_spawn_pizza.iter() {
         for (_, level_handle) in level_handles.iter() {
             let level = &level_assets.get(level_handle).unwrap().level;
+            let max_level_dimension = level.px_wid.max(level.px_hei) as f32;
 
             if level_selection.is_match(&0, level) {
                 let (parent_entity, _) = levels
@@ -150,7 +151,8 @@ pub fn event_spawn_pizza(
                         let mut offset_position = Vec3::new(0.0, 0.0, 0.);
                         let mut mierda_position = player_translation + offset_position;
 
-                        while (player_translation - mierda_position).length() < 50.0
+                        while (player_translation - mierda_position).length()
+                            < max_level_dimension / 3.0
                             || mierda_position.x < 0.0 + 24.0
                             || mierda_position.x > (level.px_wid as f32) - 24.0
                             || mierda_position.y < 0.0 + 24.0

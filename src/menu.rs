@@ -115,7 +115,7 @@ fn setup_menu(
                         ..Default::default()
                     },
                     button_colors,
-                    ChangeState(GameState::Cutscene),
+                    ChangeState(GameState::Gameplay),
                 ))
                 .with_children(|parent| {
                     parent.spawn((

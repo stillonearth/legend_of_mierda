@@ -1,11 +1,7 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
 use bevy::log::LogPlugin;
-use bevy::{
-    input::common_conditions::input_toggle_active,
-    prelude::*,
-    window::{PresentMode, WindowTheme},
-};
+use bevy::{input::common_conditions::input_toggle_active, prelude::*, window::PresentMode};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_kira_audio::prelude::*;
@@ -53,11 +49,9 @@ fn main() {
                         title: "Legend of Mierda".into(),
                         resolution: (1024., 1024.).into(),
                         present_mode: PresentMode::AutoVsync,
-                        // Tells wasm to resize the window according to the available canvas
                         fit_canvas_to_parent: true,
-                        // Tells wasm not to override default event handling, like F5, Ctrl+R etc.
                         prevent_default_event_handling: false,
-                        window_theme: Some(WindowTheme::Dark),
+                        resizable: false,
                         ..default()
                     }),
                     ..default()

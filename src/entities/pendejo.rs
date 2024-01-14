@@ -252,6 +252,7 @@ pub fn handle_spawn_pendejo(
     for ev_spawn in ev_spawn_mierda.iter() {
         for (_, level_handle) in level_handles.iter() {
             let level = &level_assets.get(level_handle).unwrap().level;
+            let max_level_dimension = level.px_wid.max(level.px_hei) as f32;
 
             if level_selection.is_match(&0, level) {
                 let (parent_entity, _) = levels
@@ -284,7 +285,8 @@ pub fn handle_spawn_pendejo(
                         let mut offset_position = Vec3::new(0.0, 0.0, 0.);
                         let mut pendejo_position = player_translation + offset_position;
 
-                        while (player_translation - pendejo_position).length() < 50.0
+                        while (player_translation - pendejo_position).length()
+                            < max_level_dimension / 3.0
                             || pendejo_position.x < 0.0 + 24.0
                             || pendejo_position.x > (level.px_wid as f32) - 24.0
                             || pendejo_position.y < 0.0 + 24.0
