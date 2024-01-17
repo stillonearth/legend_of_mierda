@@ -5,6 +5,7 @@ pub mod mierda;
 pub mod pendejo;
 pub mod pizza;
 pub mod player;
+pub mod text_indicator;
 
 pub struct EntitiesPlugin;
 
@@ -25,6 +26,7 @@ impl Plugin for EntitiesPlugin {
             player::PlayerPlugin,
             pendejo::PendejoPlugin,
             biboran::BiboranPlugin,
+            text_indicator::TextIndicatorPlugin,
         ));
     }
 }

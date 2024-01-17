@@ -10,7 +10,7 @@ use rand::Rng;
 
 use crate::{loading::load_texture_atlas, physics::ColliderBundle, sprites::*, utils::*};
 
-use super::player::Player;
+use super::{player::Player, text_indicator::SpawnTextIndicatorEvent};
 
 // -----------
 // Compontents
@@ -28,6 +28,7 @@ pub struct Mierda {
     pub health: u8,
     pub hit_at: Option<Timer>,
     pub is_dummy: bool,
+    pub marked_for_despawn: bool,
 }
 
 #[derive(Clone, Default, Bundle)]
@@ -93,7 +94,7 @@ pub fn create_mierda_bundle(
     };
 
     let mierda = Mierda {
-        health: 100,
+        health: 10,
         move_direction: Vec2 {
             x: rand::random::<f32>() * 2.0 - 1.0,
             y: rand::random::<f32>() * 2.0 - 1.0,
@@ -101,6 +102,7 @@ pub fn create_mierda_bundle(
         .normalize(),
         hit_at: None,
         is_dummy,
+        marked_for_despawn: false,
     };
 
     MierdaBundle {
@@ -275,9 +277,10 @@ pub fn handle_spawn_mierda(
                         let new_entity = new_entity.unwrap();
                         commands.entity(new_entity).insert(Mierda {
                             is_dummy: false,
-                            health: 100,
+                            health: 30,
                             move_direction: Vec2::ZERO,
                             hit_at: None,
+                            marked_for_despawn: false,
                         });
 
                         commands.add(CloneEntity {
@@ -295,10 +298,11 @@ pub fn handle_spawn_mierda(
 
 pub fn handle_mierda_hit(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     q_player: Query<(&Transform, &Player)>,
     mut los_mierdas: Query<(Entity, &Transform, &mut Velocity, &mut Mierda)>,
     mut ev_mierda_hit: EventReader<MierdaHitEvent>,
-    // mut ev_mierda_spawn: EventWriter<SpawnMierdaEvent>,
+    mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>, // mut ev_mierda_spawn: EventWriter<SpawnMierdaEvent>,
 ) {
     for event in ev_mierda_hit.iter() {
         for (player_transform, _) in q_player.iter() {
@@ -311,51 +315,74 @@ pub fn handle_mierda_hit(
             mierda_velocity.linvel.x += vector_attack.x * 200.;
             mierda_velocity.linvel.y += vector_attack.y * 200.;
 
+            let distance = mierda_position.distance(player_position).abs();
+            let damage = distance as u8;
+
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
             mierda.hit_at = Some(timer.clone());
+            mierda.health -= u8::min(damage, mierda.health);
 
             commands.entity(mierda_entity).insert(FlashingTimer {
                 timer: timer.clone(),
             });
 
-            // despawn mierda async
-            commands
-                .promise(|| (mierda_entity))
-                .then(asyn!(state => {
-                    state.asyn().timeout(0.3)
-                }))
-                .then(
-                    asyn!(state, mut commands: Commands, asset_server: Res<AssetServer>, q_mierdas: Query<(Entity, &GlobalTransform)> => {
-                                let mierda_transform = *q_mierdas.get(state.value).unwrap().1;
-                                commands.spawn((
-                                    ParticleSystemBundle {
-                                        transform: (mierda_transform).into(),
-                                        particle_system: ParticleSystem {
-                                            spawn_rate_per_second: 0.0.into(),
-                                            texture: ParticleTexture::Sprite(asset_server.load("px.png")),
-                                            max_particles: 1_00,
-                                            initial_speed: (0.0..10.0).into(),
-                                            scale: 1.0.into(),
-                                            velocity_modifiers: vec![
-                                                VelocityModifier::Drag(0.001.into()),
-                                                VelocityModifier::Vector(Vec3::new(0.0, -100.0, 0.0).into()),
-                                            ],
-                                            color: (Color::BLUE..Color::AQUAMARINE).into(),
-                                            bursts: vec![ParticleBurst {
-                                                time: 0.0,
-                                                count: 20,
-                                            }],
-                                            looping: false,
-                                            ..ParticleSystem::default()
-                                        },
-                                        ..default()
-                                    },
-                                    Playing,
-                                ));
-                                commands.entity(state.value).despawn_recursive();
-                            }),
-                );
+            ev_spawn_text_indicator.send(SpawnTextIndicatorEvent {
+                text: format!("-{}", damage),
+                entity: mierda_entity,
+            });
+
+            commands.spawn((
+                ParticleSystemBundle {
+                    transform: *mierda_transform,
+                    particle_system: ParticleSystem {
+                        spawn_rate_per_second: 0.0.into(),
+                        texture: ParticleTexture::Sprite(asset_server.load("px.png")),
+                        max_particles: 1_00,
+                        initial_speed: (0.0..10.0).into(),
+                        scale: 1.0.into(),
+                        velocity_modifiers: vec![
+                            VelocityModifier::Drag(0.001.into()),
+                            VelocityModifier::Vector(Vec3::new(0.0, -100.0, 0.0).into()),
+                        ],
+                        color: (Color::BLUE..Color::AQUAMARINE).into(),
+                        bursts: vec![ParticleBurst {
+                            time: 0.0,
+                            count: 20,
+                        }],
+                        looping: false,
+                        ..ParticleSystem::default()
+                    },
+                    ..default()
+                },
+                Playing,
+            ));
         }
+    }
+}
+
+pub fn despawn_dead_mierdas(
+    mut commands: Commands,
+    mut los_mierdas: Query<(Entity, &Transform, &mut Velocity, &mut Mierda)>,
+) {
+    for (e, _, _, mut m) in los_mierdas.iter_mut() {
+        if m.health != 0 {
+            continue;
+        }
+
+        if m.marked_for_despawn {
+            continue;
+        }
+
+        m.marked_for_despawn = true;
+
+        commands
+            .promise(|| (e))
+            .then(asyn!(state => {
+                state.asyn().timeout(0.3)
+            }))
+            .then(asyn!(state, mut commands: Commands => {
+                commands.entity(state.value).despawn_recursive();
+            }));
     }
 }
 
@@ -383,6 +410,8 @@ impl Plugin for EnemyPlugin {
                     // Events
                     handle_mierda_hit,
                     handle_spawn_mierda,
+                    // Rest
+                    despawn_dead_mierdas,
                 ),
             );
     }

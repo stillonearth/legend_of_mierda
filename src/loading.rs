@@ -16,10 +16,11 @@ impl Plugin for LoadingPlugin {
         app.add_collection_to_loading_state::<_, TextureAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, AvatarAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, CutsceneAssets>(GameState::Loading);
-        app.add_collection_to_loading_state::<_, FontAssets>(GameState::Loading);
+        // app.add_collection_to_loading_state::<_, FontAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, SceneAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, AnimationAssets>(GameState::Loading);
 
+        app.init_resource::<FontAssets>();
         app.init_resource::<MaterialAssets>();
         app.init_resource::<MeshAssets>();
         app.init_resource::<CharacterSpritesheets>();
@@ -48,8 +49,18 @@ pub struct AnimationAssets {
 
 #[derive(AssetCollection, Resource)]
 pub struct FontAssets {
-    #[asset(path = "fonts/PixeloidMono-d94EV.ttf")]
     pub pixeloid_mono: Handle<Font>,
+}
+
+impl FromWorld for FontAssets {
+    fn from_world(world: &mut World) -> Self {
+        let world = world.cell();
+        let asset_server = world.get_resource_mut::<AssetServer>().unwrap();
+
+        FontAssets {
+            pixeloid_mono: asset_server.load("fonts/PixeloidMono-d94EV.ttf"),
+        }
+    }
 }
 
 #[derive(AssetCollection, Resource)]
