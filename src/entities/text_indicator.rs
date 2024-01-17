@@ -1,8 +1,6 @@
-use bevy::{prelude::*};
+use bevy::prelude::*;
 
-
-
-use crate::{loading::FontAssets};
+use crate::loading::FontAssets;
 
 // -----------
 // Compontents
@@ -16,44 +14,6 @@ pub struct TextIndicator {
 // --------
 // Systems
 // --------
-
-// pub fn spawn_text_indicator(
-//     mut commands: Commands,
-//     q_player: Query<(Entity, &Player)>,
-//     q_text_indicator: Query<(Entity, &mut TextIndicator)>,
-//     font_assets: Res<FontAssets>,
-// ) {
-//     if q_text_indicator.iter().count() > 0 {
-//         return;
-//     }
-
-//     for (entity, player) in q_player.iter() {
-//         let timer = Timer::from_seconds(2.0, TimerMode::Once);
-
-//         let text_indicator = TextIndicator { timer };
-
-//         println!("text indicator spawned");
-
-//         commands.entity(entity).with_children(|parent| {
-//             let text_style = TextStyle {
-//                 font: font_assets.pixeloid_mono.clone(),
-//                 font_size: 10.0,
-//                 color: Color::WHITE,
-//             };
-//             let text_alignment = TextAlignment::Center;
-
-//             parent.spawn((
-//                 Text2dBundle {
-//                     text: Text::from_section("rotation", text_style.clone())
-//                         .with_alignment(text_alignment),
-//                     transform: Transform::from_translation(Vec3::new(0.0, 0.0, 1.0)),
-//                     ..default()
-//                 },
-//                 text_indicator,
-//             ));
-//         });
-//     }
-// }
 
 pub fn update_text_indicator(
     mut commands: Commands,
