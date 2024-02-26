@@ -136,7 +136,7 @@ pub fn event_on_level_change(
 
     mut ew_wave: EventWriter<WaveEvent>,
 ) {
-    for event in er_on_level_change.iter() {
+    for event in er_on_level_change.read() {
         match event.level_id {
             1 => {
                 let waves = get_level_1_waves();
@@ -174,7 +174,7 @@ pub fn event_wave(
     mut ev_pizza_spawn: EventWriter<SpawnPizzaEvent>,
     mut ev_biboran_spawn: EventWriter<SpawnBiboranEvent>,
 ) {
-    for event in er_on_wave_change.iter() {
+    for event in er_on_wave_change.read() {
         match event.wave_entry {
             WaveEntry::Mierda { count } => {
                 ev_mierda_spawn.send(SpawnMierdaEvent {
@@ -232,35 +232,35 @@ pub fn get_level_1_waves() -> Vec<Wave> {
             event_duration: Duration::from_secs(10),
             wave_duration: Duration::from_secs(30),
         },
-        // Wave {
-        //     events: vec![
-        //         WaveEntry::Mierda { count: 100 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Mierda { count: 100 },
-        //         WaveEntry::Biboran { count: 1 },
-        //         WaveEntry::Mierda { count: 100 },
-        //     ],
-        //     event_duration: Duration::from_secs(20),
-        //     wave_duration: Duration::from_secs(80),
-        // },
-        // Wave {
-        //     events: vec![
-        //         WaveEntry::Mierda { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Mierda { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Biboran { count: 1 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Mierda { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Biboran { count: 1 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Biboran { count: 1 },
-        //         WaveEntry::Pizza { count: 3 },
-        //     ],
-        //     event_duration: Duration::from_secs(20),
-        //     wave_duration: Duration::from_secs(260),
-        // },
+        Wave {
+            events: vec![
+                WaveEntry::Mierda { count: 100 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Mierda { count: 100 },
+                WaveEntry::Biboran { count: 1 },
+                WaveEntry::Mierda { count: 100 },
+            ],
+            event_duration: Duration::from_secs(20),
+            wave_duration: Duration::from_secs(80),
+        },
+        Wave {
+            events: vec![
+                WaveEntry::Mierda { count: 200 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Pendejo { count: 200 },
+                WaveEntry::Mierda { count: 200 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Biboran { count: 1 },
+                WaveEntry::Pendejo { count: 200 },
+                WaveEntry::Mierda { count: 200 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Biboran { count: 1 },
+                WaveEntry::Pendejo { count: 200 },
+                WaveEntry::Biboran { count: 1 },
+                WaveEntry::Pizza { count: 3 },
+            ],
+            event_duration: Duration::from_secs(20),
+            wave_duration: Duration::from_secs(260),
+        },
     ]
 }

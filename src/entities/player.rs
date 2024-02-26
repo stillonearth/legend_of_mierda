@@ -61,7 +61,7 @@ impl LdtkEntity for PlayerBundle {
         };
 
         let atlas_handle = load_texture_atlas(
-            PLAYER_ASSET_SHEET_1,
+            PLAYER_ASSET_SHEET_1.to_string(),
             asset_server,
             SHEET_1_COLUMNS,
             SHEET_1_ROWS,
@@ -116,7 +116,7 @@ pub fn event_player_attack(
     mut q_los_mierdas: Query<(Entity, &Transform, &mut Mierda)>,
     mut q_los_pendejos: Query<(Entity, &Transform, &mut Pendejo)>,
 ) {
-    for ev in ev_player_attack.iter() {
+    for ev in ev_player_attack.read() {
         let (_, transform, char_animation) = q_player.get_mut(ev.entity).unwrap();
 
         let player_position = transform.translation;
@@ -186,7 +186,7 @@ pub fn event_player_hit(
     mut q_ui_healthbar: Query<(Entity, &mut Style, &UIPlayerHealth)>,
     asset_server: Res<AssetServer>,
 ) {
-    for ev in ev_player_hit_reader.iter() {
+    for ev in ev_player_hit_reader.read() {
         let (_, player_transform, mut player) = q_player.get_mut(ev.entity).unwrap();
 
         commands.spawn((
@@ -238,7 +238,7 @@ pub fn handle_player_mierda_collisions(
     q_los_mierdas: Query<(Entity, &mut Velocity, &Mierda)>,
     mut ev_player_hit: EventWriter<PlayerHitEvent>,
 ) {
-    for event in collision_events.iter() {
+    for event in collision_events.read() {
         for (e, _) in q_player.iter_mut() {
             if let CollisionEvent::Started(e1, e2, _) = event {
                 if !(e1.index() == e.index() || e2.index() == e.index()) {
@@ -262,7 +262,7 @@ pub fn handle_player_pendejo_collisions(
     q_los_pendejos: Query<(Entity, &mut Velocity, &Pendejo)>,
     mut ev_player_hit: EventWriter<PlayerHitEvent>,
 ) {
-    for event in collision_events.iter() {
+    for event in collision_events.read() {
         for (e, _) in q_player.iter_mut() {
             if let CollisionEvent::Started(e1, e2, _) = event {
                 if !(e1.index() == e.index() || e2.index() == e.index()) {

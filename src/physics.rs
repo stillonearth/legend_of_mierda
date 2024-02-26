@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-#[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
+#[derive(Clone, Default, Bundle, LdtkIntCell)]
 pub struct ColliderBundle {
     pub collider: Collider,
     pub rigid_body: RigidBody,

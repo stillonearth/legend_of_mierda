@@ -70,12 +70,12 @@ pub fn create_pendejo_bundle(
         ..Default::default()
     };
 
-    let (soritesheet_path, spritesheet_type) = PENDEJO_SPRITE_SHEETS
+    let (spritesheet_path, spritesheet_type) = PENDEJO_SPRITE_SHEETS
         .choose(&mut rand::thread_rng())
         .unwrap();
 
     let atlas_handle = load_texture_atlas(
-        soritesheet_path,
+        spritesheet_path.to_string(),
         asset_server,
         SHEET_1_COLUMNS,
         SHEET_1_ROWS,
@@ -233,14 +233,11 @@ pub fn handle_spawn_pendejo(
     mut commands: Commands,
     mut ev_spawn_mierda: EventReader<SpawnPendejoEvent>,
     level_selection: Res<LevelSelection>,
-    level_handles: Query<(Entity, &Handle<LdtkLevel>)>,
-    level_assets: Res<Assets<LdtkLevel>>,
+    levels: Query<(Entity, &LevelIid)>,
+    projects: Query<&Handle<LdtkProject>>,
+    project_assets: Res<Assets<LdtkProject>>,
     los_pendejos: Query<(Entity, &Parent, &Pendejo)>,
-    levels: Query<(Entity, &Handle<LdtkLevel>)>,
     q_player_query: Query<(Entity, &Transform, &Player)>,
-
-    _asset_server: Res<AssetServer>,
-    _texture_atlasses: ResMut<Assets<TextureAtlas>>,
 ) {
     if q_player_query.iter().count() == 0 {
         return;
@@ -249,15 +246,22 @@ pub fn handle_spawn_pendejo(
     let mut rng = rand::thread_rng();
     let player_translation = q_player_query.single().1.translation;
 
-    for ev_spawn in ev_spawn_mierda.iter() {
-        for (_, level_handle) in level_handles.iter() {
-            let level = &level_assets.get(level_handle).unwrap().level;
+    for ev_spawn in ev_spawn_mierda.read() {
+        for (_, level_iid) in levels.iter() {
+            let project = project_assets.get(projects.single()).unwrap();
+            let level = project.get_raw_level_by_iid(level_iid.get()).unwrap();
             let max_level_dimension = level.px_wid.max(level.px_hei) as f32;
 
-            if level_selection.is_match(&0, level) {
+            if level_selection.is_match(
+                &LevelIndices {
+                    level: 0,
+                    ..default()
+                },
+                level,
+            ) {
                 let (parent_entity, _) = levels
                     .iter()
-                    .find(|(_, handle)| *handle == level_handle)
+                    .find(|(_, handle)| *handle == level_iid)
                     .unwrap();
 
                 for _i in 0..ev_spawn.count {
@@ -334,7 +338,7 @@ pub fn handle_hit_pendejo(
     mut ev_pendejo_hit: EventReader<PendejoHitEvent>,
     // mut ev_mierda_spawn: EventWriter<SpawnMierdaEvent>,
 ) {
-    for event in ev_pendejo_hit.iter() {
+    for event in ev_pendejo_hit.read() {
         for (player_transform, _) in q_player.iter() {
             let player_position = player_transform.translation;
 

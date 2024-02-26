@@ -34,19 +34,22 @@ pub struct WallBundle {
 }
 
 pub fn update_level_selection(
-    level_query: Query<(&Handle<LdtkLevel>, &Transform), Without<Player>>,
+    level_query: Query<(&LevelIid, &Transform), Without<Player>>,
     player_query: Query<&GlobalTransform, With<Player>>,
     mut level_selection: ResMut<LevelSelection>,
-    ldtk_levels: Res<Assets<LdtkLevel>>,
+    projects: Query<&Handle<LdtkProject>>,
+    project_assets: Res<Assets<LdtkProject>>,
     mut ew_level_change: EventWriter<LevelChangeEvent>,
 ) {
-    for (level_handle, level_transform) in &level_query {
-        if let Some(ldtk_level) = ldtk_levels.get(level_handle) {
+    for (level_iid, level_transform) in &level_query {
+        let project = project_assets.get(projects.single()).unwrap();
+
+        if let Some(ldtk_level) = project.get_raw_level_by_iid(level_iid.get()) {
             let level_bounds = Rect {
                 min: Vec2::new(level_transform.translation.x, level_transform.translation.y),
                 max: Vec2::new(
-                    level_transform.translation.x + ldtk_level.level.px_wid as f32,
-                    level_transform.translation.y + ldtk_level.level.px_hei as f32,
+                    level_transform.translation.x + ldtk_level.px_wid as f32,
+                    level_transform.translation.y + ldtk_level.px_hei as f32,
                 ),
             };
 
@@ -58,12 +61,11 @@ pub fn update_level_selection(
                     && player_transform.translation().y > level_bounds.min.y;
 
                 if player_within_x_bounds && player_within_y_bounds {
-                    let new_level = LevelSelection::Iid(ldtk_level.level.iid.clone());
+                    let new_level = LevelSelection::Iid(LevelIid::new(ldtk_level.iid.clone()));
                     if *level_selection != new_level {
                         *level_selection = new_level;
 
-                        let level = &ldtk_levels.get(level_handle).unwrap().level;
-                        let level_id = level.get_int_field("LevelID");
+                        let level_id = ldtk_level.get_int_field("LevelID");
                         if level_id.is_ok() {
                             let level_id = *level_id.unwrap() as usize;
                             ew_level_change.send(LevelChangeEvent { level_id });
@@ -85,26 +87,31 @@ pub fn camera_fit_inside_current_level(
         Without<Player>,
     >,
     player_query: Query<&GlobalTransform, With<Player>>,
-    level_query: Query<
-        (&Transform, &Handle<LdtkLevel>),
-        (Without<OrthographicProjection>, Without<Player>),
-    >,
+    level_query: Query<(&Transform, &LevelIid), (Without<OrthographicProjection>, Without<Player>)>,
     level_selection: Res<LevelSelection>,
-    ldtk_levels: Res<Assets<LdtkLevel>>,
+    projects: Query<&Handle<LdtkProject>>,
+    project_assets: Res<Assets<LdtkProject>>,
 ) {
     if player_query.is_empty() {
         return;
     }
+    let project = project_assets.get(projects.single()).unwrap();
 
     let player_translation = player_query.single().translation();
 
     let (mut orthographic_projection, mut camera_transform) = camera_query.single_mut();
 
-    for (level_transform, level_handle) in &level_query {
-        if let Some(ldtk_level) = ldtk_levels.get(level_handle) {
-            let level = &ldtk_level.level;
-            if level_selection.is_match(&0, level) {
-                let level_ratio = level.px_wid as f32 / ldtk_level.level.px_hei as f32;
+    for (level_transform, level_iid) in &level_query {
+        if let Some(ldtk_level) = project.get_raw_level_by_iid(level_iid.get()) {
+            let level = &ldtk_level;
+            if level_selection.is_match(
+                &LevelIndices {
+                    level: 0,
+                    ..default()
+                },
+                level,
+            ) {
+                let level_ratio = level.px_wid as f32 / ldtk_level.px_hei as f32;
                 orthographic_projection.viewport_origin = Vec2::ZERO;
                 if level_ratio > ASPECT_RATIO {
                     // level is wider than the screen
@@ -148,9 +155,12 @@ pub fn spawn_wall_collision(
     mut commands: Commands,
     wall_query: Query<(&GridCoords, &Parent), Added<Wall>>,
     parent_query: Query<&Parent, Without<Wall>>,
-    level_query: Query<(Entity, &Handle<LdtkLevel>)>,
-    levels: Res<Assets<LdtkLevel>>,
+    level_query: Query<(Entity, &LevelIid)>,
+    ldtk_projects: Query<&Handle<LdtkProject>>,
+    ldtk_project_assets: Res<Assets<LdtkProject>>,
 ) {
+    // let project = project_assets.get(projects.single()).unwrap();
+
     /// Represents a wide wall that is 1 tile tall
     /// Used to spawn wall collisions
     #[derive(Clone, Eq, PartialEq, Debug, Default, Hash)]
@@ -189,22 +199,23 @@ pub fn spawn_wall_collision(
     });
 
     if !wall_query.is_empty() {
-        level_query.for_each(|(level_entity, level_handle)| {
+        level_query.for_each(|(level_entity, level_iid)| {
             if let Some(level_walls) = level_to_wall_locations.get(&level_entity) {
-                let level = levels
-                    .get(level_handle)
-                    .expect("Level should be loaded by this point");
+                let ldtk_project = ldtk_project_assets
+                    .get(ldtk_projects.single())
+                    .expect("Project should be loaded if level has spawned");
+
+                let level = ldtk_project
+                    .as_standalone()
+                    .get_loaded_level_by_iid(&level_iid.to_string())
+                    .expect("Spawned level should exist in LDtk project");
 
                 let LayerInstance {
                     c_wid: width,
                     c_hei: height,
                     grid_size,
                     ..
-                } = level
-                    .level
-                    .layer_instances
-                    .clone()
-                    .expect("Level asset should have layers")[0];
+                } = level.layer_instances()[0];
 
                 // combine wall tiles into flat "plates" in each individual row
                 let mut plate_stack: Vec<Vec<Plate>> = Vec::new();

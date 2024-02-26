@@ -78,7 +78,7 @@ pub fn create_biboran_bundle(
     };
 
     let atlas_handle = load_texture_atlas(
-        BIBORAN_ASSET_SHEET,
+        BIBORAN_ASSET_SHEET.to_string(),
         asset_server,
         1,
         1,
@@ -153,10 +153,10 @@ pub fn event_spawn_biboran(
     mut commands: Commands,
     mut er_spawn_biboran: EventReader<SpawnBiboranEvent>,
     level_selection: Res<LevelSelection>,
-    level_handles: Query<(Entity, &Handle<LdtkLevel>)>,
-    level_assets: Res<Assets<LdtkLevel>>,
+    levels: Query<(Entity, &LevelIid)>,
+    projects: Query<&Handle<LdtkProject>>,
+    project_assets: Res<Assets<LdtkProject>>,
     biborans: Query<(Entity, &Parent, &Biboran)>,
-    levels: Query<(Entity, &Handle<LdtkLevel>)>,
     q_player_query: Query<(Entity, &Transform, &Player)>,
 ) {
     if q_player_query.iter().count() == 0 {
@@ -166,15 +166,22 @@ pub fn event_spawn_biboran(
     let mut rng = rand::thread_rng();
     let player_translation = q_player_query.single().1.translation;
 
-    for ev_spawn in er_spawn_biboran.iter() {
-        for (_, level_handle) in level_handles.iter() {
-            let level = &level_assets.get(level_handle).unwrap().level;
+    for ev_spawn in er_spawn_biboran.read() {
+        for (_, level_iid) in levels.iter() {
+            let project = project_assets.get(projects.single()).unwrap();
+            let level = project.get_raw_level_by_iid(level_iid.get()).unwrap();
             let max_level_dimension = level.px_wid.max(level.px_hei) as f32;
 
-            if level_selection.is_match(&0, level) {
+            if level_selection.is_match(
+                &LevelIndices {
+                    level: 0,
+                    ..default()
+                },
+                level,
+            ) {
                 let (parent_entity, _) = levels
                     .iter()
-                    .find(|(_, handle)| *handle == level_handle)
+                    .find(|(_, handle)| *handle == level_iid)
                     .unwrap();
 
                 for _i in 0..ev_spawn.count {
@@ -250,7 +257,7 @@ pub fn event_on_biboran_step_over(
     audio: Res<BiboranPrayer>,
     mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
-    for e in er_biboran_step_over.iter() {
+    for e in er_biboran_step_over.read() {
         for (_, mut _player) in q_player.iter_mut() {
             biboran_timer.0 = Timer::new(Duration::from_secs(14), TimerMode::Once);
 
@@ -293,7 +300,7 @@ pub(crate) fn handle_player_biboran_collision(
     mut ev_biboran_step_over: EventWriter<BiboranStepOverEvent>,
 ) {
     for (player_entity, _) in q_player.iter() {
-        for event in collision_events.iter() {
+        for event in collision_events.read() {
             for (e_biboran, _) in q_q_biborans.iter_mut() {
                 if let CollisionEvent::Started(e1, e2, _) = event {
                     if e1.index() == e_biboran.index() && e2.index() == player_entity.index() {

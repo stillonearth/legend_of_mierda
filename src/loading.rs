@@ -148,7 +148,7 @@ impl FromWorld for CharacterSpritesheets {
         let texture_atlasses = texture_atlasses_world_borrow.as_deref_mut().unwrap();
 
         let player_atlas_1 = load_texture_atlas(
-            PLAYER_ASSET_SHEET_1,
+            PLAYER_ASSET_SHEET_1.to_string(),
             asset_server,
             SHEET_1_COLUMNS,
             SHEET_1_ROWS,
@@ -158,7 +158,7 @@ impl FromWorld for CharacterSpritesheets {
         );
 
         let pendejo_atlas_1 = load_texture_atlas(
-            PENDEJO_SPRITE_SHEETS[0].0,
+            PENDEJO_SPRITE_SHEETS[0].0.to_string(),
             asset_server,
             SHEET_1_COLUMNS,
             SHEET_1_ROWS,
@@ -168,7 +168,7 @@ impl FromWorld for CharacterSpritesheets {
         );
 
         let pendejo_atlas_2 = load_texture_atlas(
-            PENDEJO_SPRITE_SHEETS[1].0,
+            PENDEJO_SPRITE_SHEETS[1].0.to_string(),
             asset_server,
             SHEET_1_COLUMNS,
             SHEET_1_ROWS,
@@ -178,7 +178,7 @@ impl FromWorld for CharacterSpritesheets {
         );
 
         let player_atlas_2 = load_texture_atlas(
-            PLAYER_ASSET_SHEET_2,
+            PLAYER_ASSET_SHEET_2.to_string(),
             asset_server,
             SHEET_2_COLUMNS,
             SHEET_2_ROWS,
@@ -188,7 +188,7 @@ impl FromWorld for CharacterSpritesheets {
         );
 
         let mierda_atlas = load_texture_atlas(
-            MIERDA_ASSET_SHEET,
+            MIERDA_ASSET_SHEET.to_string(),
             asset_server,
             5,
             1,
@@ -208,7 +208,7 @@ impl FromWorld for CharacterSpritesheets {
 }
 
 pub fn load_texture_atlas(
-    path: &str,
+    path: String,
     asset_server: &AssetServer,
     sheet_columns: usize,
     sheet_rows: usize,

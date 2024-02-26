@@ -86,7 +86,7 @@ fn main() {
             set_clear_color: SetClearColor::FromLevelBackground,
             ..Default::default()
         })
-        .insert_resource(LevelSelection::Index(0))
+        .insert_resource(LevelSelection::Uid(0))
         .register_ldtk_int_cell::<ldtk::WallBundle>(1);
 
     app.run();

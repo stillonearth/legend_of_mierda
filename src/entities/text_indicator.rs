@@ -50,7 +50,7 @@ pub fn event_spawn_text_indicator(
     mut ev_spawn_text_indicator: EventReader<SpawnTextIndicatorEvent>,
     font_assets: Res<FontAssets>,
 ) {
-    for ev in ev_spawn_text_indicator.iter() {
+    for ev in ev_spawn_text_indicator.read() {
         let timer = Timer::from_seconds(2.0, TimerMode::Once);
 
         let text_indicator = TextIndicator { timer };

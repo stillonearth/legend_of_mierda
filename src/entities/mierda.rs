@@ -78,7 +78,7 @@ pub fn create_mierda_bundle(
     };
 
     let atlas_handle = load_texture_atlas(
-        MIERDA_ASSET_SHEET,
+        MIERDA_ASSET_SHEET.to_string(),
         asset_server,
         5,
         1,
@@ -176,7 +176,7 @@ pub fn handle_mierda_wall_collisions(
     mut collision_events: EventReader<CollisionEvent>,
     mut q_los_mierdas: Query<(Entity, &mut Velocity, &Mierda)>,
 ) {
-    for event in collision_events.iter() {
+    for event in collision_events.read() {
         for (e, mut v, _) in q_los_mierdas.iter_mut() {
             if let CollisionEvent::Started(e1, e2, _) = event {
                 if e1.index() == e.index() || e2.index() == e.index() {
@@ -207,10 +207,10 @@ pub fn handle_spawn_mierda(
     mut commands: Commands,
     mut ev_spawn_mierda: EventReader<SpawnMierdaEvent>,
     level_selection: Res<LevelSelection>,
-    level_handles: Query<(Entity, &Handle<LdtkLevel>)>,
-    level_assets: Res<Assets<LdtkLevel>>,
+    levels: Query<(Entity, &LevelIid)>,
+    projects: Query<&Handle<LdtkProject>>,
+    project_assets: Res<Assets<LdtkProject>>,
     los_mierdas: Query<(Entity, &Parent, &Mierda)>,
-    levels: Query<(Entity, &Handle<LdtkLevel>)>,
     q_player_query: Query<(Entity, &Transform, &Player)>,
 ) {
     if q_player_query.iter().count() == 0 {
@@ -220,15 +220,22 @@ pub fn handle_spawn_mierda(
     let mut rng = rand::thread_rng();
     let player_translation = q_player_query.single().1.translation;
 
-    for ev_spawn in ev_spawn_mierda.iter() {
-        for (_, level_handle) in level_handles.iter() {
-            let level = &level_assets.get(level_handle).unwrap().level;
+    for ev_spawn in ev_spawn_mierda.read() {
+        for (_, level_iid) in levels.iter() {
+            let project = project_assets.get(projects.single()).unwrap();
+            let level = project.get_raw_level_by_iid(level_iid.get()).unwrap();
             let max_level_dimension = level.px_wid.max(level.px_hei) as f32;
 
-            if level_selection.is_match(&0, level) {
+            if level_selection.is_match(
+                &LevelIndices {
+                    level: 0,
+                    ..default()
+                },
+                level,
+            ) {
                 let (parent_entity, _) = levels
                     .iter()
-                    .find(|(_, handle)| *handle == level_handle)
+                    .find(|(_, handle)| *handle == level_iid)
                     .unwrap();
 
                 for _i in 0..ev_spawn.count {
@@ -304,7 +311,7 @@ pub fn handle_mierda_hit(
     mut ev_mierda_hit: EventReader<MierdaHitEvent>,
     mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>, // mut ev_mierda_spawn: EventWriter<SpawnMierdaEvent>,
 ) {
-    for event in ev_mierda_hit.iter() {
+    for event in ev_mierda_hit.read() {
         for (player_transform, _) in q_player.iter() {
             let player_position = player_transform.translation;
 
