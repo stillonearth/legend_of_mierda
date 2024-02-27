@@ -309,7 +309,7 @@ pub fn spawn_wall_collision(
 
 pub fn hide_dummy_entities(
     mut commands: Commands,
-    level_selection: Res<LevelSelection>,
+    _level_selection: Res<LevelSelection>,
     mut set: ParamSet<(
         Query<(Entity, &mut Visibility, &Mierda)>,
         Query<(Entity, &mut Visibility, &Pizza)>,
