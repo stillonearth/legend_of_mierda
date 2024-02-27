@@ -14,6 +14,7 @@ use crate::entities::{
 };
 
 const ASPECT_RATIO: f32 = 1.0;
+pub const LEVEL_1_IID: &str = "d53f9950-c640-11ed-8430-4942c04951ff";
 
 // Events
 
@@ -316,9 +317,9 @@ pub fn hide_dummy_entities(
         Query<(Entity, &mut Visibility, &Biboran)>,
     )>,
 ) {
-    if !level_selection.is_changed() {
-        return;
-    }
+    // if !level_selection.is_changed() {
+    //     return;
+    // }
 
     for (entity, mut visibility, mierda) in set.p0().iter_mut() {
         if mierda.is_dummy {

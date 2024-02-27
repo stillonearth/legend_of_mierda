@@ -228,7 +228,7 @@ pub fn ui_wave_info_text(
 pub fn get_level_1_waves() -> Vec<Wave> {
     vec![
         Wave {
-            events: vec![WaveEntry::Mierda { count: 10 }],
+            events: vec![WaveEntry::Pendejo { count: 100 }],
             event_duration: Duration::from_secs(10),
             wave_duration: Duration::from_secs(30),
         },

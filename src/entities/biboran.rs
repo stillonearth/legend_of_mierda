@@ -179,11 +179,6 @@ pub fn event_spawn_biboran(
                 },
                 level,
             ) {
-                let (parent_entity, _) = levels
-                    .iter()
-                    .find(|(_, handle)| *handle == level_iid)
-                    .unwrap();
-
                 for _i in 0..ev_spawn.count {
                     for (biboran_entity, biboran_parent, biboran) in biborans.iter() {
                         if !biboran.is_dummy {
@@ -191,10 +186,6 @@ pub fn event_spawn_biboran(
                         }
 
                         let biboran_parent = biboran_parent.get();
-
-                        if parent_entity != biboran_parent {
-                            continue;
-                        }
 
                         let mut parent = commands.entity(biboran_parent);
 

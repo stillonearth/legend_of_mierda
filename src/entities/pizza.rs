@@ -128,11 +128,6 @@ pub fn event_spawn_pizza(
                 },
                 level,
             ) {
-                let (parent_entity, _) = levels
-                    .iter()
-                    .find(|(_, handle)| *handle == level_iid)
-                    .unwrap();
-
                 for _i in 0..ev_spawn.count {
                     for (pizza_entity, mierda_parent, pizza) in los_pizzas.iter() {
                         if !pizza.is_dummy {
@@ -140,10 +135,6 @@ pub fn event_spawn_pizza(
                         }
 
                         let pizza_parent = mierda_parent.get();
-
-                        if parent_entity != pizza_parent {
-                            continue;
-                        }
 
                         let mut parent = commands.entity(pizza_parent);
 

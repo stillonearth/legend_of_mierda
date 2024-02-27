@@ -8,6 +8,7 @@ use bevy_kira_audio::prelude::*;
 use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
 use bevy_scene_hook::HookPlugin;
+use ldtk::LEVEL_1_IID;
 use pecs::prelude::*;
 
 use cutscene::*;
@@ -58,7 +59,7 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest())
                 .set(LogPlugin {
-                    filter: "info,wgpu_core=warn,wgpu_hal=warn,legend_of_mierda=debug,bevy_animation=error".into(),
+                    filter: "info,wgpu_core=warn,wgpu_hal=warn,legend_of_mierda=debug,bevy_animation=error,bevy_gltf=error".into(),
                     level: bevy::log::Level::DEBUG,
                 }),
             AudioPlugin))
@@ -86,7 +87,7 @@ fn main() {
             set_clear_color: SetClearColor::FromLevelBackground,
             ..Default::default()
         })
-        .insert_resource(LevelSelection::Uid(0))
+        .insert_resource(LevelSelection::iid(LEVEL_1_IID))
         .register_ldtk_int_cell::<ldtk::WallBundle>(1);
 
     app.run();
@@ -131,9 +132,15 @@ impl Plugin for LegendOfMierdaPlugin {
     }
 }
 
-fn spawn_game_world(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn spawn_game_world(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut ew_level_change: EventWriter<ldtk::LevelChangeEvent>,
+) {
     commands.spawn(LdtkWorldBundle {
         ldtk_handle: asset_server.load("levels/example.ldtk"),
         ..Default::default()
     });
+
+    ew_level_change.send(ldtk::LevelChangeEvent { level_id: 1 });
 }

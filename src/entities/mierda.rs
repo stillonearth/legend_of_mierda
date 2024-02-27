@@ -233,11 +233,6 @@ pub fn handle_spawn_mierda(
                 },
                 level,
             ) {
-                let (parent_entity, _) = levels
-                    .iter()
-                    .find(|(_, handle)| *handle == level_iid)
-                    .unwrap();
-
                 for _i in 0..ev_spawn.count {
                     for (mierda_entity, mierda_parent, mierda) in los_mierdas.iter() {
                         if !mierda.is_dummy {
@@ -245,10 +240,6 @@ pub fn handle_spawn_mierda(
                         }
 
                         let mierda_parent = mierda_parent.get();
-
-                        if parent_entity != mierda_parent {
-                            continue;
-                        }
 
                         let mut parent = commands.entity(mierda_parent);
 
@@ -259,7 +250,6 @@ pub fn handle_spawn_mierda(
                         });
 
                         // generate random position
-
                         let mut offset_position = Vec3::new(0.0, 0.0, 0.);
                         let mut mierda_position = player_translation + offset_position;
 
@@ -305,7 +295,6 @@ pub fn handle_spawn_mierda(
 
 pub fn handle_mierda_hit(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     q_player: Query<(&Transform, &Player)>,
     mut los_mierdas: Query<(Entity, &Transform, &mut Velocity, &mut Mierda)>,
     mut ev_mierda_hit: EventReader<MierdaHitEvent>,
@@ -322,8 +311,8 @@ pub fn handle_mierda_hit(
             mierda_velocity.linvel.x += vector_attack.x * 200.;
             mierda_velocity.linvel.y += vector_attack.y * 200.;
 
-            let distance = mierda_position.distance(player_position).abs();
-            let damage = distance as u8;
+            // let distance = mierda_position.distance(player_position).abs();
+            let damage = 100;
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
             mierda.hit_at = Some(timer.clone());
@@ -337,32 +326,6 @@ pub fn handle_mierda_hit(
                 text: format!("-{}", damage),
                 entity: mierda_entity,
             });
-
-            commands.spawn((
-                ParticleSystemBundle {
-                    transform: *mierda_transform,
-                    particle_system: ParticleSystem {
-                        spawn_rate_per_second: 0.0.into(),
-                        texture: ParticleTexture::Sprite(asset_server.load("px.png")),
-                        max_particles: 1_00,
-                        initial_speed: (0.0..10.0).into(),
-                        scale: 1.0.into(),
-                        velocity_modifiers: vec![
-                            VelocityModifier::Drag(0.001.into()),
-                            VelocityModifier::Vector(Vec3::new(0.0, -100.0, 0.0).into()),
-                        ],
-                        color: (Color::BLUE..Color::AQUAMARINE).into(),
-                        bursts: vec![ParticleBurst {
-                            time: 0.0,
-                            count: 20,
-                        }],
-                        looping: false,
-                        ..ParticleSystem::default()
-                    },
-                    ..default()
-                },
-                Playing,
-            ));
         }
     }
 }

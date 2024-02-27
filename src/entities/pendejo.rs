@@ -12,7 +12,7 @@ use rand::seq::SliceRandom;
 
 use crate::{loading::load_texture_atlas, physics::ColliderBundle, sprites::*, utils::CloneEntity};
 
-use super::player::Player;
+use super::{player::Player, text_indicator::SpawnTextIndicatorEvent};
 
 // ----------
 // Components
@@ -34,6 +34,7 @@ pub struct Pendejo {
     pub health: u8,
     pub hit_at: Option<Timer>,
     pub is_dummy: bool,
+    pub marked_for_despawn: bool,
 }
 
 #[derive(Default, Bundle)]
@@ -99,6 +100,7 @@ pub fn create_pendejo_bundle(
         .normalize(),
         hit_at: None,
         is_dummy,
+        marked_for_despawn: false,
     };
 
     PendejoBundle {
@@ -259,11 +261,6 @@ pub fn handle_spawn_pendejo(
                 },
                 level,
             ) {
-                let (parent_entity, _) = levels
-                    .iter()
-                    .find(|(_, handle)| *handle == level_iid)
-                    .unwrap();
-
                 for _i in 0..ev_spawn.count {
                     for (mierda_entity, mierda_parent, mierda) in los_pendejos.iter() {
                         if !mierda.is_dummy {
@@ -271,10 +268,6 @@ pub fn handle_spawn_pendejo(
                         }
 
                         let mierda_parent = mierda_parent.get();
-
-                        if parent_entity != mierda_parent {
-                            continue;
-                        }
 
                         let mut parent = commands.entity(mierda_parent);
 
@@ -313,6 +306,7 @@ pub fn handle_spawn_pendejo(
                             health: 100,
                             move_direction: Vec2::ZERO,
                             hit_at: None,
+                            marked_for_despawn: false,
                         });
 
                         commands.add(CloneEntity {
@@ -331,69 +325,66 @@ pub fn handle_spawn_pendejo(
     }
 }
 
-pub fn handle_hit_pendejo(
+pub fn handle_pendejo_hit(
     mut commands: Commands,
     q_player: Query<(&Transform, &Player)>,
-    mut los_mierdas: Query<(Entity, &Transform, &mut Velocity, &mut Pendejo)>,
+    mut los_pendejos: Query<(Entity, &Transform, &mut Velocity, &mut Pendejo)>,
     mut ev_pendejo_hit: EventReader<PendejoHitEvent>,
-    // mut ev_mierda_spawn: EventWriter<SpawnMierdaEvent>,
+    mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>, // mut ev_mierda_spawn: EventWriter<SpawnMierdaEvent>,
 ) {
     for event in ev_pendejo_hit.read() {
         for (player_transform, _) in q_player.iter() {
             let player_position = player_transform.translation;
 
             let (mierda_entity, mierda_transform, mut mierda_velocity, mut mierda) =
-                los_mierdas.get_mut(event.0).unwrap();
+                los_pendejos.get_mut(event.0).unwrap();
             let mierda_position = mierda_transform.translation;
             let vector_attack = (mierda_position - player_position).normalize();
             mierda_velocity.linvel.x += vector_attack.x * 200.;
             mierda_velocity.linvel.y += vector_attack.y * 200.;
 
+            // let distance = mierda_position.distance(player_position).abs();
+            let damage = 50;
+
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
             mierda.hit_at = Some(timer.clone());
+            mierda.health -= u8::min(damage, mierda.health);
 
             commands.entity(mierda_entity).insert(FlashingTimer {
                 timer: timer.clone(),
             });
 
-            // despawn mierda async
-            commands
-                .promise(|| (mierda_entity))
-                .then(asyn!(state => {
-                    state.asyn().timeout(0.3)
-                }))
-                .then(
-                    asyn!(state, mut commands: Commands, asset_server: Res<AssetServer>, q_mierdas: Query<(Entity, &GlobalTransform)> => {
-                                let mierda_transform = *q_mierdas.get(state.value).unwrap().1;
-                                commands.spawn((
-                                    ParticleSystemBundle {
-                                        transform: (mierda_transform).into(),
-                                        particle_system: ParticleSystem {
-                                            spawn_rate_per_second: 0.0.into(),
-                                            texture: ParticleTexture::Sprite(asset_server.load("px.png")),
-                                            max_particles: 1_00,
-                                            initial_speed: (0.0..10.0).into(),
-                                            scale: 1.0.into(),
-                                            velocity_modifiers: vec![
-                                                VelocityModifier::Drag(0.001.into()),
-                                                VelocityModifier::Vector(Vec3::new(0.0, -100.0, 0.0).into()),
-                                            ],
-                                            color: (Color::BLUE..Color::BISQUE).into(),
-                                            bursts: vec![ParticleBurst {
-                                                time: 0.0,
-                                                count: 20,
-                                            }],
-                                            looping: false,
-                                            ..ParticleSystem::default()
-                                        },
-                                        ..default()
-                                    },
-                                    Playing,
-                                ));
-                                commands.entity(state.value).despawn_recursive();
-                            }),
-                );
+            ev_spawn_text_indicator.send(SpawnTextIndicatorEvent {
+                text: format!("-{}", damage),
+                entity: mierda_entity,
+            });
         }
+    }
+}
+
+pub fn despawn_dead_pendejos(
+    mut commands: Commands,
+    mut los_mierdas: Query<(Entity, &Transform, &mut Velocity, &mut Pendejo)>,
+) {
+    for (e, _, _, mut m) in los_mierdas.iter_mut() {
+        if m.health != 0 {
+            continue;
+        }
+
+        if m.marked_for_despawn {
+            continue;
+        }
+
+        m.marked_for_despawn = true;
+
+        commands
+            .promise(|| (e))
+            .then(asyn!(state => {
+                state.asyn().timeout(0.3)
+            }))
+            .then(asyn!(state, mut commands: Commands => {
+                commands.entity(state.value).despawn_recursive();
+            }));
     }
 }
 
@@ -416,11 +407,11 @@ impl Plugin for PendejoPlugin {
                     // AI
                     pendejo_activity,
                     update_pendejos_move_direction,
-                    // Physics, Collisions
-                    // handle_mierda_wall_collisions,
                     // Events
-                    handle_hit_pendejo,
+                    handle_pendejo_hit,
                     handle_spawn_pendejo,
+                    // Rest
+                    despawn_dead_pendejos,
                 ),
             );
     }
