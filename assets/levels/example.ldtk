@@ -10,8 +10,8 @@
 	},
 	"iid": "a3386460-7820-11ed-b6fd-157a63b4d02d",
 	"jsonVersion": "1.5.3",
-	"appBuildId": 473703,
-	"nextUid": 217,
+	"appBuildId": 473871,
+	"nextUid": 215,
 	"identifierStyle": "Capitalize",
 	"toc": [
 		{
@@ -102,41 +102,6 @@
 	"customCommands": [],
 	"flags": [ "ExportOldTableOfContentData", "MultiWorlds", "UseMultilinesType" ],
 	"defs": { "layers": [
-		{
-			"__type": "Tiles",
-			"identifier": "House_1",
-			"type": "Tiles",
-			"uid": 216,
-			"doc": null,
-			"uiColor": null,
-			"gridSize": 46,
-			"guideGridWid": 0,
-			"guideGridHei": 0,
-			"displayOpacity": 1,
-			"inactiveOpacity": 1,
-			"hideInList": false,
-			"hideFieldsWhenInactive": false,
-			"canSelectWhenInactive": true,
-			"renderInWorldView": true,
-			"pxOffsetX": 0,
-			"pxOffsetY": 0,
-			"parallaxFactorX": 0,
-			"parallaxFactorY": 0,
-			"parallaxScaling": true,
-			"requiredTags": [],
-			"excludedTags": [],
-			"autoTilesKilledByOtherLayerUid": null,
-			"uiFilterTags": [],
-			"useAsyncRender": false,
-			"intGridValues": [],
-			"intGridValuesGroups": [],
-			"autoRuleGroups": [],
-			"autoSourceLayerDefUid": null,
-			"tilesetDefUid": 215,
-			"tilePivotX": 0,
-			"tilePivotY": 0,
-			"biomeFieldUid": null
-		},
 		{
 			"__type": "Entities",
 			"identifier": "Entities",
@@ -1192,25 +1157,6 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "b755" }
-		},
-		{
-			"__cWid": 1,
-			"__cHei": 1,
-			"identifier": "House",
-			"uid": 215,
-			"relPath": "../sprites/house.png",
-			"embedAtlas": null,
-			"pxWid": 46,
-			"pxHei": 46,
-			"tileGridSize": 46,
-			"spacing": 0,
-			"padding": 0,
-			"tags": [],
-			"tagsSourceEnumUid": null,
-			"enumTags": [],
-			"customData": [],
-			"savedSelections": [],
-			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "d853" }
 		}
 	], "enums": [{ "identifier": "Item", "uid": 66, "values": [], "iconTilesetUid": 104, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [
 		{
@@ -1274,34 +1220,6 @@
 			"externalRelPath": null,
 			"fieldInstances": [{ "__identifier": "LevelID", "__type": "Int", "__value": 1, "__tile": null, "defUid": 205, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }],
 			"layerInstances": [
-				{
-					"__identifier": "House_1",
-					"__type": "Tiles",
-					"__cWid": 12,
-					"__cHei": 12,
-					"__gridSize": 46,
-					"__opacity": 1,
-					"__pxTotalOffsetX": 0,
-					"__pxTotalOffsetY": 0,
-					"__tilesetDefUid": 215,
-					"__tilesetRelPath": "../sprites/house.png",
-					"iid": "566e3900-b0a0-11ee-8c29-7365934c518f",
-					"levelId": 109,
-					"layerDefUid": 216,
-					"pxOffsetX": 0,
-					"pxOffsetY": 0,
-					"visible": true,
-					"optionalRules": [],
-					"intGridCsv": [],
-					"autoLayerTiles": [],
-					"seed": 1161398,
-					"overrideTilesetUid": null,
-					"gridTiles": [
-						{ "px": [46,46], "src": [0,0], "f": 0, "t": 0, "d": [13], "a": 1 },
-						{ "px": [184,46], "src": [0,0], "f": 0, "t": 0, "d": [16], "a": 1 }
-					],
-					"entityInstances": []
-				},
 				{
 					"__identifier": "Entities",
 					"__type": "Entities",
