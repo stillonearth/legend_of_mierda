@@ -25,12 +25,14 @@ use std::f32::consts::PI;
 use crate::{
     loading::{load_texture_atlas, AudioAssets},
     physics::ColliderBundle,
-    sprites::BIBORAN_ASSET_SHEET,
+    sprites::{FlashingTimer, BIBORAN_ASSET_SHEET},
     utils::*,
     GameState,
 };
 
-use super::player::Player;
+use super::{
+    mierda::Mierda, pendejo::Pendejo, player::Player, text_indicator::SpawnTextIndicatorEvent,
+};
 
 // ----------
 // Components
@@ -129,6 +131,9 @@ pub struct BiboranRenderImage(Handle<Image>);
 
 #[derive(Resource, Default)]
 pub struct BiboranTimer(pub Timer);
+
+#[derive(Resource, Default)]
+pub struct BiboranEffectTimer(pub Timer);
 
 #[derive(Resource, Default)]
 pub struct BiboranPrayer(Handle<AudioInstance>);
@@ -243,6 +248,7 @@ pub fn event_on_biboran_step_over(
     mut q_player: Query<(Entity, &mut Player)>,
     mut q_biboran_animations: Query<(&mut Visibility, &BiboranSprite)>, // mut q_ui_healthbar: Query<(Entity, &mut Style, &ui::UIPlayerHealth)>,
     mut biboran_timer: ResMut<BiboranTimer>,
+    mut biboran_effect_timer: ResMut<BiboranEffectTimer>,
     animations: Res<Animations>,
     mut players: Query<(&mut AnimationPlayer, &BiboranBookScene)>,
     audio: Res<BiboranPrayer>,
@@ -251,6 +257,7 @@ pub fn event_on_biboran_step_over(
     for e in er_biboran_step_over.read() {
         for (_, mut _player) in q_player.iter_mut() {
             biboran_timer.0 = Timer::new(Duration::from_secs(14), TimerMode::Once);
+            biboran_effect_timer.0 = Timer::new(Duration::from_secs(1), TimerMode::Repeating);
 
             for (mut v, _) in q_biboran_animations.iter_mut() {
                 *v = Visibility::Visible;
@@ -411,24 +418,65 @@ pub fn setup_biboran_scene(
 }
 
 fn biboran_holy_effect(
-    mut _players: Query<(&mut AnimationPlayer, &BiboranBookScene)>,
+    mut commands: Commands,
+    mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>,
     mut q_biboran_sprite: Query<(&mut Visibility, &BiboranSprite)>,
-    mut biboran_animation_timer: ResMut<BiboranTimer>,
+    mut biboran_timer: ResMut<BiboranTimer>,
+    mut biboran_effect_timer: ResMut<BiboranEffectTimer>,
     time: Res<Time>,
     audio: Res<BiboranPrayer>,
     mut audio_instances: ResMut<Assets<AudioInstance>>,
+    mut los_mierdas: Query<(Entity, &mut Mierda)>,
+    mut los_pendejos: Query<(Entity, &mut Pendejo)>,
 ) {
-    biboran_animation_timer.0.tick(time.delta());
+    biboran_timer.0.tick(time.delta());
+    biboran_effect_timer.0.tick(time.delta());
 
-    if biboran_animation_timer.0.just_finished() {
+    if biboran_timer.0.just_finished() {
         for (mut v, _) in q_biboran_sprite.iter_mut() {
-            if biboran_animation_timer.0.just_finished() {
+            if biboran_timer.0.just_finished() {
                 *v = Visibility::Hidden;
             }
         }
     }
 
-    if biboran_animation_timer.0.finished() {
+    if !biboran_timer.0.finished() && biboran_effect_timer.0.finished() {
+        for (mierda_entity, mut mierda) in los_mierdas.iter_mut() {
+            let damage = 5;
+
+            let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
+            mierda.hit_at = Some(timer.clone());
+            mierda.health -= u8::min(damage, mierda.health);
+
+            commands.entity(mierda_entity).insert(FlashingTimer {
+                timer: timer.clone(),
+            });
+
+            ev_spawn_text_indicator.send(SpawnTextIndicatorEvent {
+                text: format!("-{}", damage),
+                entity: mierda_entity,
+            });
+        }
+
+        for (pendejo_entity, mut pendejo) in los_pendejos.iter_mut() {
+            let damage = 30;
+
+            let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
+            pendejo.hit_at = Some(timer.clone());
+            pendejo.health -= u8::min(damage, pendejo.health);
+
+            commands.entity(pendejo_entity).insert(FlashingTimer {
+                timer: timer.clone(),
+            });
+
+            ev_spawn_text_indicator.send(SpawnTextIndicatorEvent {
+                text: format!("-{}", damage),
+                entity: pendejo_entity,
+            });
+        }
+    }
+
+    if biboran_timer.0.finished() {
         if let Some(instance) = audio_instances.get_mut(&audio.0) {
             match instance.state() {
                 PlaybackState::Playing { .. } => {
@@ -437,6 +485,8 @@ fn biboran_holy_effect(
                 _ => {}
             }
         }
+
+        biboran_effect_timer.0.pause();
     }
 }
 
@@ -497,6 +547,7 @@ impl Plugin for BiboranPlugin {
         app.register_ldtk_entity::<BiboranBundle>("Biboran")
             .init_resource::<BiboranRenderImage>()
             .init_resource::<BiboranTimer>()
+            .init_resource::<BiboranEffectTimer>()
             .init_resource::<BiboranPrayer>()
             // Event Handlers
             .add_event::<SpawnBiboranEvent>()

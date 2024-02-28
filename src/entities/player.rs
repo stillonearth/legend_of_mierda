@@ -57,6 +57,7 @@ impl LdtkEntity for PlayerBundle {
                 combine_rule: CoefficientCombineRule::Min,
             },
             rotation_constraints,
+            density: ColliderMassProperties::Mass(300.0),
             ..Default::default()
         };
 
@@ -215,11 +216,11 @@ pub fn event_player_hit(
             Playing,
         ));
 
-        if player.health < 10 {
+        if player.health <= 0 {
             ev_game_over.send(GameOverEvent);
             continue;
         } else {
-            player.health -= 10;
+            player.health -= 1;
 
             for (_, mut style, _) in q_ui_healthbar.iter_mut() {
                 style.width = Val::Percent(player.health as f32);

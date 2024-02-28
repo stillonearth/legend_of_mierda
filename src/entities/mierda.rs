@@ -298,7 +298,7 @@ pub fn handle_mierda_hit(
     q_player: Query<(&Transform, &Player)>,
     mut los_mierdas: Query<(Entity, &Transform, &mut Velocity, &mut Mierda)>,
     mut ev_mierda_hit: EventReader<MierdaHitEvent>,
-    mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>, // mut ev_mierda_spawn: EventWriter<SpawnMierdaEvent>,
+    mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>,
 ) {
     for event in ev_mierda_hit.read() {
         for (player_transform, _) in q_player.iter() {

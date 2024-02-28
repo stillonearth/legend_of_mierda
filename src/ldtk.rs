@@ -131,8 +131,8 @@ pub fn camera_fit_inside_current_level(
                     let mut width = (level.px_wid as f32 / 16.).round() * 16.;
                     let mut height = width / ASPECT_RATIO;
 
-                    width *= 0.5;
-                    height *= 0.5;
+                    width *= 0.7;
+                    height *= 0.7;
 
                     orthographic_projection.scaling_mode =
                         bevy::render::camera::ScalingMode::Fixed { width, height };
