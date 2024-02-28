@@ -61,7 +61,7 @@ pub fn create_pendejo_bundle(
     let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
     let collider_bundle = ColliderBundle {
-        collider: Collider::cuboid(4., 13.),
+        collider: Collider::cuboid(8., 26.),
         rigid_body: RigidBody::Dynamic,
         friction: Friction {
             coefficient: 0.0,
@@ -81,7 +81,7 @@ pub fn create_pendejo_bundle(
         SHEET_1_COLUMNS,
         SHEET_1_ROWS,
         None,
-        32.,
+        64.,
         texture_atlasses,
     );
 

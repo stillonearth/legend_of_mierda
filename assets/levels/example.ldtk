@@ -72,7 +72,7 @@
 				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
 				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
 				"entityIid": "8ee89370-8990-11ee-b898-d15885d355ef"
-			}, "worldX": 543, "worldY": 273, "widPx": 4, "heiPx": 4, "fields" : {} }]
+			}, "worldX": 543, "worldY": 273, "widPx": 8, "heiPx": 8, "fields" : {} }]
 		}
 	],
 	"worldLayout": null,
@@ -1125,8 +1125,8 @@
 			"exportToToc": true,
 			"allowOutOfBounds": false,
 			"doc": null,
-			"width": 4,
-			"height": 4,
+			"width": 8,
+			"height": 8,
 			"resizableX": false,
 			"resizableY": false,
 			"minWidth": null,
@@ -1653,8 +1653,8 @@
 							"__tile": { "tilesetUid": 104, "x": 80, "y": 240, "w": 16, "h": 16 },
 							"__smartColor": "#03CB7C",
 							"iid": "8ee89370-8990-11ee-b898-d15885d355ef",
-							"width": 4,
-							"height": 4,
+							"width": 8,
+							"height": 8,
 							"defUid": 207,
 							"px": [287,273],
 							"fieldInstances": [{ "__identifier": "is_dummy", "__type": "Bool", "__value": true, "__tile": null, "defUid": 210, "realEditorValues": [] }],
