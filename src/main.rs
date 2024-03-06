@@ -48,7 +48,7 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: "Legend of Mierda".into(),
-                        resolution: (1024., 1024.).into(),
+                        resolution: (900., 900.).into(),
                         present_mode: PresentMode::AutoVsync,
                         fit_canvas_to_parent: true,
                         prevent_default_event_handling: false,
