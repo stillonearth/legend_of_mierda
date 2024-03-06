@@ -35,6 +35,8 @@ pub struct AudioAssets {
     pub mierda: Handle<AudioSource>,
     #[asset(path = "audio/slash.ogg")]
     pub slash: Handle<AudioSource>,
+    #[asset(path = "audio/hit.ogg")]
+    pub hit: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection, Resource)]

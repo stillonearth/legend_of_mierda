@@ -1,18 +1,16 @@
-use std::time::Duration;
-
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-
+use bevy_kira_audio::prelude::*;
 use bevy_rapier2d::prelude::Velocity;
 use bevy_rapier2d::prelude::*;
 use pecs::prelude::*;
-use rand::Rng;
-
 use rand::seq::SliceRandom;
+use rand::Rng;
+use std::time::Duration;
 
 use crate::{
     gameplay::scoring::Score, loading::load_texture_atlas, physics::ColliderBundle, sprites::*,
-    utils::CloneEntity,
+    utils::CloneEntity, AudioAssets, GameState,
 };
 
 use super::{player::Player, text_indicator::SpawnTextIndicatorEvent};
@@ -333,8 +331,13 @@ pub fn handle_pendejo_hit(
     q_player: Query<(&Transform, &Player)>,
     mut los_pendejos: Query<(Entity, &Transform, &mut Velocity, &mut Pendejo)>,
     mut ev_pendejo_hit: EventReader<PendejoHitEvent>,
-    mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>, // mut ev_mierda_spawn: EventWriter<SpawnMierdaEvent>,
+    mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>,
+
+    audio: Res<Audio>,
+    audio_assets: Res<AudioAssets>,
 ) {
+    let mut hit_sound_played = false;
+
     for event in ev_pendejo_hit.read() {
         for (player_transform, _) in q_player.iter() {
             let player_position = player_transform.translation;
@@ -352,6 +355,11 @@ pub fn handle_pendejo_hit(
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
             mierda.hit_at = Some(timer.clone());
             mierda.health -= u8::min(damage, mierda.health);
+
+            if !hit_sound_played {
+                audio.play(audio_assets.hit.clone()).with_volume(0.5);
+                hit_sound_played = true;
+            }
 
             commands.entity(mierda_entity).insert(FlashingTimer {
                 timer: timer.clone(),
@@ -417,7 +425,8 @@ impl Plugin for PendejoPlugin {
                     handle_spawn_pendejo,
                     // Rest
                     despawn_dead_pendejos,
-                ),
+                )
+                    .run_if(in_state(GameState::Gameplay)),
             );
     }
 }
