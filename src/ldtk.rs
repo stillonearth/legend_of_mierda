@@ -124,8 +124,6 @@ pub fn camera_fit_inside_current_level(
                         (player_translation.x - level_transform.translation.x - width / 2.)
                             .clamp(0., level.px_wid as f32 - width);
                     camera_transform.translation.y = 0.;
-
-                    println!("dead branch");
                 } else {
                     // level is taller than the screen
                     let mut width = (level.px_wid as f32 / 16.).round() * 16.;

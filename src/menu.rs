@@ -50,8 +50,6 @@ fn setup_menu(
 ) {
     info!("menu");
 
-    commands.spawn(Camera2dBundle::default());
-
     commands
         .spawn((
             NodeBundle {

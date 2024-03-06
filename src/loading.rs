@@ -9,7 +9,7 @@ pub struct LoadingPlugin;
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
         app.add_loading_state(
-            LoadingState::new(GameState::Loading).continue_to_state(GameState::Menu),
+            LoadingState::new(GameState::Loading).continue_to_state(GameState::Splash),
         );
 
         app.add_collection_to_loading_state::<_, AudioAssets>(GameState::Loading);
@@ -91,6 +91,8 @@ pub struct CutsceneAssets {
     pub phone_call_1: Handle<Image>,
     #[asset(path = "cutscenes/main-menu.png")]
     pub main_menu: Handle<Image>,
+    #[asset(path = "cutscenes/splash.png")]
+    pub splash: Handle<Image>,
 }
 
 #[derive(Resource)]

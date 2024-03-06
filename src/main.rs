@@ -25,6 +25,7 @@ mod loading;
 mod menu;
 mod particles;
 mod physics;
+mod splashscreen;
 mod sprites;
 mod ui;
 mod utils;
@@ -33,6 +34,7 @@ mod utils;
 enum GameState {
     #[default]
     Loading,
+    Splash,
     Menu,
     Cutscene,
     Gameplay,
@@ -101,34 +103,38 @@ pub struct LegendOfMierdaPlugin;
 
 impl Plugin for LegendOfMierdaPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((entities::EntitiesPlugin, gameplay::GameplayPlugin))
-            .add_systems(
-                OnEnter(GameState::Gameplay),
-                (spawn_game_world, ui::draw_ui),
-            )
-            .add_systems(
-                Update,
-                (
-                    ldtk::spawn_wall_collision,
-                    ldtk::camera_fit_inside_current_level,
-                    ldtk::update_level_selection,
-                ),
-            ) // Housekeeping
-            .add_systems(
-                Update,
-                (ldtk::hide_dummy_entities, ldtk::fix_missing_ldtk_entities),
-            )
-            // Sprites
-            .add_systems(
-                Update,
-                (sprites::animate_player_sprite, sprites::flash_sprite),
-            )
-            // Controls
-            .add_systems(Update, controls::controls)
-            // Particles
-            .add_systems(Update, particles::fix_particle_transform_z)
-            // App Events
-            .add_event::<ldtk::LevelChangeEvent>();
+        app.add_plugins((
+            entities::EntitiesPlugin,
+            gameplay::GameplayPlugin,
+            splashscreen::SplashscreenPlugin,
+        ))
+        .add_systems(
+            OnEnter(GameState::Gameplay),
+            (spawn_game_world, ui::draw_ui),
+        )
+        .add_systems(
+            Update,
+            (
+                ldtk::spawn_wall_collision,
+                ldtk::camera_fit_inside_current_level,
+                ldtk::update_level_selection,
+            ),
+        ) // Housekeeping
+        .add_systems(
+            Update,
+            (ldtk::hide_dummy_entities, ldtk::fix_missing_ldtk_entities),
+        )
+        // Sprites
+        .add_systems(
+            Update,
+            (sprites::animate_player_sprite, sprites::flash_sprite),
+        )
+        // Controls
+        .add_systems(Update, controls::controls)
+        // Particles
+        .add_systems(Update, particles::fix_particle_transform_z)
+        // App Events
+        .add_event::<ldtk::LevelChangeEvent>();
     }
 }
 
