@@ -192,6 +192,8 @@ pub fn event_player_hit(
     mut q_player: Query<(Entity, &GlobalTransform, &mut Player)>,
     mut q_ui_healthbar: Query<(Entity, &mut Style, &UIPlayerHealth)>,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
+    audio_assets: Res<AudioAssets>,
 ) {
     for ev in ev_player_hit_reader.read() {
         let (_, player_transform, mut player) = q_player.get_mut(ev.entity).unwrap();
@@ -221,6 +223,8 @@ pub fn event_player_hit(
             },
             Playing,
         ));
+
+        audio.play(audio_assets.hurt.clone()).with_volume(0.5);
 
         if player.health <= 0 {
             ev_game_over.send(GameOverEvent);
