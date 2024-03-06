@@ -33,6 +33,8 @@ pub struct AudioAssets {
     pub biboran: Handle<AudioSource>,
     #[asset(path = "audio/mierda.ogg")]
     pub mierda: Handle<AudioSource>,
+    #[asset(path = "audio/slash.ogg")]
+    pub slash: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection, Resource)]

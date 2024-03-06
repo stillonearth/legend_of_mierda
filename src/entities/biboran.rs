@@ -459,7 +459,7 @@ fn biboran_holy_effect(
         }
 
         for (pendejo_entity, mut pendejo) in los_pendejos.iter_mut() {
-            let damage = 30;
+            let damage = 5;
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
             pendejo.hit_at = Some(timer.clone());

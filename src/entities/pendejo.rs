@@ -10,7 +10,10 @@ use rand::Rng;
 
 use rand::seq::SliceRandom;
 
-use crate::{loading::load_texture_atlas, physics::ColliderBundle, sprites::*, utils::CloneEntity};
+use crate::{
+    gameplay::scoring::Score, loading::load_texture_atlas, physics::ColliderBundle, sprites::*,
+    utils::CloneEntity,
+};
 
 use super::{player::Player, text_indicator::SpawnTextIndicatorEvent};
 
@@ -283,7 +286,7 @@ pub fn handle_spawn_pendejo(
                         let mut pendejo_position = player_translation + offset_position;
 
                         while (player_translation - pendejo_position).length()
-                            < max_level_dimension / 3.0
+                            < max_level_dimension / 2.0
                             || pendejo_position.x < 0.0 + 24.0
                             || pendejo_position.x > (level.px_wid as f32) - 24.0
                             || pendejo_position.y < 0.0 + 24.0
@@ -365,6 +368,7 @@ pub fn handle_pendejo_hit(
 pub fn despawn_dead_pendejos(
     mut commands: Commands,
     mut los_mierdas: Query<(Entity, &Transform, &mut Velocity, &mut Pendejo)>,
+    mut score: ResMut<Score>,
 ) {
     for (e, _, _, mut m) in los_mierdas.iter_mut() {
         if m.health != 0 {
@@ -376,6 +380,7 @@ pub fn despawn_dead_pendejos(
         }
 
         m.marked_for_despawn = true;
+        score.score += 100;
 
         commands
             .promise(|| (e))

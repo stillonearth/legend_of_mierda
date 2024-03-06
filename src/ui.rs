@@ -11,6 +11,9 @@ pub struct UIGameOver;
 #[derive(Component)]
 pub struct UIGameplayWave;
 
+#[derive(Component)]
+pub struct UIHighscore;
+
 pub(crate) fn draw_ui(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -82,6 +85,39 @@ pub(crate) fn draw_ui(
                 },))
                 .insert(UIPlayerHealth);
         });
+    // highscore
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    justify_content: JustifyContent::FlexStart,
+                    bottom: Val::Px(35.0),
+                    right: Val::Px(10.0),
+                    padding: UiRect {
+                        right: Val::Px(75.0),
+                        ..default()
+                    },
+                    align_items: AlignItems::FlexStart,
+                    ..default()
+                },
+                ..default()
+            },
+            Name::new("highscore"),
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                TextBundle::from_section(
+                    "SCORE: 0",
+                    TextStyle {
+                        font: asset_server.load("fonts/PixeloidMono-d94EV.ttf"),
+                        font_size: 30.0,
+                        color: Color::WHITE,
+                    },
+                ),
+                UIHighscore,
+            ));
+        });
     // game over
     commands
         .spawn((
@@ -111,7 +147,7 @@ pub(crate) fn draw_ui(
             ));
         });
 
-    // game over
+    // Wave
     commands
         .spawn((
             NodeBundle {

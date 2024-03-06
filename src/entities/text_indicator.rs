@@ -58,7 +58,7 @@ pub fn event_spawn_text_indicator(
         commands.entity(ev.entity).with_children(|parent| {
             let text_style = TextStyle {
                 font: font_assets.pixeloid_mono.clone(),
-                font_size: 5.0,
+                font_size: 10.0,
                 color: Color::WHITE,
             };
             let text_alignment = TextAlignment::Center;
