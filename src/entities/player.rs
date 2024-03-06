@@ -1,12 +1,14 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_kira_audio::prelude::*;
+use bevy_kira_audio::AudioInstance;
 use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::Velocity;
 use bevy_rapier2d::prelude::*;
 
 use crate::{
     gameplay::gameover::GameOverEvent, loading::load_texture_atlas, physics::ColliderBundle,
-    sprites::*, ui::UIPlayerHealth,
+    sprites::*, ui::UIPlayerHealth, AudioAssets, GameState,
 };
 
 use super::{
@@ -116,12 +118,16 @@ pub fn event_player_attack(
     mut q_player: Query<(Entity, &Transform, &CharacterAnimation), With<Player>>,
     mut q_los_mierdas: Query<(Entity, &Transform, &mut Mierda)>,
     mut q_los_pendejos: Query<(Entity, &Transform, &mut Pendejo)>,
+    audio: Res<Audio>,
+    audio_assets: Res<AudioAssets>,
 ) {
     for ev in ev_player_attack.read() {
         let (_, transform, char_animation) = q_player.get_mut(ev.entity).unwrap();
 
         let player_position = transform.translation;
         let player_orientation = char_animation.direction;
+
+        audio.play(audio_assets.slash.clone());
 
         // find all mierdas in range
         for (entity, mierda_transform, _) in
@@ -186,6 +192,8 @@ pub fn event_player_hit(
     mut q_player: Query<(Entity, &GlobalTransform, &mut Player)>,
     mut q_ui_healthbar: Query<(Entity, &mut Style, &UIPlayerHealth)>,
     asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
+    audio_assets: Res<AudioAssets>,
 ) {
     for ev in ev_player_hit_reader.read() {
         let (_, player_transform, mut player) = q_player.get_mut(ev.entity).unwrap();
@@ -215,6 +223,8 @@ pub fn event_player_hit(
             },
             Playing,
         ));
+
+        audio.play(audio_assets.hurt.clone()).with_volume(0.5);
 
         if player.health <= 0 {
             ev_game_over.send(GameOverEvent);
@@ -301,7 +311,8 @@ impl Plugin for PlayerPlugin {
                     event_player_hit,
                     handle_player_mierda_collisions,
                     handle_player_pendejo_collisions,
-                ),
+                )
+                    .run_if(in_state(GameState::Gameplay)),
             );
     }
 }

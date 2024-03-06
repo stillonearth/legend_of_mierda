@@ -1,14 +1,16 @@
-use std::time::Duration;
-
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-
+use bevy_kira_audio::prelude::*;
 use bevy_rapier2d::prelude::Velocity;
 use bevy_rapier2d::prelude::*;
 use pecs::prelude::*;
 use rand::Rng;
+use std::time::Duration;
 
-use crate::{loading::load_texture_atlas, physics::ColliderBundle, sprites::*, utils::*};
+use crate::{
+    gameplay::scoring::Score, loading::load_texture_atlas, physics::ColliderBundle, sprites::*,
+    utils::*, AudioAssets, GameState,
+};
 
 use super::{player::Player, text_indicator::SpawnTextIndicatorEvent};
 
@@ -254,7 +256,7 @@ pub fn handle_spawn_mierda(
                         let mut mierda_position = player_translation + offset_position;
 
                         while (player_translation - mierda_position).length()
-                            < max_level_dimension / 3.0
+                            < max_level_dimension / 2.0
                             || mierda_position.x < 0.0 + 24.0
                             || mierda_position.x > (level.px_wid as f32) - 24.0
                             || mierda_position.y < 0.0 + 24.0
@@ -299,7 +301,12 @@ pub fn handle_mierda_hit(
     mut los_mierdas: Query<(Entity, &Transform, &mut Velocity, &mut Mierda)>,
     mut ev_mierda_hit: EventReader<MierdaHitEvent>,
     mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>,
+
+    audio: Res<Audio>,
+    audio_assets: Res<AudioAssets>,
 ) {
+    let mut hit_sound_played = false;
+
     for event in ev_mierda_hit.read() {
         for (player_transform, _) in q_player.iter() {
             let player_position = player_transform.translation;
@@ -318,6 +325,11 @@ pub fn handle_mierda_hit(
             mierda.hit_at = Some(timer.clone());
             mierda.health -= u8::min(damage, mierda.health);
 
+            if !hit_sound_played {
+                audio.play(audio_assets.hit.clone()).with_volume(0.5);
+                hit_sound_played = true;
+            }
+
             commands.entity(mierda_entity).insert(FlashingTimer {
                 timer: timer.clone(),
             });
@@ -333,6 +345,7 @@ pub fn handle_mierda_hit(
 pub fn despawn_dead_mierdas(
     mut commands: Commands,
     mut los_mierdas: Query<(Entity, &Transform, &mut Velocity, &mut Mierda)>,
+    mut score: ResMut<Score>,
 ) {
     for (e, _, _, mut m) in los_mierdas.iter_mut() {
         if m.health != 0 {
@@ -344,6 +357,7 @@ pub fn despawn_dead_mierdas(
         }
 
         m.marked_for_despawn = true;
+        score.score += 50;
 
         commands
             .promise(|| (e))
@@ -382,7 +396,8 @@ impl Plugin for EnemyPlugin {
                     handle_spawn_mierda,
                     // Rest
                     despawn_dead_mierdas,
-                ),
+                )
+                    .run_if(in_state(GameState::Gameplay)),
             );
     }
 }
