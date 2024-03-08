@@ -365,6 +365,9 @@ pub fn despawn_dead_mierdas(
                 state.asyn().timeout(0.3)
             }))
             .then(asyn!(state, mut commands: Commands => {
+                if commands.get_entity(state.value).is_none() {
+                    return;
+                }
                 commands.entity(state.value).despawn_recursive();
             }));
     }

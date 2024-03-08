@@ -229,8 +229,8 @@ pub fn get_level_1_waves() -> Vec<Wave> {
     vec![
         Wave {
             events: vec![
-                WaveEntry::Pendejo { count: 1 },
-                // WaveEntry::Biboran { count: 10 },
+                WaveEntry::Pendejo { count: 100 },
+                WaveEntry::Biboran { count: 10 },
             ],
             event_duration: Duration::from_secs(10),
             wave_duration: Duration::from_secs(10),
