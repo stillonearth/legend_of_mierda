@@ -397,7 +397,7 @@ impl Plugin for EnemyPlugin {
                     // Rest
                     despawn_dead_mierdas,
                 )
-                    .run_if(in_state(GameState::Gameplay)),
+                    .run_if(in_state(GameState::GamePlay)),
             );
     }
 }

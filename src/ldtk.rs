@@ -396,3 +396,22 @@ pub fn fix_missing_ldtk_entities(
             .insert((bundle.collider_bundle, Visibility::Visible));
     }
 }
+
+pub fn spawn_game_world(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut ew_level_change: EventWriter<LevelChangeEvent>,
+) {
+    commands.spawn(LdtkWorldBundle {
+        ldtk_handle: asset_server.load("levels/example.ldtk"),
+        ..Default::default()
+    });
+
+    ew_level_change.send(LevelChangeEvent { level_id: 1 });
+}
+
+pub fn despawn_game_world(mut commands: Commands, level_query: Query<(Entity, &LevelSet)>) {
+    for (entity, _) in level_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+}

@@ -426,7 +426,7 @@ impl Plugin for PendejoPlugin {
                     // Rest
                     despawn_dead_pendejos,
                 )
-                    .run_if(in_state(GameState::Gameplay)),
+                    .run_if(in_state(GameState::GamePlay)),
             );
     }
 }

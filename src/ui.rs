@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::loading::FontAssets;
+use crate::{loading::FontAssets, ButtonColors, ChangeState, GameState};
 
 #[derive(Component)]
 pub struct UIPlayerHealth;
@@ -14,11 +14,19 @@ pub struct UIGameplayWave;
 #[derive(Component)]
 pub struct UIHighscore;
 
-pub(crate) fn draw_ui(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    font_assets: Res<FontAssets>,
-) {
+#[derive(Component)]
+struct UIGameOverButton;
+
+#[derive(Component)]
+pub struct UIGamePlay;
+
+pub(crate) fn despawn_ui(mut commands: Commands, query: Query<Entity, With<UIGamePlay>>) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
+pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     // alextime face
     commands
         .spawn((
@@ -33,6 +41,7 @@ pub(crate) fn draw_ui(
                 },
                 ..default()
             },
+            UIGamePlay,
             Name::new("ui face"),
         ))
         .with_children(|parent| {
@@ -69,6 +78,7 @@ pub(crate) fn draw_ui(
                 },
                 ..default()
             },
+            UIGamePlay,
             Name::new("ui healthbar"),
         ))
         .with_children(|parent| {
@@ -103,6 +113,7 @@ pub(crate) fn draw_ui(
                 },
                 ..default()
             },
+            UIGamePlay,
             Name::new("highscore"),
         ))
         .with_children(|parent| {
@@ -116,34 +127,6 @@ pub(crate) fn draw_ui(
                     },
                 ),
                 UIHighscore,
-            ));
-        });
-    // game over
-    commands
-        .spawn((
-            NodeBundle {
-                style: Style {
-                    width: Val::Percent(100.0),
-                    position_type: PositionType::Absolute,
-                    justify_content: JustifyContent::Center,
-                    height: Val::Percent(100.0),
-                    align_items: AlignItems::Center,
-                    ..default()
-                },
-                visibility: Visibility::Hidden,
-                ..default()
-            },
-            UIGameOver,
-            Name::new("ui game over"),
-        ))
-        .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                "  JUEGO\nTERMINADO",
-                TextStyle {
-                    font: font_assets.pixeloid_mono.clone(),
-                    font_size: 100.0,
-                    color: Color::WHITE,
-                },
             ));
         });
 
@@ -163,6 +146,7 @@ pub(crate) fn draw_ui(
                 // visibility: Visibility::Hidden,
                 ..default()
             },
+            UIGamePlay,
             Name::new("Wave Text"),
         ))
         .with_children(|parent| {

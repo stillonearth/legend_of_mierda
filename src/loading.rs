@@ -9,14 +9,13 @@ pub struct LoadingPlugin;
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
         app.add_loading_state(
-            LoadingState::new(GameState::Loading).continue_to_state(GameState::Splash),
+            LoadingState::new(GameState::Loading).continue_to_state(GameState::GamePlay),
         );
 
         app.add_collection_to_loading_state::<_, AudioAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, TextureAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, AvatarAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, CutsceneAssets>(GameState::Loading);
-        // app.add_collection_to_loading_state::<_, FontAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, SceneAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, AnimationAssets>(GameState::Loading);
 
@@ -39,6 +38,8 @@ pub struct AudioAssets {
     pub hit: Handle<AudioSource>,
     #[asset(path = "audio/hurt.ogg")]
     pub hurt: Handle<AudioSource>,
+    #[asset(path = "audio/gameover.ogg")]
+    pub gameover: Handle<AudioSource>,
 }
 
 #[derive(AssetCollection, Resource)]

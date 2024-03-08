@@ -18,12 +18,15 @@ pub fn controls(
             &mut Velocity,
             &mut CharacterAnimation,
             &mut TextureAtlasSprite,
+            &Player,
         ),
         With<Player>,
     >,
     spritesheets: Res<CharacterSpritesheets>,
 ) {
-    for (entity, mut texture_atlas, mut velocity, mut char_animation, mut sprite) in &mut query {
+    for (entity, mut texture_atlas, mut velocity, mut char_animation, mut sprite, player) in
+        &mut query
+    {
         // no control during attack phase
         if char_animation.animation_type == AnimationType::Attack {
             return;

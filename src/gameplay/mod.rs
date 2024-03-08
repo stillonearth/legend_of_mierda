@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 
-pub mod gameover;
 pub mod scoring;
 pub mod waves;
 
@@ -21,8 +20,6 @@ impl Plugin for GameplayPlugin {
                 ),
             )
             // Handle game over
-            .add_systems(Update, (gameover::event_game_over,))
-            .add_event::<gameover::GameOverEvent>()
             .add_event::<waves::WaveEvent>();
     }
 }

@@ -38,8 +38,6 @@ struct Splashscreen;
 fn setup_splashscreen(mut commands: Commands, cutscene_assets: Res<CutsceneAssets>) {
     info!("splashscreen");
 
-    commands.spawn(Camera2dBundle::default());
-
     commands
         .spawn((
             NodeBundle {

@@ -1,14 +1,13 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_kira_audio::prelude::*;
-use bevy_kira_audio::AudioInstance;
 use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::Velocity;
 use bevy_rapier2d::prelude::*;
 
 use crate::{
-    gameplay::gameover::GameOverEvent, loading::load_texture_atlas, physics::ColliderBundle,
-    sprites::*, ui::UIPlayerHealth, AudioAssets, GameState,
+    gameover::GameOverEvent, loading::load_texture_atlas, physics::ColliderBundle, sprites::*,
+    ui::UIPlayerHealth, AudioAssets, GameState,
 };
 
 use super::{
@@ -85,7 +84,7 @@ impl LdtkEntity for PlayerBundle {
             sprite_bundle,
             collider_bundle,
             active_events: ActiveEvents::COLLISION_EVENTS,
-            player: Player { health: 100 },
+            player: Player { health: 1 },
             animated_character_sprite: AnimatedCharacterSprite {
                 animated_character_type: AnimatedCharacterType::Player,
             },
@@ -312,7 +311,7 @@ impl Plugin for PlayerPlugin {
                     handle_player_mierda_collisions,
                     handle_player_pendejo_collisions,
                 )
-                    .run_if(in_state(GameState::Gameplay)),
+                    .run_if(in_state(GameState::GamePlay)),
             );
     }
 }

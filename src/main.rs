@@ -19,6 +19,7 @@ mod audio;
 mod controls;
 mod cutscene;
 mod entities;
+mod gameover;
 mod gameplay;
 mod ldtk;
 mod loading;
@@ -37,7 +38,8 @@ enum GameState {
     Splash,
     Menu,
     Cutscene,
-    Gameplay,
+    GamePlay,
+    GameOver,
 }
 
 fn main() {
@@ -106,11 +108,19 @@ impl Plugin for LegendOfMierdaPlugin {
         app.add_plugins((
             entities::EntitiesPlugin,
             gameplay::GameplayPlugin,
+            gameover::GameOverPlugin,
             splashscreen::SplashscreenPlugin,
         ))
+        .add_systems(Startup, |mut commands: Commands| {
+            commands.spawn(Camera2dBundle::default());
+        })
         .add_systems(
-            OnEnter(GameState::Gameplay),
-            (spawn_game_world, ui::draw_ui),
+            OnEnter(GameState::GamePlay),
+            (ldtk::spawn_game_world, ui::draw_ui),
+        )
+        .add_systems(
+            OnExit(GameState::GamePlay),
+            (ldtk::despawn_game_world, ui::despawn_ui),
         )
         .add_systems(
             Update,
@@ -118,35 +128,31 @@ impl Plugin for LegendOfMierdaPlugin {
                 ldtk::spawn_wall_collision,
                 ldtk::camera_fit_inside_current_level,
                 ldtk::update_level_selection,
-            ),
+            )
+                .run_if(in_state(GameState::GamePlay)),
         ) // Housekeeping
         .add_systems(
             Update,
-            (ldtk::hide_dummy_entities, ldtk::fix_missing_ldtk_entities),
+            (ldtk::hide_dummy_entities, ldtk::fix_missing_ldtk_entities)
+                .run_if(in_state(GameState::GamePlay)),
         )
         // Sprites
         .add_systems(
             Update,
-            (sprites::animate_player_sprite, sprites::flash_sprite),
+            (sprites::animate_player_sprite, sprites::flash_sprite)
+                .run_if(in_state(GameState::GamePlay)),
         )
         // Controls
-        .add_systems(Update, controls::controls)
+        .add_systems(
+            Update,
+            (controls::controls).run_if(in_state(GameState::GamePlay)),
+        )
         // Particles
-        .add_systems(Update, particles::fix_particle_transform_z)
+        .add_systems(
+            Update,
+            (particles::fix_particle_transform_z).run_if(in_state(GameState::GamePlay)),
+        )
         // App Events
         .add_event::<ldtk::LevelChangeEvent>();
     }
-}
-
-fn spawn_game_world(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut ew_level_change: EventWriter<ldtk::LevelChangeEvent>,
-) {
-    commands.spawn(LdtkWorldBundle {
-        ldtk_handle: asset_server.load("levels/example.ldtk"),
-        ..Default::default()
-    });
-
-    ew_level_change.send(ldtk::LevelChangeEvent { level_id: 1 });
 }

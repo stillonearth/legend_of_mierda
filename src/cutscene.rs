@@ -215,7 +215,7 @@ fn handle_cutscene_termination(
 ) {
     let cutscene_text = get_cutscene_dialog_text();
     if cutscene_text.len() <= cutscene_state.timer_count {
-        next_state.set(GameState::Gameplay);
+        next_state.set(GameState::GamePlay);
     }
 }
 
@@ -261,14 +261,14 @@ fn handle_cutscene_text(
 
 fn get_cutscene_dialog_text() -> Vec<(usize, String)> {
     vec![
-        (0, "ALLO GENNADIY?".to_string()),
-        (1, "Da Da, Gennadiy!".to_string()),
-        (0, "Privet gennadiy!.".to_string()),
-        (0, "Shapka the snachala.".to_string()),
-        (0, "Ya Alexey Viktorovich Makeev".to_string()),
-        (0, "AlexTime".to_string()),
-        (0, "Date of birth 08/22/1974".to_string()),
-        (0, "Citizen of Russia".to_string()),
-        (0, "CPS 17 Michoacan".to_string()),
+        (0, "MORIR MIERDA".to_string()),
+        // (1, "Da Da, Gennadiy!".to_string()),
+        // (0, "Privet gennadiy!.".to_string()),
+        // (0, "Shapka the snachala.".to_string()),
+        // (0, "Ya Alexey Viktorovich Makeev".to_string()),
+        // (0, "AlexTime".to_string()),
+        // (0, "Date of birth 08/22/1974".to_string()),
+        // (0, "Citizen of Russia".to_string()),
+        // (0, "CPS 17 Michoacan".to_string()),
     ]
 }

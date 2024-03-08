@@ -552,7 +552,7 @@ impl Plugin for BiboranPlugin {
             // Event Handlers
             .add_event::<SpawnBiboranEvent>()
             .add_event::<BiboranStepOverEvent>()
-            .add_systems(OnEnter(GameState::Gameplay), setup_biboran_prayer)
+            .add_systems(OnEnter(GameState::GamePlay), setup_biboran_prayer)
             .add_systems(Startup, setup_biboran_scene)
             .add_systems(Update, biboran_holy_effect)
             // Event Handlers

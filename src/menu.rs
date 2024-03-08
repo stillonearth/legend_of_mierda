@@ -23,9 +23,9 @@ impl Plugin for MenuPlugin {
 }
 
 #[derive(Component)]
-struct ButtonColors {
-    normal: Color,
-    hovered: Color,
+pub struct ButtonColors {
+    pub normal: Color,
+    pub hovered: Color,
 }
 
 impl Default for ButtonColors {
@@ -133,7 +133,7 @@ fn setup_menu(
 }
 
 #[derive(Component)]
-struct ChangeState(GameState);
+pub struct ChangeState(pub GameState);
 
 fn click_play_button(
     mut next_state: ResMut<NextState<GameState>>,
