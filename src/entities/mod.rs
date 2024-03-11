@@ -6,6 +6,7 @@ pub mod pendejo;
 pub mod pizza;
 pub mod player;
 pub mod text_indicator;
+pub mod weapon_arrow;
 
 pub struct EntitiesPlugin;
 
@@ -26,6 +27,7 @@ impl Plugin for EntitiesPlugin {
             player::PlayerPlugin,
             pendejo::PendejoPlugin,
             biboran::BiboranPlugin,
+            weapon_arrow::WeaponArrowPlugin,
             text_indicator::TextIndicatorPlugin,
         ));
     }

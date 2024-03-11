@@ -18,7 +18,7 @@ impl Plugin for LoadingPlugin {
         app.add_collection_to_loading_state::<_, CutsceneAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, SceneAssets>(GameState::Loading);
         app.add_collection_to_loading_state::<_, AnimationAssets>(GameState::Loading);
-        app.add_collection_to_loading_state::<_, SpriteAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, StaticSpriteAssets>(GameState::Loading);
 
         app.init_resource::<FontAssets>();
         app.init_resource::<MaterialAssets>();
@@ -80,9 +80,9 @@ pub struct TextureAssets {
 }
 
 #[derive(AssetCollection, Resource)]
-pub struct SpriteAssets {
+pub struct StaticSpriteAssets {
     #[asset(path = "sprites/arrow.png")]
-    pub bevy: Handle<Image>,
+    pub arrow: Handle<Image>,
 }
 
 #[derive(AssetCollection, Resource)]

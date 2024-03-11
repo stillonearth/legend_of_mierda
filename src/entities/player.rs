@@ -84,7 +84,7 @@ impl LdtkEntity for PlayerBundle {
             sprite_bundle,
             collider_bundle,
             active_events: ActiveEvents::COLLISION_EVENTS,
-            player: Player { health: 1 },
+            player: Player { health: 100 },
             animated_character_sprite: AnimatedCharacterSprite {
                 animated_character_type: AnimatedCharacterType::Player,
             },
@@ -111,6 +111,7 @@ pub struct PlayerHitEvent {
 // --------------
 
 pub fn event_player_attack(
+    mut commands: Commands,
     mut ev_player_attack: EventReader<PlayerAttackEvent>,
     mut ev_mierda_hit: EventWriter<MierdaHitEvent>,
     mut ev_pendejo_hit: EventWriter<PendejoHitEvent>,
@@ -121,6 +122,10 @@ pub fn event_player_attack(
     audio_assets: Res<AudioAssets>,
 ) {
     for ev in ev_player_attack.read() {
+        if commands.get_entity(ev.entity).is_none() {
+            continue;
+        }
+
         let (_, transform, char_animation) = q_player.get_mut(ev.entity).unwrap();
 
         let player_position = transform.translation;
@@ -195,6 +200,10 @@ pub fn event_player_hit(
     audio_assets: Res<AudioAssets>,
 ) {
     for ev in ev_player_hit_reader.read() {
+        if commands.get_entity(ev.entity).is_none() {
+            continue;
+        }
+
         let (_, player_transform, mut player) = q_player.get_mut(ev.entity).unwrap();
 
         commands.spawn((

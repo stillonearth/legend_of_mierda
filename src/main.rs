@@ -8,6 +8,7 @@ use bevy_kira_audio::prelude::*;
 use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
 use bevy_scene_hook::HookPlugin;
+use bevy_tweening::TweeningPlugin;
 use ldtk::LEVEL_1_IID;
 use pecs::prelude::*;
 
@@ -68,6 +69,7 @@ fn main() {
                 }),
             AudioPlugin))
         .add_plugins(HookPlugin)
+        .add_plugins(TweeningPlugin)
         .add_plugins(LoadingPlugin)
         .add_plugins((MenuPlugin, CutscenePlugin, LegendOfMierdaPlugin))
         .add_plugins(audio::InternalAudioPlugin)
