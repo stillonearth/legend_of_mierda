@@ -1,9 +1,7 @@
 use std::time::Duration;
 
-use bevy::{prelude::*, transform::commands};
-use bevy_tweening::{
-    lens::TransformPositionLens, Animator, EaseFunction, RepeatCount, RepeatStrategy, Tween,
-};
+use bevy::prelude::*;
+use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, RepeatCount, Tween};
 
 use super::player::Player;
 use crate::{loading::StaticSpriteAssets, GameState};
@@ -47,35 +45,35 @@ fn inject_arrow_sprite(
     mut q_arrows: ParamSet<(Query<(&mut Transform, &WeaponArrow), Without<Player>>,)>,
     static_sprite_assets: Res<StaticSpriteAssets>,
 ) {
-    for (entity, parent, player_transform, _) in q_players.iter() {
+    for (entity, _parent, _player_transform, _) in q_players.iter() {
         if q_arrows.p0().iter().count() == 0 {
             let timer_activation = WeaponArrowTimer(Timer::new(
-                Duration::from_secs_f32(0.25),
+                Duration::from_secs_f32(1.0),
                 TimerMode::Repeating,
             ));
 
-            let timer_deactivation = WeaponArrowHideTimer(Timer::new(
+            let mut timer_hide = WeaponArrowHideTimer(Timer::new(
                 Duration::from_secs_f32(0.5),
                 TimerMode::Repeating,
             ));
+
+            timer_hide.0.pause();
 
             commands.entity(entity).with_children(|parent| {
                 parent.spawn((
                     WeaponArrowBundle {
                         sprite_bundle: SpriteBundle {
                             texture: static_sprite_assets.arrow.clone(),
-                            // transform: Transform::from_translation(
-                            //     player_transform.translation + Vec3::new(10.0, 0.0, 0.0),
-                            // )
-                            // .with_scale(Vec3::ONE * 0.5),
+                            transform: Transform::from_translation(Vec3::new(20.0, 0., 0.)),
+                            visibility: Visibility::Hidden,
                             ..default()
                         },
                         weapon_arrow: WeaponArrow::Right,
                         timer_activation: timer_activation.clone(),
-                        timer_deactivation: timer_deactivation.clone(),
+                        timer_deactivation: timer_hide.clone(),
                     },
                     Name::new("weapon arrow"),
-                    ZIndex::Local(101),
+                    ZIndex::Local(103),
                 ));
             });
 
@@ -88,30 +86,18 @@ fn inject_arrow_sprite(
                                 ..default()
                             },
                             texture: static_sprite_assets.arrow.clone(),
-                            // transform: Transform::from_translation(
-                            //     player_transform.translation + Vec3::new(-10.0, 0.0, 0.0),
-                            // )
-                            // .with_scale(Vec3::ONE * 0.5),
+                            transform: Transform::from_translation(Vec3::new(-20.0, 0., 0.)),
+                            visibility: Visibility::Hidden,
                             ..default()
                         },
                         weapon_arrow: WeaponArrow::Left,
                         timer_activation: timer_activation.clone(),
-                        timer_deactivation: timer_deactivation.clone(),
+                        timer_deactivation: timer_hide.clone(),
                     },
                     Name::new("weapon arrow"),
-                    ZIndex::Local(101),
+                    ZIndex::Local(103),
                 ));
             });
-        } else {
-            // for (mut biboran_transform, _) in q_arrows.p1().iter_mut() {
-            //     biboran_transform.translation =
-            //         player_transform.translation + Vec3::new(25.0, 0.0, 0.0);
-            // }
-
-            // for (mut biboran_transform, _) in q_arrows.p2().iter_mut() {
-            //     biboran_transform.translation =
-            //         player_transform.translation + Vec3::new(-25.0, 0.0, 0.0);
-            // }
         }
     }
 }
@@ -135,14 +121,16 @@ fn animate_arrow(
         return;
     }
 
-    for (entity, mut _transform, mut visibility, arrow, mut activation_timer, mut hide_timer) in
+    for (entity, mut transform, mut visibility, arrow, mut timer_activate, mut timer_hide) in
         queries.p1().iter_mut()
     {
-        activation_timer.0.tick(time.delta());
-        hide_timer.0.tick(time.delta());
+        timer_activate.0.tick(time.delta());
+        timer_hide.0.tick(time.delta());
 
-        if activation_timer.0.just_finished() {
+        if timer_activate.0.just_finished() {
             *visibility = Visibility::Visible;
+
+            timer_hide.0.unpause();
 
             let end = match arrow {
                 WeaponArrow::Right => Vec3::new(55., 0., 0.),
@@ -150,20 +138,28 @@ fn animate_arrow(
             };
 
             let tween = Tween::new(
-                EaseFunction::QuadraticInOut,
-                Duration::from_secs_f32(0.25),
+                EaseFunction::CubicIn,
+                Duration::from_secs_f32(0.5),
                 TransformPositionLens {
-                    start: Vec3::ZERO,
+                    start: match arrow {
+                        WeaponArrow::Right => Vec3::new(20., 0., 0.),
+                        WeaponArrow::Left => Vec3::new(-20., 0., 0.),
+                    },
                     end: end,
                 },
-            )
-            .with_repeat_count(RepeatCount::Infinite);
+            );
 
             commands.entity(entity).insert(Animator::new(tween));
         }
 
-        if hide_timer.0.just_finished() {
+        if timer_hide.0.just_finished() {
+            timer_hide.0.pause();
             *visibility = Visibility::Hidden;
+
+            transform.translation = match arrow {
+                WeaponArrow::Right => Vec3::new(20., 0., 0.),
+                WeaponArrow::Left => Vec3::new(-20., 0., 0.),
+            };
         }
     }
 }
