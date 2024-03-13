@@ -1,9 +1,14 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
+use bevy_rapier2d::na::ComplexField;
 use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween};
 
-use super::player::Player;
+use super::{
+    mierda::{Mierda, MierdaHitEvent},
+    pendejo::{Pendejo, PendejoHitEvent},
+    player::Player,
+};
 use crate::{loading::StaticSpriteAssets, GameState};
 
 // ----------
@@ -16,6 +21,13 @@ pub enum WeaponArrow {
     Right,
     Left,
 }
+
+// ------
+// Events
+// ------
+
+#[derive(Event, Clone)]
+pub struct WeaponArrowAttackEvent {}
 
 // -------
 // Bundles
@@ -115,6 +127,7 @@ fn animate_arrow(
             &mut WeaponArrowHideTimer,
         )>,
     )>,
+    mut ev_arrow_attack: EventWriter<WeaponArrowAttackEvent>,
     time: Res<Time>,
 ) {
     if queries.p0().iter().next().is_none() {
@@ -138,8 +151,8 @@ fn animate_arrow(
             };
 
             let tween = Tween::new(
-                EaseFunction::CubicIn,
-                Duration::from_secs_f32(0.5),
+                EaseFunction::QuadraticInOut,
+                Duration::from_secs_f32(0.25),
                 TransformPositionLens {
                     start: match arrow {
                         WeaponArrow::Right => Vec3::new(20., 0., 0.),
@@ -149,6 +162,7 @@ fn animate_arrow(
                 },
             );
 
+            ev_arrow_attack.send(WeaponArrowAttackEvent {});
             commands.entity(entity).insert(Animator::new(tween));
         }
 
@@ -160,6 +174,57 @@ fn animate_arrow(
                 WeaponArrow::Right => Vec3::new(20., 0., 0.),
                 WeaponArrow::Left => Vec3::new(-20., 0., 0.),
             };
+        }
+    }
+}
+
+fn handle_arrow_attack(
+    mut arrow_attack_events: EventReader<WeaponArrowAttackEvent>,
+    mut ev_mierda_hit: EventWriter<MierdaHitEvent>,
+    mut ev_pendejo_hit: EventWriter<PendejoHitEvent>,
+    mut queries: ParamSet<(
+        Query<(&Transform, &Player)>,
+        Query<(Entity, &Transform, &Pendejo)>,
+        Query<(Entity, &Transform, &Mierda)>,
+    )>,
+) {
+    for (_) in arrow_attack_events.read() {
+        if queries.p0().iter().len() == 0 {
+            return;
+        }
+
+        let player_translation = queries.p0().iter().next().unwrap().0.translation;
+
+        for (e, transfrom, _) in queries.p1().iter() {
+            let translation = transfrom.translation;
+
+            if (translation.z - player_translation.z).abs() > 16.0 {
+                continue;
+            }
+
+            let distance = translation.distance(player_translation).abs();
+
+            if distance > 40.0 {
+                continue;
+            }
+
+            ev_pendejo_hit.send(PendejoHitEvent(e));
+        }
+
+        for (e, transfrom, _) in queries.p2().iter() {
+            let translation = transfrom.translation;
+
+            if (translation.z - player_translation.z).abs() > 16.0 {
+                continue;
+            }
+
+            let distance = translation.distance(player_translation).abs();
+
+            if distance > 40.0 {
+                continue;
+            }
+
+            ev_mierda_hit.send(MierdaHitEvent(e));
         }
     }
 }
@@ -176,7 +241,9 @@ impl Plugin for WeaponArrowPlugin {
             // Event Handlers
             .add_systems(
                 Update,
-                (inject_arrow_sprite, animate_arrow).run_if(in_state(GameState::GamePlay)),
-            );
+                (inject_arrow_sprite, animate_arrow, handle_arrow_attack)
+                    .run_if(in_state(GameState::GamePlay)),
+            )
+            .add_event::<WeaponArrowAttackEvent>();
     }
 }

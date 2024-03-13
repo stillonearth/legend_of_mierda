@@ -21,7 +21,6 @@ use super::{player::Player, text_indicator::SpawnTextIndicatorEvent};
 
 #[derive(Component, Clone, Default, Reflect)]
 pub struct DirectionUpdateTime {
-    /// track when the bomb should explode (non-repeating timer)
     pub timer: Timer,
 }
 
@@ -396,9 +395,6 @@ pub fn despawn_dead_pendejos(
                 state.asyn().timeout(0.3)
             }))
             .then(asyn!(state, mut commands: Commands => {
-                if commands.get_entity(state.value).is_none() {
-                    return;
-                }
                 commands.entity(state.value).despawn_recursive();
             }));
     }
