@@ -24,7 +24,7 @@ pub fn controls(
     >,
     spritesheets: Res<CharacterSpritesheets>,
 ) {
-    for (entity, mut texture_atlas, mut velocity, mut char_animation, mut sprite, player) in
+    for (entity, mut texture_atlas, mut velocity, mut char_animation, mut sprite, _player) in
         &mut query
     {
         // no control during attack phase

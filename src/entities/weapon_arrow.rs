@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, RepeatCount, Tween};
+use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween};
 
 use super::player::Player;
 use crate::{loading::StaticSpriteAssets, GameState};
@@ -145,7 +145,7 @@ fn animate_arrow(
                         WeaponArrow::Right => Vec3::new(20., 0., 0.),
                         WeaponArrow::Left => Vec3::new(-20., 0., 0.),
                     },
-                    end: end,
+                    end,
                 },
             );
 
