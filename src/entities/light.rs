@@ -63,11 +63,11 @@ impl LdtkEntity for LanternBundle {
 
 pub fn setup_light(
     mut commands: Commands,
-    player_lights: Query<(Entity, &PlayerLight)>,
+    _player_lights: Query<(Entity, &PlayerLight)>,
     q_lanterns: Query<(&GlobalTransform, &Lantern)>,
     q_level_lights: Query<(Entity, &LevelLight)>,
     q_walls: Query<(&GridCoords, &Wall)>,
-    q_players: Query<(Entity, &GlobalTransform, &Player)>,
+    _q_players: Query<(Entity, &GlobalTransform, &Player)>,
     q_occluders: Query<(Entity, &LightOccluder2D)>,
 ) {
     if q_level_lights.iter().count() == 0 {

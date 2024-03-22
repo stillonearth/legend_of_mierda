@@ -1,6 +1,6 @@
 use bevy::{
     core_pipeline::{
-        clear_color::ClearColorConfig, core_2d, core_3d,
+        core_2d,
         fullscreen_vertex_shader::fullscreen_shader_vertex_state,
     },
     ecs::query::QueryItem,
@@ -21,7 +21,6 @@ use bevy::{
             TextureViewDimension,
         },
         renderer::{RenderContext, RenderDevice},
-        texture::BevyDefault,
         view::ViewTarget,
         RenderApp,
     },
@@ -44,7 +43,7 @@ impl Plugin for PostProcessPlugin {
             // and writing the data to that buffer every frame.
             UniformComponentPlugin::<PostProcessSettings>::default(),
         ))
-        .add_systems(Update, (update_settings));
+        .add_systems(Update, update_settings);
 
         // We need to get the render app from the main app
         let Ok(render_app) = app.get_sub_app_mut(RenderApp) else {
@@ -299,7 +298,7 @@ impl FromWorld for PostProcessPipeline {
 
 // Change the intensity over time to show that the effect is controlled from the main world
 fn update_settings(mut settings: Query<&mut PostProcessSettings>, time: Res<Time>) {
-    for (mut settings) in &mut settings {
+    for mut settings in &mut settings {
         settings.noise = time.elapsed_seconds().sin();
     }
 }
