@@ -43,7 +43,8 @@ impl Plugin for PostProcessPlugin {
             // This plugin will prepare the component for the GPU by creating a uniform buffer
             // and writing the data to that buffer every frame.
             UniformComponentPlugin::<PostProcessSettings>::default(),
-        ));
+        ))
+        .add_systems(Update, (update_settings));
 
         // We need to get the render app from the main app
         let Ok(render_app) = app.get_sub_app_mut(RenderApp) else {
@@ -105,6 +106,7 @@ impl PostProcessNode {
 pub struct PostProcessSettings {
     pub height: f32,
     pub width: f32,
+    pub noise: f32,
 }
 
 // The ViewNode trait is required by the ViewNodeRunner
@@ -292,5 +294,12 @@ impl FromWorld for PostProcessPipeline {
             sampler,
             pipeline_id,
         }
+    }
+}
+
+// Change the intensity over time to show that the effect is controlled from the main world
+fn update_settings(mut settings: Query<&mut PostProcessSettings>, time: Res<Time>) {
+    for (mut settings) in &mut settings {
+        settings.noise = time.elapsed_seconds().sin();
     }
 }
