@@ -1,7 +1,6 @@
 # Legend of Mierda
-menu | cutscene | gameplay
---- | --- | ---
-![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/d467acd9-6b76-44be-9013-494beb9478f5) | ![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/f7ce3ac4-bc30-4241-87a2-7eea49b09a56) | ![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/e115dff6-85f3-497a-9fa6-439bd7682a14)
+
+![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/d467acd9-6b76-44be-9013-494beb9478f5)  ![image](https://github.com/stillonearth/legend_of_mierda/assets/97428129/e115dff6-85f3-497a-9fa6-439bd7682a14)
 
 This is Work-In-Progress. The pace is "when mood is right", so there may be long periods of inactivity.
 
