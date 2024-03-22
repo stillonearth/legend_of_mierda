@@ -4,7 +4,7 @@ use bevy::log::LogPlugin;
 use bevy::render::camera::RenderTarget;
 use bevy::{input::common_conditions::input_toggle_active, prelude::*, window::PresentMode};
 use bevy_ecs_ldtk::prelude::*;
-use bevy_inspector_egui::quick::{ResourceInspectorPlugin, WorldInspectorPlugin};
+use bevy_inspector_egui::quick::{WorldInspectorPlugin};
 use bevy_kira_audio::prelude::*;
 use bevy_magic_light_2d::gi::compositing::{setup_post_processing_camera, CameraTargets};
 use bevy_magic_light_2d::gi::resource::{BevyMagicLight2DSettings, LightPassParams};

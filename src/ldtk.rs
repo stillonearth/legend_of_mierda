@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use bevy_magic_light_2d::{FloorCamera, SpriteCamera};
+use bevy_magic_light_2d::{SpriteCamera};
 use bevy_rapier2d::prelude::*;
 
 use crate::entities::{

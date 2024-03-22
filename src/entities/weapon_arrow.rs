@@ -188,7 +188,7 @@ fn handle_arrow_attack(
         Query<(Entity, &Transform, &Mierda)>,
     )>,
 ) {
-    for (_) in arrow_attack_events.read() {
+    for _ in arrow_attack_events.read() {
         if queries.p0().iter().len() == 0 {
             return;
         }

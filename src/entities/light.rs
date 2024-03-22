@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_magic_light_2d::prelude::*;
-use ffmpeg_next::util::range;
+
 
 use crate::{
     entities::player::Player, load_texture_atlas, sprites::LANTERN_ASSET_SHEET, GameState,
@@ -50,7 +50,7 @@ pub fn create_lantern_bundle(
 
 impl LdtkEntity for LanternBundle {
     fn bundle_entity(
-        entity_instance: &EntityInstance,
+        _entity_instance: &EntityInstance,
         _layer_instance: &LayerInstance,
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
@@ -62,9 +62,9 @@ impl LdtkEntity for LanternBundle {
 }
 
 pub fn setup_light(
-    mut q_lanterns: Query<(&GlobalTransform, &Lantern)>,
-    mut q_level_lights: Query<(Entity, &LevelLight)>,
-    mut player_lights: Query<(Entity, &PlayerLight)>,
+    q_lanterns: Query<(&GlobalTransform, &Lantern)>,
+    q_level_lights: Query<(Entity, &LevelLight)>,
+    player_lights: Query<(Entity, &PlayerLight)>,
     mut commands: Commands,
     q_players: Query<(Entity, &GlobalTransform, &Player)>,
 ) {
@@ -107,7 +107,7 @@ pub fn setup_light(
             return;
         }
 
-        let player_global_transform = q_players.iter().next().unwrap().1.clone();
+        let player_global_transform = *q_players.iter().next().unwrap().1;
 
         commands.spawn((
             OmniLightSource2D {
