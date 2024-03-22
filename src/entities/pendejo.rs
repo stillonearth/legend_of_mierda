@@ -338,6 +338,10 @@ pub fn handle_pendejo_hit(
     let mut hit_sound_played = false;
 
     for event in ev_pendejo_hit.read() {
+        if commands.get_entity(event.0).is_none() {
+            continue;
+        }
+
         for (player_transform, _) in q_player.iter() {
             let player_position = player_transform.translation;
 

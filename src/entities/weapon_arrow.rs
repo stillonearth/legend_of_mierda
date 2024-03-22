@@ -65,7 +65,7 @@ fn inject_arrow_sprite(
             ));
 
             let mut timer_hide = WeaponArrowHideTimer(Timer::new(
-                Duration::from_secs_f32(0.5),
+                Duration::from_secs_f32(0.2),
                 TimerMode::Repeating,
             ));
 
@@ -152,7 +152,7 @@ fn animate_arrow(
 
             let tween = Tween::new(
                 EaseFunction::QuadraticInOut,
-                Duration::from_secs_f32(0.25),
+                Duration::from_secs_f32(0.15),
                 TransformPositionLens {
                     start: match arrow {
                         WeaponArrow::Right => Vec3::new(20., 0., 0.),

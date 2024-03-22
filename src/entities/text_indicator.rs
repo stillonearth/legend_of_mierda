@@ -55,6 +55,10 @@ pub fn event_spawn_text_indicator(
 
         let text_indicator = TextIndicator { timer };
 
+        if commands.get_entity(ev.entity).is_none() {
+            continue;
+        }
+
         commands.entity(ev.entity).with_children(|parent| {
             let text_style = TextStyle {
                 font: font_assets.pixeloid_mono.clone(),

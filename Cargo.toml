@@ -45,6 +45,7 @@ webbrowser = { version = "0.8", features = ["hardened"] }
 ffmpeg-next = "6.1"
 bevy-scene-hook = "9.0"
 bevy_tweening = "0.9.0"
+bevy_shader_utils = "0.5.2"
 bevy_magic_light_2d = {git="https://github.com/zaycev/bevy-magic-light-2d", rev="8ce01dc618d4905b3"}
 
 [profile.dev.package."*"]

@@ -4,7 +4,7 @@ use bevy::log::LogPlugin;
 use bevy::render::camera::RenderTarget;
 use bevy::{input::common_conditions::input_toggle_active, prelude::*, window::PresentMode};
 use bevy_ecs_ldtk::prelude::*;
-use bevy_inspector_egui::quick::{WorldInspectorPlugin};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_kira_audio::prelude::*;
 use bevy_magic_light_2d::gi::compositing::{setup_post_processing_camera, CameraTargets};
 use bevy_magic_light_2d::gi::resource::{BevyMagicLight2DSettings, LightPassParams};
@@ -20,6 +20,7 @@ use pecs::prelude::*;
 use cutscene::*;
 use loading::*;
 use menu::*;
+use postprocessing::{PostProcessPlugin, PostProcessSettings};
 
 mod audio;
 mod controls;
@@ -32,6 +33,7 @@ mod loading;
 mod menu;
 mod particles;
 mod physics;
+mod postprocessing;
 mod splashscreen;
 mod sprites;
 mod ui;
@@ -72,7 +74,7 @@ fn main() {
                     filter: "info,wgpu_core=warn,wgpu_hal=warn,legend_of_mierda=debug,bevy_animation=error,bevy_gltf=error".into(),
                     level: bevy::log::Level::DEBUG,
                 }),
-            AudioPlugin))
+            AudioPlugin, PostProcessPlugin))
         .add_plugins((HookPlugin, PecsPlugin, TweeningPlugin, BevyMagicLight2DPlugin))
         .add_plugins((LoadingPlugin, MenuPlugin, CutscenePlugin, LegendOfMierdaPlugin))
         .add_plugins(audio::InternalAudioPlugin)
@@ -122,24 +124,24 @@ fn main() {
 // -----------
 
 fn spawn_camera(mut commands: Commands, camera_targets: Res<CameraTargets>) {
-    commands
-        .spawn((
-            Camera2dBundle {
-                camera: Camera {
-                    hdr: true,
-                    target: RenderTarget::Image(camera_targets.floor_target.clone()),
-                    ..Default::default()
-                },
+    commands.spawn((
+        Camera2dBundle {
+            camera: Camera {
+                hdr: true,
+                target: RenderTarget::Image(camera_targets.floor_target.clone()),
                 ..Default::default()
             },
-            Name::new("main_camera"),
-            FloorCamera,
-        ))
-        .insert(SpriteCamera)
-        .insert(UiCameraConfig {
-            // show_ui: false,
+            ..Default::default()
+        },
+        Name::new("main_camera"),
+        FloorCamera,
+        PostProcessSettings {
+            width: 712.,
+            height: 712.,
             ..default()
-        });
+        },
+        SpriteCamera,
+    ));
 }
 
 pub struct LegendOfMierdaPlugin;
