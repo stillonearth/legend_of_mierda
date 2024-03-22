@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 pub mod biboran;
+pub mod light;
 pub mod mierda;
 pub mod pendejo;
 pub mod pizza;
@@ -29,6 +30,7 @@ impl Plugin for EntitiesPlugin {
             biboran::BiboranPlugin,
             weapon_arrow::WeaponArrowPlugin,
             text_indicator::TextIndicatorPlugin,
+            light::LightPlugiin,
         ));
     }
 }

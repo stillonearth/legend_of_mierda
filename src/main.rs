@@ -1,10 +1,15 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
 use bevy::log::LogPlugin;
+use bevy::render::camera::RenderTarget;
 use bevy::{input::common_conditions::input_toggle_active, prelude::*, window::PresentMode};
 use bevy_ecs_ldtk::prelude::*;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_inspector_egui::quick::{ResourceInspectorPlugin, WorldInspectorPlugin};
 use bevy_kira_audio::prelude::*;
+use bevy_magic_light_2d::gi::compositing::{setup_post_processing_camera, CameraTargets};
+use bevy_magic_light_2d::gi::resource::{BevyMagicLight2DSettings, LightPassParams};
+use bevy_magic_light_2d::gi::BevyMagicLight2DPlugin;
+use bevy_magic_light_2d::{FloorCamera, SpriteCamera};
 use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
 use bevy_scene_hook::HookPlugin;
@@ -68,12 +73,14 @@ fn main() {
                     level: bevy::log::Level::DEBUG,
                 }),
             AudioPlugin))
-        .add_plugins(HookPlugin)
-        .add_plugins(TweeningPlugin)
-        .add_plugins(LoadingPlugin)
-        .add_plugins((MenuPlugin, CutscenePlugin, LegendOfMierdaPlugin))
+        .add_plugins((HookPlugin, PecsPlugin, TweeningPlugin, BevyMagicLight2DPlugin))
+        .add_plugins((LoadingPlugin, MenuPlugin, CutscenePlugin, LegendOfMierdaPlugin))
         .add_plugins(audio::InternalAudioPlugin)
-        .add_plugins(PecsPlugin)
+        // .add_plugins(
+        //     ResourceInspectorPlugin::<BevyMagicLight2DSettings>::new()
+        //     .run_if(
+        //         input_toggle_active(false, KeyCode::Escape)
+        //     ))
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         )
@@ -83,6 +90,17 @@ fn main() {
         .insert_resource(RapierConfiguration {
             gravity: Vec2::new(0.0, 0.0),
             ..Default::default()
+        })
+        // Magic Light
+        .insert_resource(BevyMagicLight2DSettings {
+            light_pass_params: LightPassParams {
+                reservoir_size: 8,
+                smooth_kernel_size: (3, 3),
+                direct_light_contrib: 0.5,
+                indirect_light_contrib: 0.5,
+                ..default()
+            },
+            ..default()
         })
         // LDTK
         .add_plugins(LdtkPlugin)
@@ -103,6 +121,27 @@ fn main() {
 // Game Plugin
 // -----------
 
+fn spawn_camera(mut commands: Commands, camera_targets: Res<CameraTargets>) {
+    commands
+        .spawn((
+            Camera2dBundle {
+                camera: Camera {
+                    hdr: true,
+                    target: RenderTarget::Image(camera_targets.floor_target.clone()),
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            Name::new("main_camera"),
+            FloorCamera,
+        ))
+        .insert(SpriteCamera)
+        .insert(UiCameraConfig {
+            // show_ui: false,
+            ..default()
+        });
+}
+
 pub struct LegendOfMierdaPlugin;
 
 impl Plugin for LegendOfMierdaPlugin {
@@ -113,9 +152,7 @@ impl Plugin for LegendOfMierdaPlugin {
             gameover::GameOverPlugin,
             splashscreen::SplashscreenPlugin,
         ))
-        .add_systems(Startup, |mut commands: Commands| {
-            commands.spawn(Camera2dBundle::default());
-        })
+        .add_systems(Startup, (spawn_camera).after(setup_post_processing_camera))
         .add_systems(
             OnEnter(GameState::GamePlay),
             (ldtk::spawn_game_world, ui::draw_ui),

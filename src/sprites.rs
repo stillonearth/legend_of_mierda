@@ -13,6 +13,7 @@ pub const PLAYER_ASSET_SHEET_1: &str = "sprites/alextime-1.png";
 pub const PLAYER_ASSET_SHEET_2: &str = "sprites/alextime-2.png";
 pub const MIERDA_ASSET_SHEET: &str = "sprites/mierda.png";
 pub const PIZZA_ASSET_SHEET: &str = "sprites/pizza.png";
+pub const LANTERN_ASSET_SHEET: &str = "sprites/lantern.png";
 pub const BIBORAN_ASSET_SHEET: &str = "sprites/biboran.png";
 pub const PENDEJO_SPRITE_SHEETS: [(&str, AnimatedCharacterType); 2] = [
     ("sprites/pendejo-1.png", AnimatedCharacterType::Pendejo1),

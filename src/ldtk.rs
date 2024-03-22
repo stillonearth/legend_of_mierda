@@ -3,6 +3,7 @@ use std::collections::{HashMap, HashSet};
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+use bevy_magic_light_2d::{FloorCamera, SpriteCamera};
 use bevy_rapier2d::prelude::*;
 
 use crate::entities::{
@@ -84,6 +85,7 @@ pub fn camera_fit_inside_current_level(
         (
             &mut bevy::render::camera::OrthographicProjection,
             &mut Transform,
+            &SpriteCamera,
         ),
         Without<Player>,
     >,
@@ -96,11 +98,12 @@ pub fn camera_fit_inside_current_level(
     if player_query.is_empty() {
         return;
     }
+
     let project = project_assets.get(projects.single()).unwrap();
 
     let player_translation = player_query.single().translation();
 
-    let (mut orthographic_projection, mut camera_transform) = camera_query.single_mut();
+    let (mut orthographic_projection, mut camera_transform, _) = camera_query.single_mut();
 
     for (level_transform, level_iid) in &level_query {
         if let Some(ldtk_level) = project.get_raw_level_by_iid(level_iid.get()) {

@@ -33,6 +33,7 @@ pub struct PlayerBundle {
     pub animated_character_sprite: AnimatedCharacterSprite,
     pub collider_bundle: ColliderBundle,
     pub active_events: ActiveEvents,
+    pub name: Name,
 }
 
 // ----
@@ -88,6 +89,7 @@ impl LdtkEntity for PlayerBundle {
             animated_character_sprite: AnimatedCharacterSprite {
                 animated_character_type: AnimatedCharacterType::Player,
             },
+            name: Name::new("Player"),
         }
     }
 }
