@@ -261,8 +261,8 @@ fn handle_cutscene_text(
 
 fn get_cutscene_dialog_text() -> Vec<(usize, String)> {
     vec![
-        (0, "MORIR MIERDA".to_string()),
-        // (1, "Da Da, Gennadiy!".to_string()),
+        (0, "LEGEND OF MIERDA".to_string()),
+        (1, "VERSION 24-4-4".to_string()),
         // (0, "Privet gennadiy!.".to_string()),
         // (0, "Shapka the snachala.".to_string()),
         // (0, "Ya Alexey Viktorovich Makeev".to_string()),
