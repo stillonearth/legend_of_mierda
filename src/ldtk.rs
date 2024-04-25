@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use bevy_magic_light_2d::{SpriteCamera};
+use bevy_magic_light_2d::SpriteCamera;
 use bevy_rapier2d::prelude::*;
 
 use crate::entities::{
@@ -353,7 +353,7 @@ pub fn hide_dummy_entities(
 
 pub fn fix_missing_ldtk_entities(
     asset_server: Res<AssetServer>,
-    texture_atlasses: ResMut<Assets<TextureAtlas>>,
+    texture_atlasses: ResMut<Assets<TextureAtlasLayout>>,
     mut commands: Commands,
     los_mierdas: Query<(Entity, &Mierda), Without<Collider>>,
     los_pizzas: Query<(Entity, &Pizza), Without<Collider>>,

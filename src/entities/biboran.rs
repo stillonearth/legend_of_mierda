@@ -1,11 +1,10 @@
 use std::time::Duration;
 
 use bevy::{
-    core_pipeline::clear_color::ClearColorConfig,
     pbr::CascadeShadowConfigBuilder,
     prelude::*,
     render::{
-        camera::RenderTarget,
+        camera::{ClearColorConfig, RenderTarget},
         render_resource::{
             Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
         },
@@ -63,7 +62,7 @@ pub struct BiboranBundle {
 
 pub fn create_biboran_bundle(
     asset_server: &AssetServer,
-    texture_atlasses: &mut Assets<TextureAtlas>,
+    texture_atlasses: &mut Assets<TextureAtlasLayout>,
     is_dummy: bool,
 ) -> BiboranBundle {
     let rotation_constraints = LockedAxes::ROTATION_LOCKED;
@@ -79,7 +78,7 @@ pub fn create_biboran_bundle(
         ..Default::default()
     };
 
-    let atlas_handle = load_texture_atlas(
+    let atlas_image_bundle = load_texture_atlas(
         BIBORAN_ASSET_SHEET.to_string(),
         asset_server,
         1,
@@ -90,8 +89,11 @@ pub fn create_biboran_bundle(
     );
 
     let sprite_bundle = SpriteSheetBundle {
-        texture_atlas: atlas_handle,
-        sprite: TextureAtlasSprite::new(0),
+        atlas: TextureAtlas {
+            layout: atlas_image_bundle.texture_atlas.layout,
+            index: 0,
+        },
+        sprite: Sprite::default(),
         ..default()
     };
 
@@ -110,7 +112,7 @@ impl LdtkEntity for BiboranBundle {
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
         asset_server: &AssetServer,
-        texture_atlasses: &mut Assets<TextureAtlas>,
+        texture_atlasses: &mut Assets<TextureAtlasLayout>,
     ) -> BiboranBundle {
         let is_dummy = *entity_instance
             .get_bool_field("is_dummy")
@@ -366,15 +368,13 @@ pub fn setup_biboran_scene(
             camera: Camera {
                 order: -1,
                 target: RenderTarget::Image(image_handle.clone()),
-                ..default()
-            },
-            camera_3d: Camera3d {
                 clear_color: ClearColorConfig::Custom(Color::rgba_u8(0, 0, 0, 0)),
                 ..default()
             },
+            camera_3d: Camera3d { ..default() },
             ..default()
         },
-        UiCameraConfig { show_ui: false },
+        // UiCameraConfig { show_ui: false },
         RenderLayers::layer(1),
     ));
 

@@ -65,12 +65,12 @@ pub fn event_spawn_text_indicator(
                 font_size: 10.0,
                 color: Color::WHITE,
             };
-            let text_alignment = TextAlignment::Center;
+            let text_alignment = JustifyText::Center;
 
             parent.spawn((
                 Text2dBundle {
                     text: Text::from_section(ev.text.clone(), text_style.clone())
-                        .with_alignment(text_alignment),
+                        .with_justify(text_alignment),
                     transform: Transform::from_translation(Vec3::new(0.0, 0.0, 1.0)),
                     ..default()
                 },
