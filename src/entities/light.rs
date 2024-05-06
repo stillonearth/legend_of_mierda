@@ -24,9 +24,9 @@ pub struct LanternBundle {
 
 pub fn create_lantern_bundle(
     asset_server: &AssetServer,
-    texture_atlasses: &mut Assets<TextureAtlasLayout>,
+    texture_atlasses: &mut Assets<TextureAtlas>,
 ) -> LanternBundle {
-    let atlas_image_bundle = load_texture_atlas(
+    let atlas_handle = load_texture_atlas(
         LANTERN_ASSET_SHEET.to_string(),
         asset_server,
         1,
@@ -37,11 +37,8 @@ pub fn create_lantern_bundle(
     );
 
     let sprite_bundle = SpriteSheetBundle {
-        atlas: TextureAtlas {
-            layout: atlas_image_bundle.texture_atlas.layout,
-            index: 0,
-        },
-        sprite: Sprite::default(),
+        texture_atlas: atlas_handle,
+        sprite: TextureAtlasSprite::new(0),
         ..default()
     };
 
@@ -58,7 +55,7 @@ impl LdtkEntity for LanternBundle {
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
         asset_server: &AssetServer,
-        texture_atlasses: &mut Assets<TextureAtlasLayout>,
+        texture_atlasses: &mut Assets<TextureAtlas>,
     ) -> LanternBundle {
         create_lantern_bundle(asset_server, texture_atlasses)
     }
@@ -66,11 +63,11 @@ impl LdtkEntity for LanternBundle {
 
 pub fn setup_light(
     mut commands: Commands,
-    player_lights: Query<(Entity, &PlayerLight)>,
+    _player_lights: Query<(Entity, &PlayerLight)>,
     q_lanterns: Query<(&GlobalTransform, &Lantern)>,
     q_level_lights: Query<(Entity, &LevelLight)>,
     q_walls: Query<(&GridCoords, &Wall)>,
-    q_players: Query<(Entity, &GlobalTransform, &Player)>,
+    _q_players: Query<(Entity, &GlobalTransform, &Player)>,
     q_occluders: Query<(Entity, &LightOccluder2D)>,
 ) {
     if q_level_lights.iter().count() == 0 {
@@ -114,7 +111,7 @@ pub fn setup_light(
         commands.spawn((
             SkylightLight2D {
                 color: Color::rgb_u8(249, 143, 33),
-                intensity: 0.001,
+                intensity: 0.03,
             },
             Name::new("global_skylight"),
         ));
@@ -153,30 +150,30 @@ pub fn setup_light(
             .push_children(&occluders);
     }
 
-    if player_lights.iter().count() == 0 {
-        if q_players.is_empty() {
-            return;
-        }
+    // if player_lights.iter().count() == 0 {
+    //     if q_players.is_empty() {
+    //         return;
+    //     }
 
-        let player_global_transform = *q_players.iter().next().unwrap().1;
+    //     let player_global_transform = *q_players.iter().next().unwrap().1;
 
-        commands.spawn((
-            OmniLightSource2D {
-                intensity: 1.0,
-                color: Color::rgb_u8(128, 255, 128),
-                falloff: Vec3::new(1.5, 1.5, 0.05),
-                ..default()
-            },
-            SpatialBundle {
-                transform: Transform {
-                    translation: player_global_transform.translation(),
-                    ..default()
-                },
-                ..default()
-            },
-            PlayerLight,
-        ));
-    }
+    //     commands.spawn((
+    //         OmniLightSource2D {
+    //             intensity: 1.0,
+    //             color: Color::rgb_u8(255, 255, 255),
+    //             falloff: Vec3::new(1.5, 5.0, 0.05),
+    //             ..default()
+    //         },
+    //         SpatialBundle {
+    //             transform: Transform {
+    //                 translation: player_global_transform.translation(),
+    //                 ..default()
+    //             },
+    //             ..default()
+    //         },
+    //         PlayerLight,
+    //     ));
+    // }
 }
 
 fn update_player_light_position(

@@ -55,7 +55,7 @@ pub struct PendejoBundle {
 
 pub fn create_pendejo_bundle(
     asset_server: &AssetServer,
-    texture_atlasses: &mut Assets<TextureAtlasLayout>,
+    texture_atlasses: &mut Assets<TextureAtlas>,
     is_dummy: bool,
 ) -> PendejoBundle {
     let rotation_constraints = LockedAxes::ROTATION_LOCKED;
@@ -75,7 +75,7 @@ pub fn create_pendejo_bundle(
         .choose(&mut rand::thread_rng())
         .unwrap();
 
-    let atlas_image_bundle = load_texture_atlas(
+    let atlas_handle = load_texture_atlas(
         spritesheet_path.to_string(),
         asset_server,
         SHEET_1_COLUMNS,
@@ -86,11 +86,8 @@ pub fn create_pendejo_bundle(
     );
 
     let sprite_bundle = SpriteSheetBundle {
-        atlas: TextureAtlas {
-            layout: atlas_image_bundle.texture_atlas.layout,
-            index: 0,
-        },
-        sprite: Sprite::default(),
+        texture_atlas: atlas_handle,
+        sprite: TextureAtlasSprite::new(0),
         ..default()
     };
 
@@ -133,7 +130,7 @@ impl LdtkEntity for PendejoBundle {
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
         asset_server: &AssetServer,
-        texture_atlasses: &mut Assets<TextureAtlasLayout>,
+        texture_atlasses: &mut Assets<TextureAtlas>,
     ) -> PendejoBundle {
         let is_dummy = *entity_instance
             .get_bool_field("is_dummy")

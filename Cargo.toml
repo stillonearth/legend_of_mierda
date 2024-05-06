@@ -1,11 +1,11 @@
 [package]
 name = "legend_of_mierda"
-version = "0.2.0"
+version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-bevy = { version = "0.13", default-features = false, features = [
+bevy = { version = "0.12", default-features = false, features = [
     "animation",
     "bevy_asset",
     "bevy_gilrs",
@@ -28,24 +28,24 @@ bevy = { version = "0.13", default-features = false, features = [
     "default_font",
     "webgl2",
 ] }
-bevy_ecs_ldtk = {git="https://github.com/Trouv/bevy_ecs_ldtk", rev="2ee602f", features = [
+bevy_ecs_ldtk = { version = "0.9", features = [
     "default",
     "derive",
     "atlas",
     "render",
-]}
-bevy-inspector-egui = "0.23"
-bevy_rapier2d = "0.25"
+] }
+bevy-inspector-egui = "0.22"
+bevy_rapier2d = "0.23"
 rand = "0.8.5"
-pecs = {git="https://github.com/jkb0o/pecs", rev="38dc92d"}
-bevy_particle_systems = "0.12"
-bevy_asset_loader = "0.20"
-bevy_kira_audio = "0.19"
+pecs = "0.5"
+bevy_particle_systems = "0.11"
+bevy_asset_loader = "0.18"
+bevy_kira_audio = "0.18"
 webbrowser = { version = "0.8", features = ["hardened"] }
-ffmpeg-next = "7.0"
-bevy-scene-hook = "10.0"
-bevy_tweening = "0.10"
-bevy_magic_light_2d = {git="https://github.com/zaycev/bevy-magic-light-2d", rev="4a95369"}
+ffmpeg-next = "6.1"
+bevy-scene-hook = "9.0"
+bevy_tweening = "0.9.0"
+bevy_magic_light_2d = {git="https://github.com/zaycev/bevy-magic-light-2d", rev="8ce01dc618d4905b3"}
 
 [profile.dev.package."*"]
 opt-level = 3
@@ -65,6 +65,3 @@ lto = "thin"
 dev = [
     "bevy/dynamic_linking",
 ]
-
-[patch.crates-io]
-bevy_ecs_tilemap = { git = "https://github.com/StarArawn/bevy_ecs_tilemap/", rev = "25def41" }

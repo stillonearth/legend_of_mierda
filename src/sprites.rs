@@ -82,10 +82,11 @@ pub struct AnimationTimer(pub Timer);
 pub fn animate_player_sprite(
     time: Res<Time>,
     mut query: Query<(
-        &mut TextureAtlas,
+        &mut Handle<TextureAtlas>,
         &mut CharacterAnimation,
         &mut AnimationTimer,
-        &mut Sprite,
+        &mut TextureAtlasSprite,
+        &mut Transform,
         &mut AnimatedCharacterSprite,
     )>,
     spritesheets: Res<CharacterSpritesheets>,
@@ -95,6 +96,7 @@ pub fn animate_player_sprite(
         mut character_animation,
         mut timer,
         mut sprite,
+        mut _transform,
         animated_character_sprite,
     ) in &mut query
     {
@@ -107,39 +109,32 @@ pub fn animate_player_sprite(
         );
 
         if timer.just_finished() {
-            texture_atlas.index =
-                if (texture_atlas.index >= indices.last) || (texture_atlas.index < indices.first) {
-                    // if attacking animation finished, go back to standing
-                    if character_animation.animation_type == AnimationType::Attack
-                        && (texture_atlas.index >= indices.last)
-                    {
-                        let spritesheet = match animated_character_sprite.animated_character_type {
-                            AnimatedCharacterType::Player => {
-                                spritesheets.player_atlas_1.texture_atlas.clone()
-                            }
-                            AnimatedCharacterType::Pendejo1 => {
-                                spritesheets.pendejo_atlas_1.texture_atlas.clone()
-                            }
-                            AnimatedCharacterType::Pendejo2 => {
-                                spritesheets.pendejo_atlas_2.texture_atlas.clone()
-                            }
-                        };
+            sprite.index = if (sprite.index >= indices.last) || (sprite.index < indices.first) {
+                // if attacking animation finished, go back to standing
+                if character_animation.animation_type == AnimationType::Attack
+                    && (sprite.index >= indices.last)
+                {
+                    let spritesheet = match animated_character_sprite.animated_character_type {
+                        AnimatedCharacterType::Player => spritesheets.player_atlas_1.clone(),
+                        AnimatedCharacterType::Pendejo1 => spritesheets.pendejo_atlas_1.clone(),
+                        AnimatedCharacterType::Pendejo2 => spritesheets.pendejo_atlas_2.clone(),
+                    };
 
-                        character_animation.animation_type = AnimationType::Stand;
-                        texture_atlas.clone_from(&spritesheet);
-                    }
+                    character_animation.animation_type = AnimationType::Stand;
+                    texture_atlas.clone_from(&spritesheet);
+                }
 
-                    if character_animation.animation_type == AnimationType::Stand {
-                        indices = get_animation_indices(
-                            character_animation.animation_type,
-                            character_animation.direction,
-                        );
-                    }
+                if character_animation.animation_type == AnimationType::Stand {
+                    indices = get_animation_indices(
+                        character_animation.animation_type,
+                        character_animation.direction,
+                    );
+                }
 
-                    indices.first
-                } else {
-                    texture_atlas.index + 1
-                };
+                indices.first
+            } else {
+                sprite.index + 1
+            };
         }
 
         if character_animation.animation_type == AnimationType::Walk
@@ -219,7 +214,7 @@ pub fn get_animation_indices(
 
 pub fn flash_sprite(
     mut commands: Commands,
-    mut flashing_query: Query<(&mut FlashingTimer, Entity, &mut Sprite)>,
+    mut flashing_query: Query<(&mut FlashingTimer, Entity, &mut TextureAtlasSprite)>,
     time: Res<Time>,
 ) {
     for (mut timer, timer_e, mut timer_sprite) in flashing_query.iter_mut() {

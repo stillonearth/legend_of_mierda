@@ -53,7 +53,7 @@ enum GameState {
 fn main() {
     let mut app = App::new();
 
-    app.init_state::<GameState>()
+    app.add_state::<GameState>()
         // .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()).set())
         .add_plugins((
             DefaultPlugins
@@ -62,6 +62,7 @@ fn main() {
                         title: "Legend of Mierda".into(),
                         resolution: (900., 900.).into(),
                         present_mode: PresentMode::AutoVsync,
+                        fit_canvas_to_parent: true,
                         prevent_default_event_handling: false,
                         resizable: false,
                         ..default()
@@ -72,9 +73,8 @@ fn main() {
                 .set(LogPlugin {
                     filter: "info,wgpu_core=warn,wgpu_hal=warn,legend_of_mierda=debug,bevy_animation=error,bevy_gltf=error".into(),
                     level: bevy::log::Level::DEBUG,
-                    ..default()
                 }),
-            AudioPlugin, PostProcessPlugin ))
+            AudioPlugin, PostProcessPlugin))
         .add_plugins((HookPlugin, PecsPlugin, TweeningPlugin, BevyMagicLight2DPlugin))
         .add_plugins((LoadingPlugin, MenuPlugin, CutscenePlugin, LegendOfMierdaPlugin))
         .add_plugins(audio::InternalAudioPlugin)

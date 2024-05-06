@@ -1,6 +1,6 @@
 use bevy::{
     core_pipeline::{
-        core_3d::graph::{Core3d, Node3d},
+        core_2d,
         fullscreen_vertex_shader::fullscreen_shader_vertex_state,
     },
     ecs::query::QueryItem,
@@ -10,14 +10,17 @@ use bevy::{
             ComponentUniforms, ExtractComponent, ExtractComponentPlugin, UniformComponentPlugin,
         },
         render_graph::{
-            NodeRunError, RenderGraphApp, RenderGraphContext, RenderLabel, ViewNode, ViewNodeRunner,
+            NodeRunError, RenderGraphApp, RenderGraphContext, ViewNode, ViewNodeRunner,
         },
         render_resource::{
-            binding_types::{sampler, texture_2d, uniform_buffer},
-            *,
+            BindGroupEntries, BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry,
+            BindingType, CachedRenderPipelineId, ColorTargetState, ColorWrites, FragmentState,
+            MultisampleState, Operations, PipelineCache, PrimitiveState, RenderPassColorAttachment,
+            RenderPassDescriptor, RenderPipelineDescriptor, Sampler, SamplerBindingType,
+            SamplerDescriptor, ShaderStages, ShaderType, TextureFormat, TextureSampleType,
+            TextureViewDimension,
         },
         renderer::{RenderContext, RenderDevice},
-        texture::BevyDefault,
         view::ViewTarget,
         RenderApp,
     },
@@ -39,7 +42,8 @@ impl Plugin for PostProcessPlugin {
             // This plugin will prepare the component for the GPU by creating a uniform buffer
             // and writing the data to that buffer every frame.
             UniformComponentPlugin::<PostProcessSettings>::default(),
-        ));
+        ))
+        .add_systems(Update, update_settings);
 
         // We need to get the render app from the main app
         let Ok(render_app) = app.get_sub_app_mut(RenderApp) else {
@@ -61,20 +65,20 @@ impl Plugin for PostProcessPlugin {
             // The [`ViewNodeRunner`] is a special [`Node`] that will automatically run the node for each view
             // matching the [`ViewQuery`]
             .add_render_graph_node::<ViewNodeRunner<PostProcessNode>>(
-                // Specify the label of the graph, in this case we want the graph for 3d
-                Core3d,
-                // It also needs the label of the node
-                PostProcessLabel,
+                // Specify the name of the graph, in this case we want the graph for 3d
+                core_2d::graph::NAME,
+                // It also needs the name of the node
+                PostProcessNode::NAME,
             )
             .add_render_graph_edges(
-                Core3d,
+                core_2d::graph::NAME,
                 // Specify the node ordering.
                 // This will automatically create all required node edges to enforce the given ordering.
-                (
-                    Node3d::Tonemapping,
-                    PostProcessLabel,
-                    Node3d::EndMainPassPostProcessing,
-                ),
+                &[
+                    core_2d::graph::node::TONEMAPPING,
+                    PostProcessNode::NAME,
+                    core_2d::graph::node::END_MAIN_PASS_POST_PROCESSING,
+                ],
             );
     }
 
@@ -90,12 +94,12 @@ impl Plugin for PostProcessPlugin {
     }
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone, RenderLabel)]
-struct PostProcessLabel;
-
 // The post process node used for the render graph
 #[derive(Default)]
 struct PostProcessNode;
+impl PostProcessNode {
+    pub const NAME: &'static str = "post_process";
+}
 
 #[derive(Component, Default, Clone, Copy, ExtractComponent, ShaderType)]
 pub struct PostProcessSettings {
@@ -188,8 +192,6 @@ impl ViewNode for PostProcessNode {
                 ops: Operations::default(),
             })],
             depth_stencil_attachment: None,
-            timestamp_writes: None,
-            occlusion_query_set: None,
         });
 
         // This is mostly just wgpu boilerplate for drawing a fullscreen triangle,
@@ -215,21 +217,40 @@ impl FromWorld for PostProcessPipeline {
         let render_device = world.resource::<RenderDevice>();
 
         // We need to define the bind group layout used for our pipeline
-        let layout = render_device.create_bind_group_layout(
-            "post_process_bind_group_layout",
-            &BindGroupLayoutEntries::sequential(
-                // The layout entries will only be visible in the fragment stage
-                ShaderStages::FRAGMENT,
-                (
-                    // The screen texture
-                    texture_2d(TextureSampleType::Float { filterable: true }),
-                    // The sampler that will be used to sample the screen texture
-                    sampler(SamplerBindingType::Filtering),
-                    // The settings uniform that will control the effect
-                    uniform_buffer::<PostProcessSettings>(false),
-                ),
-            ),
-        );
+        let layout = render_device.create_bind_group_layout(&BindGroupLayoutDescriptor {
+            label: Some("post_process_bind_group_layout"),
+            entries: &[
+                // The screen texture
+                BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: ShaderStages::FRAGMENT,
+                    ty: BindingType::Texture {
+                        sample_type: TextureSampleType::Float { filterable: true },
+                        view_dimension: TextureViewDimension::D2,
+                        multisampled: false,
+                    },
+                    count: None,
+                },
+                // The sampler that will be used to sample the screen texture
+                BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: ShaderStages::FRAGMENT,
+                    ty: BindingType::Sampler(SamplerBindingType::Filtering),
+                    count: None,
+                },
+                // The settings uniform that will control the effect
+                BindGroupLayoutEntry {
+                    binding: 2,
+                    visibility: ShaderStages::FRAGMENT,
+                    ty: BindingType::Buffer {
+                        ty: bevy::render::render_resource::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: Some(PostProcessSettings::min_size()),
+                    },
+                    count: None,
+                },
+            ],
+        });
 
         // We can create the sampler here since it won't change at runtime and doesn't depend on the view
         let sampler = render_device.create_sampler(&SamplerDescriptor::default());
@@ -254,7 +275,7 @@ impl FromWorld for PostProcessPipeline {
                     // It can be anything as long as it matches here and in the shader.
                     entry_point: "fragment".into(),
                     targets: vec![Some(ColorTargetState {
-                        format: TextureFormat::bevy_default(),
+                        format: TextureFormat::Rgba16Float,
                         blend: None,
                         write_mask: ColorWrites::ALL,
                     })],

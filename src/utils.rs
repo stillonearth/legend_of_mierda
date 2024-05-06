@@ -4,7 +4,6 @@
 
 use bevy::ecs::system::Command;
 use bevy::prelude::*;
-use bevy::reflect::TypeRegistry;
 
 pub struct CloneEntity {
     pub source: Entity,
@@ -52,9 +51,8 @@ impl CloneEntity {
                 .clone_value();
 
             let mut destination = world.get_entity_mut(self.destination).unwrap();
-            let mut type_registry = TypeRegistry::default();
 
-            component.apply_or_insert(&mut destination, &*source, &type_registry);
+            component.apply_or_insert(&mut destination, &*source);
         }
     }
 }

@@ -9,16 +9,16 @@ pub struct LoadingPlugin;
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
         app.add_loading_state(
-            LoadingState::new(GameState::Loading)
-                .continue_to_state(GameState::Splash)
-                .load_collection::<AudioAssets>()
-                .load_collection::<TextureAssets>()
-                .load_collection::<AvatarAssets>()
-                .load_collection::<CutsceneAssets>()
-                .load_collection::<SceneAssets>()
-                .load_collection::<AnimationAssets>()
-                .load_collection::<StaticSpriteAssets>(),
+            LoadingState::new(GameState::Loading).continue_to_state(GameState::Splash),
         );
+
+        app.add_collection_to_loading_state::<_, AudioAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, TextureAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, AvatarAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, CutsceneAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, SceneAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, AnimationAssets>(GameState::Loading);
+        app.add_collection_to_loading_state::<_, StaticSpriteAssets>(GameState::Loading);
 
         app.init_resource::<FontAssets>();
         app.init_resource::<MaterialAssets>();
@@ -133,24 +133,26 @@ impl FromWorld for MaterialAssets {
             .unwrap();
 
         MaterialAssets {
-            black: materials_asset.add(bevy::prelude::Color::rgb(0., 0.1, 0.1)),
-            white: materials_asset.add(bevy::prelude::Color::rgb(1., 0.9, 0.9)),
-            red: materials_asset.add(bevy::prelude::Color::rgba(1., 0.1, 0.1, 0.5)),
-            yellow: materials_asset.add(bevy::prelude::Color::YELLOW),
-            blue: materials_asset.add(bevy::prelude::Color::BLUE),
-            transparent_white: materials_asset.add(bevy::prelude::Color::rgba(1., 0.9, 0.9, 0.5)),
-            transparent_black: materials_asset.add(bevy::prelude::Color::rgba(0., 0.1, 0.1, 0.5)),
+            black: materials_asset.add(bevy::prelude::Color::rgb(0., 0.1, 0.1).into()),
+            white: materials_asset.add(bevy::prelude::Color::rgb(1., 0.9, 0.9).into()),
+            red: materials_asset.add(bevy::prelude::Color::rgba(1., 0.1, 0.1, 0.5).into()),
+            yellow: materials_asset.add(bevy::prelude::Color::YELLOW.into()),
+            blue: materials_asset.add(bevy::prelude::Color::BLUE.into()),
+            transparent_white: materials_asset
+                .add(bevy::prelude::Color::rgba(1., 0.9, 0.9, 0.5).into()),
+            transparent_black: materials_asset
+                .add(bevy::prelude::Color::rgba(0., 0.1, 0.1, 0.5).into()),
         }
     }
 }
 
 #[derive(Resource)]
 pub struct CharacterSpritesheets {
-    pub player_atlas_1: AtlasImageBundle,
-    pub player_atlas_2: AtlasImageBundle,
-    pub mierda_atlas: AtlasImageBundle,
-    pub pendejo_atlas_1: AtlasImageBundle,
-    pub pendejo_atlas_2: AtlasImageBundle,
+    pub player_atlas_1: Handle<TextureAtlas>,
+    pub player_atlas_2: Handle<TextureAtlas>,
+    pub mierda_atlas: Handle<TextureAtlas>,
+    pub pendejo_atlas_1: Handle<TextureAtlas>,
+    pub pendejo_atlas_2: Handle<TextureAtlas>,
 }
 
 impl FromWorld for CharacterSpritesheets {
@@ -160,8 +162,7 @@ impl FromWorld for CharacterSpritesheets {
         let asset_server_world_borrow = world.get_resource::<AssetServer>();
         let asset_server = asset_server_world_borrow.as_deref().unwrap();
 
-        let mut texture_atlasses_world_borrow =
-            world.get_resource_mut::<Assets<TextureAtlasLayout>>();
+        let mut texture_atlasses_world_borrow = world.get_resource_mut::<Assets<TextureAtlas>>();
         let texture_atlasses = texture_atlasses_world_borrow.as_deref_mut().unwrap();
 
         let player_atlas_1 = load_texture_atlas(
@@ -231,27 +232,18 @@ pub fn load_texture_atlas(
     sheet_rows: usize,
     padding: Option<Vec2>,
     sprite_size: f32,
-    mut atlases: &mut Assets<TextureAtlasLayout>,
-) -> AtlasImageBundle {
+    texture_atlasses: &mut Assets<TextureAtlas>,
+) -> Handle<TextureAtlas> {
     let texture_handle = asset_server.load(path);
-    let layout = TextureAtlasLayout::from_grid(
+
+    let atlas = TextureAtlas::from_grid(
+        texture_handle,
         Vec2::ONE * sprite_size,
         sheet_columns,
         sheet_rows,
         padding,
         None,
     );
-    let layout_handle = atlases.add(layout);
 
-    AtlasImageBundle {
-        texture_atlas: TextureAtlas {
-            layout: layout_handle,
-            index: 0,
-        },
-        image: UiImage {
-            texture: texture_handle,
-            ..default()
-        },
-        ..default()
-    }
+    texture_atlasses.add(atlas)
 }

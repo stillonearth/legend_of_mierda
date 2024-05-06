@@ -10,20 +10,23 @@ use crate::{
 
 pub fn controls(
     mut commands: Commands,
-    input: Res<ButtonInput<KeyCode>>,
+    input: Res<Input<KeyCode>>,
     mut query: Query<
         (
             Entity,
-            &mut TextureAtlas,
+            &mut Handle<TextureAtlas>,
             &mut Velocity,
             &mut CharacterAnimation,
+            &mut TextureAtlasSprite,
             &Player,
         ),
         With<Player>,
     >,
     spritesheets: Res<CharacterSpritesheets>,
 ) {
-    for (entity, mut texture_atlas, mut velocity, mut char_animation, _player) in &mut query {
+    for (entity, mut texture_atlas, mut velocity, mut char_animation, mut sprite, _player) in
+        &mut query
+    {
         // no control during attack phase
         if char_animation.animation_type == AnimationType::Attack {
             return;
@@ -31,11 +34,11 @@ pub fn controls(
 
         if input.pressed(KeyCode::Space) {
             char_animation.animation_type = AnimationType::Attack;
-            texture_atlas.layout = spritesheets.player_atlas_2.texture_atlas.layout.clone();
+            texture_atlas.clone_from(&spritesheets.player_atlas_2);
 
             let indices =
                 get_animation_indices(char_animation.animation_type, char_animation.direction);
-            texture_atlas.index = indices.first;
+            sprite.index = indices.first;
             velocity.linvel = Vec2::ZERO;
 
             commands
@@ -50,10 +53,10 @@ pub fn controls(
                             }),
                 );
         } else {
-            let right = if input.pressed(KeyCode::KeyD) { 1. } else { 0. };
-            let left = if input.pressed(KeyCode::KeyA) { 1. } else { 0. };
-            let up = if input.pressed(KeyCode::KeyW) { 1. } else { 0. };
-            let down = if input.pressed(KeyCode::KeyS) { 1. } else { 0. };
+            let right = if input.pressed(KeyCode::D) { 1. } else { 0. };
+            let left = if input.pressed(KeyCode::A) { 1. } else { 0. };
+            let up = if input.pressed(KeyCode::W) { 1. } else { 0. };
+            let down = if input.pressed(KeyCode::S) { 1. } else { 0. };
 
             velocity.linvel.x = right - left;
             velocity.linvel.y = up - down;
@@ -79,7 +82,7 @@ pub fn controls(
             if char_animation.animation_type != AnimationType::Attack {
                 // Change spritesheet
                 if char_animation.animation_type != AnimationType::Walk {
-                    texture_atlas.layout = spritesheets.player_atlas_1.texture_atlas.layout.clone();
+                    texture_atlas.clone_from(&spritesheets.player_atlas_1);
                 }
 
                 if linvel_norm == 0.0 {

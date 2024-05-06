@@ -52,7 +52,7 @@ impl LdtkEntity for MierdaBundle {
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
         asset_server: &AssetServer,
-        texture_atlasses: &mut Assets<TextureAtlasLayout>,
+        texture_atlasses: &mut Assets<TextureAtlas>,
     ) -> MierdaBundle {
         let is_dummy = *entity_instance
             .get_bool_field("is_dummy")
@@ -63,7 +63,7 @@ impl LdtkEntity for MierdaBundle {
 
 pub fn create_mierda_bundle(
     asset_server: &AssetServer,
-    texture_atlasses: &mut Assets<TextureAtlasLayout>,
+    texture_atlasses: &mut Assets<TextureAtlas>,
     is_dummy: bool,
 ) -> MierdaBundle {
     let rotation_constraints = LockedAxes::ROTATION_LOCKED;
@@ -79,7 +79,7 @@ pub fn create_mierda_bundle(
         ..Default::default()
     };
 
-    let atlas_image_bundle = load_texture_atlas(
+    let atlas_handle = load_texture_atlas(
         MIERDA_ASSET_SHEET.to_string(),
         asset_server,
         5,
@@ -90,11 +90,8 @@ pub fn create_mierda_bundle(
     );
 
     let sprite_bundle = SpriteSheetBundle {
-        atlas: TextureAtlas {
-            layout: atlas_image_bundle.texture_atlas.layout,
-            index: 0,
-        },
-        sprite: Sprite::default(),
+        texture_atlas: atlas_handle,
+        sprite: TextureAtlasSprite::new(4),
         ..default()
     };
 

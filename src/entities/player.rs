@@ -47,7 +47,7 @@ impl LdtkEntity for PlayerBundle {
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
         asset_server: &AssetServer,
-        texture_atlasses: &mut Assets<TextureAtlasLayout>,
+        texture_atlasses: &mut Assets<TextureAtlas>,
     ) -> PlayerBundle {
         let rotation_constraints = LockedAxes::ROTATION_LOCKED;
 
@@ -63,7 +63,7 @@ impl LdtkEntity for PlayerBundle {
             ..Default::default()
         };
 
-        let atlas_image_bundle = load_texture_atlas(
+        let atlas_handle = load_texture_atlas(
             PLAYER_ASSET_SHEET_1.to_string(),
             asset_server,
             SHEET_1_COLUMNS,
@@ -74,11 +74,8 @@ impl LdtkEntity for PlayerBundle {
         );
 
         let sprite_bundle = SpriteSheetBundle {
-            atlas: TextureAtlas {
-                layout: atlas_image_bundle.texture_atlas.layout,
-                index: 0,
-            },
-            sprite: Sprite::default(),
+            texture_atlas: atlas_handle,
+            sprite: TextureAtlasSprite::new(0),
             ..default()
         };
 
