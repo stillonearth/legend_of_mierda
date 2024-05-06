@@ -1,21 +1,16 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
-use bevy_kira_audio::prelude::*;
 use bevy_rapier2d::prelude::Velocity;
 use bevy_rapier2d::prelude::*;
-use pecs::prelude::*;
 
 use crate::{
-    sprites::{
-    AnimatedCharacterSprite, AnimationDirection, AnimationTimer, CharacterAnimation,
-    },
     entities::player::Player,
     physics::ColliderBundle,
+    sprites::{AnimatedCharacterSprite, AnimationDirection, AnimationTimer, CharacterAnimation},
     GameState,
 };
 
 use super::enemy::{create_enemy_bundle, DirectionUpdateTime, Enemy, EnemyType};
-
 
 // --------
 // Entities

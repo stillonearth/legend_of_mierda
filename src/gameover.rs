@@ -91,7 +91,6 @@ pub(crate) fn draw_ui(mut commands: Commands, font_assets: Res<FontAssets>) {
                                 font_size: 50.0,
                                 font: font_assets.pixeloid_mono.clone(),
                                 color: Color::WHITE,
-                                ..default()
                             },
                         ),
                         UIGameOverButton,

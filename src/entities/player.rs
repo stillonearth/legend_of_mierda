@@ -202,7 +202,7 @@ pub fn event_player_hit(
 
         audio.play(audio_assets.hurt.clone()).with_volume(0.5);
 
-        if player.health <= 0 {
+        if player.health == 0 {
             ev_game_over.send(GameOverEvent);
             continue;
         } else {

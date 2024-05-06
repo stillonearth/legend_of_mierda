@@ -19,20 +19,20 @@ use bevy_kira_audio::AudioInstance;
 use bevy_rapier2d::prelude::*;
 use bevy_scene_hook::{HookedSceneBundle, SceneHook};
 
-use rand::Rng;
 use std::f32::consts::PI;
 
 use crate::{
-    loading::{load_texture_atlas, AudioAssets},
-    physics::ColliderBundle,
-    sprites::{FlashingTimer, BIBORAN_ASSET_SHEET},
-    utils::*,
-    GameState,
+    entities::characters::enemy::Enemy, physics::ColliderBundle, sprites::FlashingTimer,
+    AudioAssets, GameState,
 };
 
-use super::{
-    mierda::Mierda, pendejo::Pendejo, player::Player, text_indicator::SpawnTextIndicatorEvent,
+use crate::entities::{
+    items::item::{Item, ItemStepOverEvent, ItemType},
+    player::Player,
+    text_indicator::SpawnTextIndicatorEvent,
 };
+
+use super::item::create_item_bundle;
 
 // ----------
 // Components
@@ -44,11 +44,6 @@ pub struct BiboranSprite;
 #[derive(Component)]
 pub struct BiboranBookScene;
 
-#[derive(Clone, PartialEq, Debug, Default, Component, Reflect)]
-pub struct Biboran {
-    pub is_dummy: bool,
-}
-
 // -------
 // Bundles
 // -------
@@ -56,51 +51,9 @@ pub struct Biboran {
 #[derive(Clone, Default, Bundle)]
 pub struct BiboranBundle {
     pub sprite_bundle: SpriteSheetBundle,
-    pub biboran: Biboran,
+    pub item: Item,
     pub collider_bundle: ColliderBundle,
     pub sensor: Sensor,
-}
-
-pub fn create_biboran_bundle(
-    asset_server: &AssetServer,
-    texture_atlasses: &mut Assets<TextureAtlas>,
-    is_dummy: bool,
-) -> BiboranBundle {
-    let rotation_constraints = LockedAxes::ROTATION_LOCKED;
-
-    let collider_bundle = ColliderBundle {
-        collider: Collider::cuboid(8., 16.),
-        rigid_body: RigidBody::Dynamic,
-        friction: Friction {
-            coefficient: 20.0,
-            combine_rule: CoefficientCombineRule::Min,
-        },
-        rotation_constraints,
-        ..Default::default()
-    };
-
-    let atlas_handle = load_texture_atlas(
-        BIBORAN_ASSET_SHEET.to_string(),
-        asset_server,
-        1,
-        1,
-        None,
-        32.,
-        texture_atlasses,
-    );
-
-    let sprite_bundle = SpriteSheetBundle {
-        texture_atlas: atlas_handle,
-        sprite: TextureAtlasSprite::new(0),
-        ..default()
-    };
-
-    BiboranBundle {
-        sprite_bundle,
-        collider_bundle,
-        biboran: Biboran { is_dummy },
-        sensor: Sensor {},
-    }
 }
 
 impl LdtkEntity for BiboranBundle {
@@ -115,7 +68,14 @@ impl LdtkEntity for BiboranBundle {
         let is_dummy = *entity_instance
             .get_bool_field("is_dummy")
             .expect("expected entity to have non-nullable name string field");
-        create_biboran_bundle(asset_server, texture_atlasses, is_dummy)
+        let bundle =
+            create_item_bundle(asset_server, texture_atlasses, is_dummy, ItemType::Biboran);
+        BiboranBundle {
+            sprite_bundle: bundle.sprite_bundle,
+            collider_bundle: bundle.collider_bundle,
+            item: bundle.item,
+            sensor: bundle.sensor,
+        }
     }
 }
 
@@ -138,113 +98,11 @@ pub struct BiboranEffectTimer(pub Timer);
 #[derive(Resource, Default)]
 pub struct BiboranPrayer(Handle<AudioInstance>);
 
-// ------
-// Events
-// ------
-
-#[derive(Event, Clone)]
-pub struct BiboranStepOverEvent(pub Entity);
-
-#[derive(Event, Clone)]
-pub struct SpawnBiboranEvent {
-    pub(crate) count: u32,
-}
-
-// --------------
-// Event Handlers
-// --------------
-
-pub fn event_spawn_biboran(
-    mut commands: Commands,
-    mut er_spawn_biboran: EventReader<SpawnBiboranEvent>,
-    level_selection: Res<LevelSelection>,
-    levels: Query<(Entity, &LevelIid)>,
-    projects: Query<&Handle<LdtkProject>>,
-    project_assets: Res<Assets<LdtkProject>>,
-    biborans: Query<(Entity, &Parent, &Biboran)>,
-    q_player_query: Query<(Entity, &Transform, &Player)>,
-) {
-    if q_player_query.iter().count() == 0 {
-        return;
-    }
-
-    let mut rng = rand::thread_rng();
-    let player_translation = q_player_query.single().1.translation;
-
-    for ev_spawn in er_spawn_biboran.read() {
-        for (_, level_iid) in levels.iter() {
-            let project = project_assets.get(projects.single()).unwrap();
-            let level = project.get_raw_level_by_iid(level_iid.get()).unwrap();
-            let max_level_dimension = level.px_wid.max(level.px_hei) as f32;
-
-            if level_selection.is_match(
-                &LevelIndices {
-                    level: 0,
-                    ..default()
-                },
-                level,
-            ) {
-                for _i in 0..ev_spawn.count {
-                    for (biboran_entity, biboran_parent, biboran) in biborans.iter() {
-                        if !biboran.is_dummy {
-                            continue;
-                        }
-
-                        let biboran_parent = biboran_parent.get();
-
-                        let mut parent = commands.entity(biboran_parent);
-
-                        let mut new_entity: Option<Entity> = None;
-                        parent.with_children(|cm| {
-                            let ne = cm.spawn_empty().id();
-                            new_entity = Some(ne);
-                        });
-
-                        // generate random position
-
-                        let mut offset_position = Vec3::new(0.0, 0.0, 0.);
-                        let mut biboran_position = player_translation + offset_position;
-
-                        while (player_translation - biboran_position).length()
-                            < max_level_dimension / 3.0
-                            || biboran_position.x < 0.0 + 24.0
-                            || biboran_position.x > (level.px_wid as f32) - 24.0
-                            || biboran_position.y < 0.0 + 24.0
-                            || biboran_position.y > (level.px_hei as f32) - 24.0
-                        {
-                            let r = rng.gen_range(0.0..1000.0);
-                            let angle = rng.gen_range(0.0..std::f32::consts::PI * 2.0);
-
-                            offset_position =
-                                Vec3::new(r * f32::sin(angle), r * f32::cos(angle), 0.);
-                            biboran_position = player_translation + offset_position;
-                        }
-
-                        let transform = Transform::from_translation(biboran_position)
-                            .with_scale(Vec3::ONE * 0.5);
-
-                        let new_entity = new_entity.unwrap();
-                        commands
-                            .entity(new_entity)
-                            .insert(Biboran { is_dummy: false });
-
-                        commands.add(CloneEntity {
-                            source: biboran_entity,
-                            destination: new_entity,
-                        });
-
-                        commands.entity(new_entity).insert(transform);
-                    }
-                }
-            }
-        }
-    }
-}
-
+#[allow(clippy::single_match)]
 pub fn event_on_biboran_step_over(
     mut commands: Commands,
-    mut er_biboran_step_over: EventReader<BiboranStepOverEvent>,
-    mut q_biborans: Query<(Entity, &Biboran)>,
+    mut er_item_step_over: EventReader<ItemStepOverEvent>,
+    mut q_items: Query<(Entity, &Item)>,
     mut q_player: Query<(Entity, &mut Player)>,
     mut q_biboran_animations: Query<(&mut Visibility, &BiboranSprite)>, // mut q_ui_healthbar: Query<(Entity, &mut Style, &ui::UIPlayerHealth)>,
     mut biboran_timer: ResMut<BiboranTimer>,
@@ -254,7 +112,11 @@ pub fn event_on_biboran_step_over(
     audio: Res<BiboranPrayer>,
     mut audio_instances: ResMut<Assets<AudioInstance>>,
 ) {
-    for e in er_biboran_step_over.read() {
+    for e in er_item_step_over.read() {
+        if e.item_type != ItemType::Biboran {
+            continue;
+        }
+
         for (_, mut _player) in q_player.iter_mut() {
             biboran_timer.0 = Timer::new(Duration::from_secs(14), TimerMode::Once);
             biboran_effect_timer.0 = Timer::new(Duration::from_secs(1), TimerMode::Repeating);
@@ -278,40 +140,14 @@ pub fn event_on_biboran_step_over(
             player.play(animations.0.clone_weak()).repeat();
         }
 
-        for (e_biboran, _) in q_biborans.iter_mut() {
-            if e_biboran != e.0 {
+        for (e_biboran, item) in q_items.iter_mut() {
+            if e_biboran != e.entity {
+                continue;
+            }
+            if item.item_type != ItemType::Biboran {
                 continue;
             }
             commands.entity(e_biboran).despawn_recursive();
-        }
-    }
-}
-
-// -------
-// Physics
-// -------
-
-pub(crate) fn handle_player_biboran_collision(
-    mut collision_events: EventReader<CollisionEvent>,
-    mut q_q_biborans: Query<(Entity, &Biboran)>,
-    q_player: Query<(Entity, &mut Player)>,
-    mut ev_biboran_step_over: EventWriter<BiboranStepOverEvent>,
-) {
-    for (player_entity, _) in q_player.iter() {
-        for event in collision_events.read() {
-            for (e_biboran, _) in q_q_biborans.iter_mut() {
-                if let CollisionEvent::Started(e1, e2, _) = event {
-                    if e1.index() == e_biboran.index() && e2.index() == player_entity.index() {
-                        ev_biboran_step_over.send(BiboranStepOverEvent(e_biboran));
-                        return;
-                    }
-
-                    if e2.index() == e_biboran.index() && e1.index() == player_entity.index() {
-                        ev_biboran_step_over.send(BiboranStepOverEvent(e_biboran));
-                        return;
-                    }
-                }
-            }
         }
     }
 }
@@ -417,6 +253,7 @@ pub fn setup_biboran_scene(
     ));
 }
 
+#[allow(clippy::single_match)]
 fn biboran_holy_effect(
     mut commands: Commands,
     mut ev_spawn_text_indicator: EventWriter<SpawnTextIndicatorEvent>,
@@ -426,8 +263,7 @@ fn biboran_holy_effect(
     time: Res<Time>,
     audio: Res<BiboranPrayer>,
     mut audio_instances: ResMut<Assets<AudioInstance>>,
-    mut los_mierdas: Query<(Entity, &mut Mierda)>,
-    mut los_pendejos: Query<(Entity, &mut Pendejo)>,
+    mut enemies: Query<(Entity, &mut Enemy)>,
 ) {
     biboran_timer.0.tick(time.delta());
     biboran_effect_timer.0.tick(time.delta());
@@ -441,7 +277,7 @@ fn biboran_holy_effect(
     }
 
     if !biboran_timer.0.finished() && biboran_effect_timer.0.finished() {
-        for (mierda_entity, mut mierda) in los_mierdas.iter_mut() {
+        for (mierda_entity, mut mierda) in enemies.iter_mut() {
             let damage = 5;
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
@@ -458,20 +294,20 @@ fn biboran_holy_effect(
             });
         }
 
-        for (pendejo_entity, mut pendejo) in los_pendejos.iter_mut() {
+        for (enemy_entity, mut enemy) in enemies.iter_mut() {
             let damage = 5;
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
-            pendejo.hit_at = Some(timer.clone());
-            pendejo.health -= u8::min(damage, pendejo.health);
+            enemy.hit_at = Some(timer.clone());
+            enemy.health -= u8::min(damage, enemy.health);
 
-            commands.entity(pendejo_entity).insert(FlashingTimer {
+            commands.entity(enemy_entity).insert(FlashingTimer {
                 timer: timer.clone(),
             });
 
             ev_spawn_text_indicator.send(SpawnTextIndicatorEvent {
                 text: format!("-{}", damage),
-                entity: pendejo_entity,
+                entity: enemy_entity,
             });
         }
     }
@@ -549,21 +385,13 @@ impl Plugin for BiboranPlugin {
             .init_resource::<BiboranTimer>()
             .init_resource::<BiboranEffectTimer>()
             .init_resource::<BiboranPrayer>()
-            // Event Handlers
-            .add_event::<SpawnBiboranEvent>()
-            .add_event::<BiboranStepOverEvent>()
             .add_systems(OnEnter(GameState::GamePlay), setup_biboran_prayer)
             .add_systems(Startup, setup_biboran_scene)
             .add_systems(Update, biboran_holy_effect)
             // Event Handlers
             .add_systems(
                 Update,
-                (
-                    handle_player_biboran_collision,
-                    event_on_biboran_step_over,
-                    event_spawn_biboran,
-                    ineject_biboran_render_sprite,
-                ),
+                (event_on_biboran_step_over, ineject_biboran_render_sprite),
             );
     }
 }

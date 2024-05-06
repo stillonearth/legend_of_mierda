@@ -123,7 +123,6 @@ fn setup_menu(
                                 font_size: 100.0,
                                 font: font_assets.pixeloid_mono.clone(),
                                 color: Color::WHITE,
-                                ..default()
                             },
                         ),
                         StartGameButton,

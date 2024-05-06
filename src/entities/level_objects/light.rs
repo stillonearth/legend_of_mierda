@@ -87,7 +87,6 @@ pub fn setup_light(
                         falloff: Vec3::new(5.5, 10.0, 0.005),
                         jitter_intensity: 0.1,
                         jitter_translation: 3.0,
-                        ..default()
                     },
                     SpatialBundle {
                         transform: Transform {
@@ -191,9 +190,9 @@ fn update_player_light_position(
 // Plugin
 // ------
 
-pub struct LightPlugiin;
+pub struct LightPlugin;
 
-impl Plugin for LightPlugiin {
+impl Plugin for LightPlugin {
     fn build(&self, app: &mut App) {
         app.register_ldtk_entity::<LanternBundle>("Lantern")
             .add_systems(

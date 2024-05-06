@@ -41,6 +41,7 @@ fn setup_gameplay_music(mut commands: Commands, audio_assets: Res<AudioAssets>, 
     commands.insert_resource(GameplayMusic(handle));
 }
 
+#[allow(clippy::single_match)]
 fn stop_main_menu_music(
     main_menu_music: Res<MainMenuMusic>,
     mut audio_instances: ResMut<Assets<AudioInstance>>,
@@ -55,6 +56,7 @@ fn stop_main_menu_music(
     }
 }
 
+#[allow(clippy::single_match)]
 fn stop_gameplay_music(
     main_menu_music: Res<GameplayMusic>,
     mut audio_instances: ResMut<Assets<AudioInstance>>,

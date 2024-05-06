@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 
 pub mod characters;
-pub mod light;
-pub mod pizza;
+pub mod items;
+pub mod level_objects;
 pub mod player;
 pub mod text_indicator;
-pub mod weapon_arrow;
+pub mod weapons;
 
 pub struct EntitiesPlugin;
 
@@ -14,18 +14,16 @@ impl Plugin for EntitiesPlugin {
         {
             let registry = app.world.resource_mut::<AppTypeRegistry>();
             let mut wr = registry.write();
-            //wr.register::<pizza::Pizza>();
-            // wr.register::<biboran::Biboran>();
+            wr.register::<player::Player>();
         }
 
         app.add_plugins((
             characters::CharactersPlugin,
-            // pizza::PizzaPlugin,
             player::PlayerPlugin,
-            // biboran::BiboranPlugin,
-            weapon_arrow::WeaponArrowPlugin,
+            items::ItemsPlugin,
+            weapons::weapon_arrow::WeaponArrowPlugin,
             text_indicator::TextIndicatorPlugin,
-            light::LightPlugiin,
+            level_objects::light::LightPlugin,
         ));
     }
 }

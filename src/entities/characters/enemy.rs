@@ -109,10 +109,9 @@ pub fn create_enemy_bundle(
                     64.,
                     texture_atlasses,
                 ),
-                spritesheet_type.clone(),
+                *spritesheet_type,
             )
         }
-        _ => panic!("Unknown enemy type"),
     };
 
     let sprite_bundle = SpriteSheetBundle {
@@ -144,12 +143,12 @@ pub fn create_enemy_bundle(
         spritesheet_bundle: sprite_bundle,
         collider_bundle,
         active_events: ActiveEvents::COLLISION_EVENTS,
-        enemy: enemy,
+        enemy,
         direction_update_time: DirectionUpdateTime {
             timer: Timer::new(Duration::from_secs(5), TimerMode::Once),
         },
         animated_character_sprite: AnimatedCharacterSprite {
-            animated_character_type: spritesheet_type.clone(),
+            animated_character_type: spritesheet_type,
         },
     }
 }
@@ -258,6 +257,7 @@ pub fn handle_spawn_enemy(
                         });
 
                         commands.entity(new_entity).insert(transform);
+                        break;
                     }
                 }
             }

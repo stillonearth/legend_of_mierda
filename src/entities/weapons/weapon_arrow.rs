@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween};
 
-use super::{
+use crate::entities::{
     characters::enemy::{Enemy, EnemyHitEvent},
     player::Player,
 };

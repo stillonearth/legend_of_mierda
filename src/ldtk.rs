@@ -7,11 +7,8 @@ use bevy_magic_light_2d::SpriteCamera;
 use bevy_rapier2d::prelude::*;
 
 use crate::entities::{
-    // biboran::{create_biboran_bundle, Biboran},
-    // mierda::*,
-    // pendejo::{create_pendejo_bundle, Pendejo},
     characters::enemy::{create_enemy_bundle, Enemy},
-    pizza::*,
+    items::item::{create_item_bundle, Item},
     player::Player,
 };
 
@@ -314,9 +311,7 @@ pub fn hide_dummy_entities(
     _level_selection: Res<LevelSelection>,
     mut set: ParamSet<(
         Query<(Entity, &mut Visibility, &Enemy)>,
-        // Query<(Entity, &mut Visibility, &Pizza)>,
-        // Query<(Entity, &mut Visibility, &Pendejo)>,
-        // Query<(Entity, &mut Visibility, &Biboran)>,
+        Query<(Entity, &mut Visibility, &Item)>,
     )>,
 ) {
     // if !level_selection.is_changed() {
@@ -329,6 +324,13 @@ pub fn hide_dummy_entities(
             commands.entity(entity).remove::<Collider>();
         }
     }
+
+    for (entity, mut visibility, enemy) in set.p1().iter_mut() {
+        if enemy.is_dummy {
+            *visibility = Visibility::Hidden;
+            commands.entity(entity).remove::<Collider>();
+        }
+    }
 }
 
 pub fn fix_missing_ldtk_entities(
@@ -336,6 +338,7 @@ pub fn fix_missing_ldtk_entities(
     texture_atlasses: ResMut<Assets<TextureAtlas>>,
     mut commands: Commands,
     q_enemies: Query<(Entity, &Enemy), Without<Collider>>,
+    q_items: Query<(Entity, &Item), Without<Collider>>,
 ) {
     let asset_server = asset_server.into_inner();
     let texture_atlasses = texture_atlasses.into_inner();
@@ -353,19 +356,12 @@ pub fn fix_missing_ldtk_entities(
         ));
     }
 
-    // for (e, _) in los_pizzas.iter().filter(|(_, m)| !m.is_dummy) {
-    //     let bundle = create_pizza_bundle(asset_server, texture_atlasses, false);
-    //     commands
-    //         .entity(e)
-    //         .insert((bundle.collider_bundle, Visibility::Visible));
-    // }
-
-    // for (e, _) in biborans.iter().filter(|(_, m)| !m.is_dummy) {
-    //     let bundle = create_biboran_bundle(asset_server, texture_atlasses, false);
-    //     commands
-    //         .entity(e)
-    //         .insert((bundle.collider_bundle, Visibility::Visible));
-    // }
+    for (e, item) in q_items.iter().filter(|(_, m)| !m.is_dummy) {
+        let bundle = create_item_bundle(asset_server, texture_atlasses, false, item.item_type);
+        commands
+            .entity(e)
+            .insert((bundle.collider_bundle, Visibility::Visible));
+    }
 }
 
 pub fn spawn_game_world(
