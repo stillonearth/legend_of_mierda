@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::entities::enemy::{EnemyType, SpawnEnemyEvent};
+use crate::entities::characters::enemy::{EnemyType, SpawnEnemyEvent};
 use crate::ldtk::LevelChangeEvent;
 use crate::{entities::pizza::SpawnPizzaEvent, ui::*};
 

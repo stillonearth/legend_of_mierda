@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween};
 
 use super::{
-    enemy::{Enemy, EnemyHitEvent},
+    characters::enemy::{Enemy, EnemyHitEvent},
     player::Player,
 };
 use crate::{loading::StaticSpriteAssets, GameState};
@@ -178,7 +178,7 @@ fn animate_arrow(
 
 fn handle_arrow_attack(
     mut arrow_attack_events: EventReader<WeaponArrowAttackEvent>,
-    mut ev_enemy_hit_event: EventWriter<EnemyHitEvent>,
+    mut ev_enemy_hit: EventWriter<EnemyHitEvent>,
     mut queries: ParamSet<(
         Query<(&Transform, &Player)>,
         Query<(Entity, &Transform, &Enemy)>,
@@ -204,7 +204,7 @@ fn handle_arrow_attack(
                 continue;
             }
 
-            ev_enemy_hit_event.send(EnemyHitEvent(e));
+            ev_enemy_hit.send(EnemyHitEvent(e));
         }
     }
 }

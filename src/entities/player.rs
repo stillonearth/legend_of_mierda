@@ -10,7 +10,7 @@ use crate::{
     ui::UIPlayerHealth, AudioAssets, GameState,
 };
 
-use super::enemy::{Enemy, EnemyHitEvent};
+use super::characters::enemy::{Enemy, EnemyHitEvent};
 
 // --------
 // Entities

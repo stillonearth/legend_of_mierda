@@ -1,10 +1,7 @@
 use bevy::prelude::*;
 
 pub mod characters;
-pub mod enemy;
 pub mod light;
-pub mod mierda;
-pub mod pendejo;
 pub mod pizza;
 pub mod player;
 pub mod text_indicator;

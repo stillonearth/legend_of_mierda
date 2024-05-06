@@ -10,7 +10,7 @@ use crate::entities::{
     // biboran::{create_biboran_bundle, Biboran},
     // mierda::*,
     // pendejo::{create_pendejo_bundle, Pendejo},
-    enemy::{create_enemy_bundle, Enemy},
+    characters::enemy::{create_enemy_bundle, Enemy},
     pizza::*,
     player::Player,
 };
