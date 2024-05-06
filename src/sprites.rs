@@ -20,12 +20,13 @@ pub const PENDEJO_SPRITE_SHEETS: [(&str, AnimatedCharacterType); 2] = [
     ("sprites/pendejo-2.png", AnimatedCharacterType::Pendejo2),
 ];
 
-#[derive(Copy, Clone, Reflect, Default)]
+#[derive(Copy, Clone, Reflect, Default, Debug, PartialEq, Eq)]
 pub enum AnimatedCharacterType {
     #[default]
     Player,
     Pendejo1,
     Pendejo2,
+    NotAnimated,
 }
 
 #[derive(Copy, Clone, Component, Reflect, Default)]
@@ -102,6 +103,10 @@ pub fn animate_player_sprite(
     {
         timer.tick(time.delta());
 
+        if animated_character_sprite.animated_character_type == AnimatedCharacterType::NotAnimated {
+            continue;
+        }
+
         // fix sprite position
         let mut indices = get_animation_indices(
             character_animation.animation_type,
@@ -118,6 +123,7 @@ pub fn animate_player_sprite(
                         AnimatedCharacterType::Player => spritesheets.player_atlas_1.clone(),
                         AnimatedCharacterType::Pendejo1 => spritesheets.pendejo_atlas_1.clone(),
                         AnimatedCharacterType::Pendejo2 => spritesheets.pendejo_atlas_2.clone(),
+                        _ => panic!("not implemented"),
                     };
 
                     character_animation.animation_type = AnimationType::Stand;

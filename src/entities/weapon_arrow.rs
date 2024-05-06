@@ -4,8 +4,7 @@ use bevy::prelude::*;
 use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween};
 
 use super::{
-    mierda::{Mierda, MierdaHitEvent},
-    pendejo::{Pendejo, PendejoHitEvent},
+    enemy::{Enemy, EnemyHitEvent},
     player::Player,
 };
 use crate::{loading::StaticSpriteAssets, GameState};
@@ -179,12 +178,10 @@ fn animate_arrow(
 
 fn handle_arrow_attack(
     mut arrow_attack_events: EventReader<WeaponArrowAttackEvent>,
-    mut ev_mierda_hit: EventWriter<MierdaHitEvent>,
-    mut ev_pendejo_hit: EventWriter<PendejoHitEvent>,
+    mut ev_enemy_hit_event: EventWriter<EnemyHitEvent>,
     mut queries: ParamSet<(
         Query<(&Transform, &Player)>,
-        Query<(Entity, &Transform, &Pendejo)>,
-        Query<(Entity, &Transform, &Mierda)>,
+        Query<(Entity, &Transform, &Enemy)>,
     )>,
 ) {
     for _ in arrow_attack_events.read() {
@@ -207,23 +204,7 @@ fn handle_arrow_attack(
                 continue;
             }
 
-            ev_pendejo_hit.send(PendejoHitEvent(e));
-        }
-
-        for (e, transfrom, _) in queries.p2().iter() {
-            let translation = transfrom.translation;
-
-            if (translation.z - player_translation.z).abs() > 16.0 {
-                continue;
-            }
-
-            let distance = translation.distance(player_translation).abs();
-
-            if distance > 40.0 {
-                continue;
-            }
-
-            ev_mierda_hit.send(MierdaHitEvent(e));
+            ev_enemy_hit_event.send(EnemyHitEvent(e));
         }
     }
 }

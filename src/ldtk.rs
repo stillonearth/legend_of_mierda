@@ -3,13 +3,14 @@ use std::collections::{HashMap, HashSet};
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use bevy_magic_light_2d::{SpriteCamera};
+use bevy_magic_light_2d::SpriteCamera;
 use bevy_rapier2d::prelude::*;
 
 use crate::entities::{
-    biboran::{create_biboran_bundle, Biboran},
-    mierda::*,
-    pendejo::{create_pendejo_bundle, Pendejo},
+    // biboran::{create_biboran_bundle, Biboran},
+    // mierda::*,
+    // pendejo::{create_pendejo_bundle, Pendejo},
+    enemy::{create_enemy_bundle, Enemy},
     pizza::*,
     player::Player,
 };
@@ -312,39 +313,18 @@ pub fn hide_dummy_entities(
     mut commands: Commands,
     _level_selection: Res<LevelSelection>,
     mut set: ParamSet<(
-        Query<(Entity, &mut Visibility, &Mierda)>,
-        Query<(Entity, &mut Visibility, &Pizza)>,
-        Query<(Entity, &mut Visibility, &Pendejo)>,
-        Query<(Entity, &mut Visibility, &Biboran)>,
+        Query<(Entity, &mut Visibility, &Enemy)>,
+        // Query<(Entity, &mut Visibility, &Pizza)>,
+        // Query<(Entity, &mut Visibility, &Pendejo)>,
+        // Query<(Entity, &mut Visibility, &Biboran)>,
     )>,
 ) {
     // if !level_selection.is_changed() {
     //     return;
     // }
 
-    for (entity, mut visibility, mierda) in set.p0().iter_mut() {
-        if mierda.is_dummy {
-            *visibility = Visibility::Hidden;
-            commands.entity(entity).remove::<Collider>();
-        }
-    }
-
-    for (entity, mut visibility, mierda) in set.p1().iter_mut() {
-        if mierda.is_dummy {
-            *visibility = Visibility::Hidden;
-            commands.entity(entity).remove::<Collider>();
-        }
-    }
-
-    for (entity, mut visibility, pendejo) in set.p2().iter_mut() {
-        if pendejo.is_dummy {
-            *visibility = Visibility::Hidden;
-            commands.entity(entity).remove::<Collider>();
-        }
-    }
-
-    for (entity, mut visibility, biboran) in set.p3().iter_mut() {
-        if biboran.is_dummy {
+    for (entity, mut visibility, enemy) in set.p0().iter_mut() {
+        if enemy.is_dummy {
             *visibility = Visibility::Hidden;
             commands.entity(entity).remove::<Collider>();
         }
@@ -355,25 +335,13 @@ pub fn fix_missing_ldtk_entities(
     asset_server: Res<AssetServer>,
     texture_atlasses: ResMut<Assets<TextureAtlas>>,
     mut commands: Commands,
-    los_mierdas: Query<(Entity, &Mierda), Without<Collider>>,
-    los_pizzas: Query<(Entity, &Pizza), Without<Collider>>,
-    los_pendejos: Query<(Entity, &Pendejo), Without<Collider>>,
-    biborans: Query<(Entity, &Biboran), Without<Collider>>,
+    q_enemies: Query<(Entity, &Enemy), Without<Collider>>,
 ) {
     let asset_server = asset_server.into_inner();
     let texture_atlasses = texture_atlasses.into_inner();
 
-    for (e, _) in los_mierdas.iter().filter(|(_, m)| !m.is_dummy) {
-        let bundle = create_mierda_bundle(asset_server, texture_atlasses, false);
-        commands.entity(e).insert((
-            bundle.collider_bundle,
-            bundle.direction_update_time,
-            Visibility::Visible,
-        ));
-    }
-
-    for (e, _) in los_pendejos.iter().filter(|(_, m)| !m.is_dummy) {
-        let bundle = create_pendejo_bundle(asset_server, texture_atlasses, false);
+    for (e, enemy) in q_enemies.iter().filter(|(_, m)| !m.is_dummy) {
+        let bundle = create_enemy_bundle(asset_server, texture_atlasses, false, enemy.enemy_type);
         commands.entity(e).insert((
             bundle.collider_bundle,
             bundle.direction_update_time,
@@ -385,19 +353,19 @@ pub fn fix_missing_ldtk_entities(
         ));
     }
 
-    for (e, _) in los_pizzas.iter().filter(|(_, m)| !m.is_dummy) {
-        let bundle = create_pizza_bundle(asset_server, texture_atlasses, false);
-        commands
-            .entity(e)
-            .insert((bundle.collider_bundle, Visibility::Visible));
-    }
+    // for (e, _) in los_pizzas.iter().filter(|(_, m)| !m.is_dummy) {
+    //     let bundle = create_pizza_bundle(asset_server, texture_atlasses, false);
+    //     commands
+    //         .entity(e)
+    //         .insert((bundle.collider_bundle, Visibility::Visible));
+    // }
 
-    for (e, _) in biborans.iter().filter(|(_, m)| !m.is_dummy) {
-        let bundle = create_biboran_bundle(asset_server, texture_atlasses, false);
-        commands
-            .entity(e)
-            .insert((bundle.collider_bundle, Visibility::Visible));
-    }
+    // for (e, _) in biborans.iter().filter(|(_, m)| !m.is_dummy) {
+    //     let bundle = create_biboran_bundle(asset_server, texture_atlasses, false);
+    //     commands
+    //         .entity(e)
+    //         .insert((bundle.collider_bundle, Visibility::Visible));
+    // }
 }
 
 pub fn spawn_game_world(

@@ -10,10 +10,7 @@ use crate::{
     ui::UIPlayerHealth, AudioAssets, GameState,
 };
 
-use super::{
-    mierda::{Mierda, MierdaHitEvent},
-    pendejo::{Pendejo, PendejoHitEvent},
-};
+use super::enemy::{Enemy, EnemyHitEvent};
 
 // --------
 // Entities
@@ -115,11 +112,9 @@ pub struct PlayerHitEvent {
 pub fn event_player_attack(
     mut commands: Commands,
     mut ev_player_attack: EventReader<PlayerAttackEvent>,
-    mut ev_mierda_hit: EventWriter<MierdaHitEvent>,
-    mut ev_pendejo_hit: EventWriter<PendejoHitEvent>,
+    mut ev_enemy_hit: EventWriter<EnemyHitEvent>,
     mut q_player: Query<(Entity, &Transform, &CharacterAnimation), With<Player>>,
-    mut q_los_mierdas: Query<(Entity, &Transform, &mut Mierda)>,
-    mut q_los_pendejos: Query<(Entity, &Transform, &mut Pendejo)>,
+    mut q_enemies: Query<(Entity, &Transform, &mut Enemy)>,
     audio: Res<Audio>,
     audio_assets: Res<AudioAssets>,
 ) {
@@ -136,9 +131,7 @@ pub fn event_player_attack(
         audio.play(audio_assets.slash.clone());
 
         // find all mierdas in range
-        for (entity, mierda_transform, _) in
-            q_los_mierdas.iter_mut().filter(|(_, _, m)| !m.is_dummy)
-        {
+        for (entity, mierda_transform, _) in q_enemies.iter_mut().filter(|(_, _, m)| !m.is_dummy) {
             let mierda_position = mierda_transform.translation;
 
             let distance = player_position.distance(mierda_position);
@@ -148,45 +141,18 @@ pub fn event_player_attack(
             }
 
             // cause damage accrodign to player_orientation
-            let is_merda_attacked = match player_orientation {
+            let is_enemy_attacked = match player_orientation {
                 AnimationDirection::Up => player_position.y < mierda_position.y,
                 AnimationDirection::Down => player_position.y > mierda_position.y,
                 AnimationDirection::Left => player_position.x > mierda_position.x,
                 AnimationDirection::Right => player_position.x < mierda_position.x,
             };
 
-            if !is_merda_attacked {
+            if !is_enemy_attacked {
                 continue;
             }
 
-            ev_mierda_hit.send(MierdaHitEvent(entity));
-        }
-
-        // same for pendejos
-        for (entity, pendejo_transform, _) in
-            q_los_pendejos.iter_mut().filter(|(_, _, m)| !m.is_dummy)
-        {
-            let pendejo_position = pendejo_transform.translation;
-
-            let distance = player_position.distance(pendejo_position);
-
-            if distance >= 40. {
-                continue;
-            }
-
-            // cause damage accrodign to player_orientation
-            let is_pendejo_attacked = match player_orientation {
-                AnimationDirection::Up => player_position.y < pendejo_position.y,
-                AnimationDirection::Down => player_position.y > pendejo_position.y,
-                AnimationDirection::Left => player_position.x > pendejo_position.x,
-                AnimationDirection::Right => player_position.x < pendejo_position.x,
-            };
-
-            if !is_pendejo_attacked {
-                continue;
-            }
-
-            ev_pendejo_hit.send(PendejoHitEvent(entity));
+            ev_enemy_hit.send(EnemyHitEvent(entity));
         }
     }
 }
@@ -253,10 +219,10 @@ pub fn event_player_hit(
 // Physics
 // ---------
 
-pub fn handle_player_mierda_collisions(
+pub fn handle_player_enemy_collisions(
     mut collision_events: EventReader<CollisionEvent>,
     mut q_player: Query<(Entity, &mut Player)>,
-    q_los_mierdas: Query<(Entity, &mut Velocity, &Mierda)>,
+    q_enemies: Query<(Entity, &mut Velocity, &Enemy)>,
     mut ev_player_hit: EventWriter<PlayerHitEvent>,
 ) {
     for event in collision_events.read() {
@@ -267,31 +233,7 @@ pub fn handle_player_mierda_collisions(
                 }
 
                 let other_entity = if e1.index() == e.index() { *e2 } else { *e1 };
-                if q_los_mierdas.get(other_entity).is_err() {
-                    continue;
-                }
-
-                ev_player_hit.send(PlayerHitEvent { entity: e });
-            }
-        }
-    }
-}
-
-pub fn handle_player_pendejo_collisions(
-    mut collision_events: EventReader<CollisionEvent>,
-    mut q_player: Query<(Entity, &mut Player)>,
-    q_los_pendejos: Query<(Entity, &mut Velocity, &Pendejo)>,
-    mut ev_player_hit: EventWriter<PlayerHitEvent>,
-) {
-    for event in collision_events.read() {
-        for (e, _) in q_player.iter_mut() {
-            if let CollisionEvent::Started(e1, e2, _) = event {
-                if !(e1.index() == e.index() || e2.index() == e.index()) {
-                    continue;
-                }
-
-                let other_entity = if e1.index() == e.index() { *e2 } else { *e1 };
-                if q_los_pendejos.get(other_entity).is_err() {
+                if q_enemies.get(other_entity).is_err() {
                     continue;
                 }
 
@@ -319,8 +261,7 @@ impl Plugin for PlayerPlugin {
                 (
                     event_player_attack,
                     event_player_hit,
-                    handle_player_mierda_collisions,
-                    handle_player_pendejo_collisions,
+                    handle_player_enemy_collisions,
                 )
                     .run_if(in_state(GameState::GamePlay)),
             );
