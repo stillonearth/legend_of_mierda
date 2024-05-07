@@ -3,7 +3,6 @@ use std::time::Duration;
 use bevy::prelude::*;
 
 use crate::entities::{
-    characters::enemy::{Enemy, EnemyHitEvent},
     player::Player,
 };
 use crate::{loading::StaticSpriteAssets, GameState};
@@ -98,7 +97,7 @@ fn control(
             angle = -0.1;
         }
 
-        transform.rotation = transform.rotation * Quat::from_rotation_z(angle);
+        transform.rotation *= Quat::from_rotation_z(angle);
     }
 }
 
