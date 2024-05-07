@@ -82,7 +82,7 @@ pub fn setup_light(
             let light_entity = commands
                 .spawn((
                     OmniLightSource2D {
-                        intensity: 0.1,
+                        intensity: 0.01,
                         color: Color::rgb_u8(255, 125, 125),
                         falloff: Vec3::new(5.5, 10.0, 0.005),
                         jitter_intensity: 0.1,
@@ -110,7 +110,7 @@ pub fn setup_light(
         commands.spawn((
             SkylightLight2D {
                 color: Color::rgb_u8(249, 143, 33),
-                intensity: 0.03,
+                intensity: 0.003,
             },
             Name::new("global_skylight"),
         ));

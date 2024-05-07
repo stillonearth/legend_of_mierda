@@ -85,6 +85,8 @@ pub struct TextureAssets {
 pub struct StaticSpriteAssets {
     #[asset(path = "sprites/arrow.png")]
     pub arrow: Handle<Image>,
+    #[asset(path = "sprites/speargun.png")]
+    pub speargun: Handle<Image>,
 }
 
 #[derive(AssetCollection, Resource)]

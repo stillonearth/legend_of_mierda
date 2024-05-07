@@ -21,7 +21,7 @@ impl Plugin for EntitiesPlugin {
             characters::CharactersPlugin,
             player::PlayerPlugin,
             items::ItemsPlugin,
-            weapons::weapon_arrow::WeaponArrowPlugin,
+            weapons::WeaponsPlugin,
             text_indicator::TextIndicatorPlugin,
             level_objects::light::LightPlugin,
         ));
