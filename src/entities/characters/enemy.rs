@@ -158,7 +158,10 @@ pub fn create_enemy_bundle(
 // ------
 
 #[derive(Event, Clone)]
-pub struct EnemyHitEvent(pub Entity);
+pub struct EnemyHitEvent {
+    pub entity: Entity,
+    pub damage: u8,
+}
 
 #[derive(Event, Clone)]
 pub struct SpawnEnemyEvent {
@@ -278,7 +281,7 @@ pub fn handle_enemy_hit(
     let mut hit_sound_played = false;
 
     for event in ev_enemy_hit.read() {
-        if commands.get_entity(event.0).is_none() {
+        if commands.get_entity(event.entity).is_none() {
             continue;
         }
 
@@ -286,15 +289,15 @@ pub fn handle_enemy_hit(
             let player_position = player_transform.translation;
 
             let (enemy_entity, mierda_transform, mut enemy_velocity, mut enemy) =
-                enemies.get_mut(event.0).unwrap();
+                enemies.get_mut(event.entity).unwrap();
             let enemy_position = mierda_transform.translation;
             let vector_attack = (enemy_position - player_position).normalize();
             enemy_velocity.linvel.x += vector_attack.x * 200.;
             enemy_velocity.linvel.y += vector_attack.y * 200.;
 
             let damage = match enemy.enemy_type {
-                EnemyType::Mierda => 100,
-                EnemyType::Pendejo => 50,
+                EnemyType::Mierda => (1.0 * event.damage as f32) as u8,
+                EnemyType::Pendejo => (0.5 * event.damage as f32) as u8,
             };
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
@@ -344,6 +347,9 @@ pub fn despawn_dead_enemies(
                 state.asyn().timeout(0.3)
             }))
             .then(asyn!(state, mut commands: Commands => {
+                if commands.get_entity(state.value).is_none() {
+                    return;
+                }
                 commands.entity(state.value).despawn_recursive();
             }));
     }

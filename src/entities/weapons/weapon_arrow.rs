@@ -204,7 +204,10 @@ fn handle_arrow_attack(
                 continue;
             }
 
-            ev_enemy_hit.send(EnemyHitEvent(e));
+            ev_enemy_hit.send(EnemyHitEvent {
+                entity: e,
+                damage: 88,
+            });
         }
     }
 }

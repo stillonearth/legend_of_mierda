@@ -4,16 +4,13 @@ use bevy_rapier2d::prelude::Velocity;
 use bevy_rapier2d::prelude::*;
 
 use crate::{
+    entities::player::Player,
     physics::ColliderBundle,
     sprites::{AnimatedCharacterSprite, AnimationTimer, CharacterAnimation},
     GameState,
-    entities::player::Player,
 };
 
-use super::{
-    enemy::{create_enemy_bundle, DirectionUpdateTime, Enemy, EnemyType},
-};
-
+use super::enemy::{create_enemy_bundle, DirectionUpdateTime, Enemy, EnemyType};
 
 // -----------
 // Compontents
@@ -123,28 +120,6 @@ pub fn update_mierdas_move_direction(
     }
 }
 
-// ---------
-// Physics
-// ---------
-
-pub fn handle_mierda_wall_collisions(
-    mut collision_events: EventReader<CollisionEvent>,
-    mut q_los_mierdas: Query<(Entity, &mut Velocity, &Enemy)>,
-) {
-    for event in collision_events.read() {
-        for (e, mut v, _) in q_los_mierdas
-            .iter_mut()
-            .filter(|(_, _, m)| m.enemy_type == EnemyType::Mierda)
-        {
-            if let CollisionEvent::Started(e1, e2, _) = event {
-                if e1.index() == e.index() || e2.index() == e.index() {
-                    v.linvel *= -1.;
-                }
-            }
-        }
-    }
-}
-
 // ---
 // Plugin
 // --
@@ -160,8 +135,6 @@ impl Plugin for MierdaPlugin {
                     // AI
                     mierda_activity,
                     update_mierdas_move_direction,
-                    // Physics, Collisions
-                    handle_mierda_wall_collisions,
                 )
                     .run_if(in_state(GameState::GamePlay)),
             );

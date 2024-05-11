@@ -110,7 +110,8 @@ pub fn setup_light(
         commands.spawn((
             SkylightLight2D {
                 color: Color::rgb_u8(249, 143, 33),
-                intensity: 0.003,
+                // intensity: 0.003,
+                intensity: 0.03,
             },
             Name::new("global_skylight"),
         ));

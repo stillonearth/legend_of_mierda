@@ -152,7 +152,10 @@ pub fn event_player_attack(
                 continue;
             }
 
-            ev_enemy_hit.send(EnemyHitEvent(entity));
+            ev_enemy_hit.send(EnemyHitEvent {
+                entity,
+                damage: 100,
+            });
         }
     }
 }
@@ -215,30 +218,38 @@ pub fn event_player_hit(
     }
 }
 
-// ---------
+// -------
 // Physics
-// ---------
+// -------
 
 pub fn handle_player_enemy_collisions(
     mut collision_events: EventReader<CollisionEvent>,
-    mut q_player: Query<(Entity, &mut Player)>,
-    q_enemies: Query<(Entity, &mut Velocity, &Enemy)>,
+    q_player: Query<(Entity, &mut Player)>,
+    q_enemies: Query<(Entity, &Enemy)>,
     mut ev_player_hit: EventWriter<PlayerHitEvent>,
 ) {
     for event in collision_events.read() {
-        for (e, _) in q_player.iter_mut() {
-            if let CollisionEvent::Started(e1, e2, _) = event {
-                if !(e1.index() == e.index() || e2.index() == e.index()) {
-                    continue;
-                }
+        if let CollisionEvent::Started(e1, e2, _) = event {
+            let contact_1_player = q_player.get(*e1);
+            let contact_2_player = q_player.get(*e2);
+            let is_contact_player = contact_1_player.is_ok() || contact_2_player.is_ok();
 
-                let other_entity = if e1.index() == e.index() { *e2 } else { *e1 };
-                if q_enemies.get(other_entity).is_err() {
-                    continue;
-                }
+            let contact_1_enemy = q_enemies.get(*e1);
+            let contact_2_enemy = q_enemies.get(*e2);
+            let is_contact_enemy = contact_1_enemy.is_ok() || contact_2_enemy.is_ok();
 
-                ev_player_hit.send(PlayerHitEvent { entity: e });
+            if !(is_contact_player && is_contact_enemy) {
+                continue;
             }
+
+            let player_entity = match contact_1_player.is_ok() {
+                true => contact_1_player.unwrap().0,
+                false => contact_2_player.unwrap().0,
+            };
+
+            ev_player_hit.send(PlayerHitEvent {
+                entity: player_entity,
+            });
         }
     }
 }
