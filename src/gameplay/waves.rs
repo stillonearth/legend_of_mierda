@@ -230,42 +230,39 @@ pub fn ui_wave_info_text(
 pub fn get_level_1_waves() -> Vec<Wave> {
     vec![
         Wave {
-            events: vec![
-                WaveEntry::Mierda { count: 300 },
-                // WaveEntry::Pizza { count: 10 },
-            ],
+            events: vec![WaveEntry::Mierda { count: 300 }],
             event_duration: Duration::from_secs(100),
             wave_duration: Duration::from_secs(100),
         },
-        // Wave {
-        //     events: vec![
-        //         WaveEntry::Mierda { count: 100 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Mierda { count: 100 },
-        //         WaveEntry::Biboran { count: 1 },
-        //         WaveEntry::Mierda { count: 100 },
-        //     ],
-        //     event_duration: Duration::from_secs(20),
-        //     wave_duration: Duration::from_secs(80),
-        // },
-        // Wave {
-        //     events: vec![
-        //         WaveEntry::Mierda { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Mierda { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Biboran { count: 1 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Mierda { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Biboran { count: 1 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Biboran { count: 1 },
-        //         WaveEntry::Pizza { count: 3 },
-        //     ],
-        //     event_duration: Duration::from_secs(20),
-        //     wave_duration: Duration::from_secs(260),
-        // },
+        Wave {
+            events: vec![
+                WaveEntry::Mierda { count: 100 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Mierda { count: 100 },
+                WaveEntry::Biboran { count: 1 },
+                WaveEntry::Mierda { count: 100 },
+            ],
+            event_duration: Duration::from_secs(20),
+            wave_duration: Duration::from_secs(80),
+        },
+        Wave {
+            events: vec![
+                WaveEntry::Mierda { count: 200 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Pendejo { count: 200 },
+                WaveEntry::Mierda { count: 200 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Biboran { count: 1 },
+                WaveEntry::Pendejo { count: 200 },
+                WaveEntry::Mierda { count: 200 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Biboran { count: 1 },
+                WaveEntry::Pendejo { count: 200 },
+                WaveEntry::Biboran { count: 1 },
+                WaveEntry::Pizza { count: 3 },
+            ],
+            event_duration: Duration::from_secs(20),
+            wave_duration: Duration::from_secs(260),
+        },
     ]
 }
