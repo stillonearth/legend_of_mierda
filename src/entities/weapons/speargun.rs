@@ -2,11 +2,14 @@ use std::f64::consts::FRAC_PI_2;
 use std::time::Duration;
 
 use crate::entities::characters::enemy::{self, Enemy, EnemyHitEvent};
-use crate::entities::player::Player;
+use crate::entities::player::{self, Player};
 use crate::physics::ColliderBundle;
 use crate::{loading::StaticSpriteAssets, GameState};
 
 use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
+use bevy_inspector_egui::egui::epaint::text::cursor;
+use bevy_magic_light_2d::SpriteCamera;
 use bevy_rapier2d::geometry::Collider;
 use bevy_rapier2d::prelude::*;
 
@@ -183,23 +186,6 @@ fn handle_speargun_attack_event(
     }
 }
 
-fn control(
-    input: Res<Input<KeyCode>>,
-    mut q_speargun: Query<(&mut Transform, &Speargun), Without<Player>>,
-) {
-    for (mut transform, _) in q_speargun.iter_mut() {
-        let mut angle = 0.00;
-        if input.pressed(KeyCode::Left) {
-            angle = 0.1;
-        }
-        if input.pressed(KeyCode::Right) {
-            angle = -0.1;
-        }
-
-        transform.rotation *= Quat::from_rotation_z(angle);
-    }
-}
-
 fn handle_speargun_attack(
     mut q_speargun: Query<(Entity, &Speargun, &mut SpeargunTimer)>,
     mut ev_arrow_attack: EventWriter<SpeargunShootEvent>,
@@ -319,195 +305,57 @@ pub fn handle_arrow_enemy_collisions(
     }
 }
 
-// fn handle_speargun_attack_event(
-//     mut commands: Commands,
-//     mut ev_arrow_attack: EventReader<SpeargunShootEvent>,
-//     q_speargun: Query<(Entity, &SpeargunArrow, &SpeargunArrowDespawnTimer)>,
-// ) {
-//     for _ in ev_arrow_attack.read() {
-//         for (entity, _, _) in q_speargun.iter() {
-//             println!("Speargun Attack!");
-//         }
-//     }
-// }
+fn control_speargun_with_arrows(
+    input: Res<Input<KeyCode>>,
+    mut q_speargun: Query<(&mut Transform, &Speargun), Without<Player>>,
+) {
+    for (mut transform, _) in q_speargun.iter_mut() {
+        let mut angle = 0.00;
+        if input.pressed(KeyCode::Left) {
+            angle = 0.1;
+        }
+        if input.pressed(KeyCode::Right) {
+            angle = -0.1;
+        }
 
-// fn adjust_speargun_angle(
-//     q_windows: Query<&Window, With<PrimaryWindow>>,
-//     q_players: Query<(Entity, &Parent, &Transform, &Player)>,
-//     mut paramset: ParamSet<(
-//         Query<(&mut Transform, &WeaponSpeargun), Without<Player>>,
-//         Query<(&mut Transform, &SpriteCamera), Without<Player>>,
-//         Query<(&Transform, &LevelIid), (Without<OrthographicProjection>, Without<Player>)>,
-//     )>,
-//     level_selection: Res<LevelSelection>,
-//     projects: Query<&Handle<LdtkProject>>,
-//     project_assets: Res<Assets<LdtkProject>>,
-// ) {
-//     let binding1 = paramset.p1();
-//     let (camera_transform, _) = binding1.single();
-//     let camera_position = Vec2::new(
-//         camera_transform.translation.x,
-//         camera_transform.translation.y,
-//     );
-//     let project = project_assets.get(projects.single());
-//     if project.is_none() {
-//         return;
-//     }
-//     let project = project.unwrap();
+        transform.rotation *= Quat::from_rotation_z(angle);
+    }
+}
 
-//     let mut level_position: Vec2 = Vec2::ZERO;
-//     let mut level_size: Vec2 = Vec2::ZERO;
+fn control_speargun_with_mouse(
+    q_window: Query<&Window, With<PrimaryWindow>>,
+    q_camera: Query<(&Camera, &GlobalTransform), With<SpriteCamera>>,
+    q_players: Query<(Entity, &GlobalTransform, &Player)>,
+    mut q_speargun: Query<(&mut Transform, &Speargun), Without<Player>>,
+) {
+    let (camera, camera_transform) = q_camera.single();
+    let window = q_window.single();
 
-//     for (level_transform, level_iid) in paramset.p2().iter() {
-//         if let Some(ldtk_level) = project.get_raw_level_by_iid(level_iid.get()) {
-//             let level = &ldtk_level;
-//             if level_selection.is_match(
-//                 &LevelIndices {
-//                     level: 0,
-//                     ..default()
-//                 },
-//                 level,
-//             ) {
-//                 level_position =
-//                     Vec2::new(level_transform.translation.x, level_transform.translation.y);
-//                 level_size = Vec2::new(level.px_wid as f32, level.px_hei as f32);
-//             }
-//         }
-//     }
+    let mut cursor_position = Vec2::ZERO;
+    if let Some(world_position) = window
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+        .map(|ray| ray.origin.truncate())
+    {
+        cursor_position = world_position;
+    } else {
+        return;
+    }
 
-//     if let Some(cursor_position) = q_windows.single().cursor_position() {
-//         if q_players.iter().next().is_none() {
-//             return;
-//         }
+    let mut player_position = Vec2::ZERO;
+    for (_, player_transform, _) in q_players.iter() {
+        player_position = player_transform.translation().truncate();
+    }
 
-//         let player_transform = q_players.iter().next().unwrap().2;
-//         let player_position = player_transform.translation;
-//         let player_position = Vec2::new(player_position.x, player_position.y);
+    let angle = {
+        let direction = cursor_position - player_position;
+        direction.normalize().angle_between(Vec2::new(1.0, 0.0))
+    };
 
-//         println!("Player Position: {:?}", player_position);
-//         println!("Cursor Position: {:?}", cursor_position);
-//         println!("Camera Position: {:?}", camera_position);
-//         println!("Level Position: {:?}", level_position);
-//         println!(
-//             "Level-Camera Position: {:?}",
-//             level_position - camera_position
-//         );
-//         println!(
-//             "Player Position-Level Size: {:?}",
-//             player_position - level_size
-//         );
-
-//         let angle = {
-//             let direction = cursor_position - level_size;
-//             direction.angle_between(Vec2::new(1.0, 0.0))
-//         };
-
-//         println!("Angle: {}", angle);
-
-//         // rotate the speargun
-//         for (mut transform, _) in paramset.p0().iter_mut() {
-//             transform.rotation = Quat::from_rotation_z(angle);
-//         }
-//     }
-// }
-
-// fn animate_arrow(
-//     mut commands: Commands,
-//     mut queries: ParamSet<(
-//         Query<(&Parent, &Transform, &Player)>,
-//         Query<(
-//             Entity,
-//             &mut Transform,
-//             &mut Visibility,
-//             &WeaponSpeargun,
-//             &mut WeaponSpeargunTimer,
-//             &mut WeaponSpeargunHideTimer,
-//         )>,
-//     )>,
-//     mut ev_arrow_attack: EventWriter<WeaponSpeargunAttackEvent>,
-//     time: Res<Time>,
-// ) {
-//     if queries.p0().iter().next().is_none() {
-//         return;
-//     }
-
-//     for (entity, mut transform, mut visibility, arrow, mut timer_activate, mut timer_hide) in
-//         queries.p1().iter_mut()
-//     {
-//         timer_activate.0.tick(time.delta());
-//         timer_hide.0.tick(time.delta());
-
-//         if timer_activate.0.just_finished() {
-//             *visibility = Visibility::Visible;
-
-//             timer_hide.0.unpause();
-
-//             let end = match arrow {
-//                 WeaponSpeargun::Right => Vec3::new(55., 0., 0.),
-//                 WeaponSpeargun::Left => Vec3::new(-55., 0., 0.),
-//             };
-
-//             let tween = Tween::new(
-//                 EaseFunction::QuadraticInOut,
-//                 Duration::from_secs_f32(0.15),
-//                 TransformPositionLens {
-//                     start: match arrow {
-//                         WeaponSpeargun::Right => Vec3::new(20., 0., 0.),
-//                         WeaponSpeargun::Left => Vec3::new(-20., 0., 0.),
-//                     },
-//                     end,
-//                 },
-//             );
-
-//             ev_arrow_attack.send(WeaponSpeargunAttackEvent {});
-//             commands.entity(entity).insert(Animator::new(tween));
-//         }
-
-//         if timer_hide.0.just_finished() {
-// println!("Cursor is inside the primary window, at {:?}", position);
-//             timer_hide.0.pause();
-//             *visibility = Visibility::Hidden;
-
-//             transform.translation = match arrow {
-//                 WeaponSpeargun::Right => Vec3::new(20., 0., 0.),
-//                 WeaponSpeargun::Left => Vec3::new(-20., 0., 0.),
-//             };
-//         }
-//     }
-// }
-
-// fn handle_arrow_attack(
-//     mut arrow_attack_events: EventReader<WeaponSpeargunAttackEvent>,
-//     mut ev_enemy_hit: EventWriter<EnemyHitEvent>,
-//     mut queries: ParamSet<(
-//         Query<(&Transform, &Player)>,
-//         Query<(Entity, &Transform, &Enemy)>,
-//     )>,
-// ) {
-//     for _ in arrow_attack_events.read() {
-//         if queries.p0().iter().len() == 0 {
-//             return;
-//         }
-
-//         let player_translation = queries.p0().iter().next().unwrap().0.translation;
-
-//         for (e, transfrom, _) in queries.p1().iter() {
-//             let translation = transfrom.translation;
-
-//             if (translation.z - player_translation.z).abs() > 16.0 {
-//                 continue;
-//             }
-
-//             let distance = translation.distance(player_translation).abs();
-
-//             if distance > 40.0 {
-//                 continue;
-//             }
-
-//             ev_enemy_hit.send(EnemyHitEvent(e));
-//         }
-//     }
-// }
+    for (mut transform, _) in q_speargun.iter_mut() {
+        transform.rotation = Quat::from_rotation_z(-angle);
+    }
+}
 
 // ------
 // Plugin
@@ -528,7 +376,8 @@ impl Plugin for WeaponSpeargunPlugin {
                     handle_arrow_timers,
                     handle_trail_timers,
                     handle_arrow_enemy_collisions,
-                    control,
+                    control_speargun_with_arrows,
+                    control_speargun_with_mouse,
                 )
                     .run_if(in_state(GameState::GamePlay)),
             )

@@ -36,7 +36,7 @@ fn setup_gameplay_music(mut commands: Commands, audio_assets: Res<AudioAssets>, 
     let handle = audio
         .play(audio_assets.mexico.clone())
         .looped()
-        .with_volume(0.001)
+        .with_volume(0.1)
         .handle();
     commands.insert_resource(GameplayMusic(handle));
 }
