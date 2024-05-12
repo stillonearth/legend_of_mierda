@@ -137,7 +137,7 @@ pub fn update_pendejos_move_direction(
                 1 => AnimationDirection::Right,
                 2 => AnimationDirection::Down,
                 3 => AnimationDirection::Left,
-                _ => todo!(),
+                _ => AnimationDirection::Left,
             };
         }
     }
