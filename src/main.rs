@@ -20,7 +20,7 @@ use pecs::prelude::*;
 use cutscene::*;
 use loading::*;
 use menu::*;
-use postprocessing::{PostProcessSettings};
+use postprocessing::{PostProcessPlugin, PostProcessSettings};
 
 mod audio;
 mod controls;
@@ -74,15 +74,10 @@ fn main() {
                     filter: "info,wgpu_core=warn,wgpu_hal=warn,legend_of_mierda=debug,bevy_animation=error,bevy_gltf=error".into(),
                     level: bevy::log::Level::DEBUG,
                 }),
-            AudioPlugin, /*PostProcessPlugin*/))
+            AudioPlugin, PostProcessPlugin))
         .add_plugins((HookPlugin, PecsPlugin, TweeningPlugin, BevyMagicLight2DPlugin))
         .add_plugins((LoadingPlugin, MenuPlugin, CutscenePlugin, LegendOfMierdaPlugin))
         .add_plugins(audio::InternalAudioPlugin)
-        // .add_plugins(
-        //     ResourceInspectorPlugin::<BevyMagicLight2DSettings>::new()
-        //     .run_if(
-        //         input_toggle_active(false, KeyCode::Escape)
-        //     ))
         .add_plugins(
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         )
