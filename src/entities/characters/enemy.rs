@@ -305,7 +305,7 @@ pub fn handle_enemy_hit(
             enemy.health -= u8::min(damage, enemy.health);
 
             if !hit_sound_played {
-                audio.play(audio_assets.hit.clone()).with_volume(0.5);
+                audio.play(audio_assets.hit.clone()).with_volume(0.05);
                 hit_sound_played = true;
             }
 
