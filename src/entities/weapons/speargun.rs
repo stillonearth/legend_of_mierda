@@ -1,16 +1,16 @@
-use std::f64::consts::FRAC_PI_2;
+use std::f32::consts::FRAC_PI_2;
 use std::time::Duration;
 
-use crate::entities::characters::enemy::{self, Enemy, EnemyHitEvent};
-use crate::entities::player::{self, Player};
+use crate::entities::characters::enemy::{Enemy, EnemyHitEvent};
+use crate::entities::player::Player;
 use crate::physics::ColliderBundle;
 use crate::{loading::StaticSpriteAssets, GameState};
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use bevy_inspector_egui::egui::epaint::text::cursor;
 use bevy_magic_light_2d::SpriteCamera;
 use bevy_rapier2d::geometry::Collider;
+use bevy_rapier2d::na::ComplexField;
 use bevy_rapier2d::prelude::*;
 
 // ----------
@@ -237,7 +237,7 @@ fn handle_arrow_timers(
                                 ..default()
                             },
                             texture: static_sprite_assets.speargun_arrow.clone(),
-                            transform: transform.clone(),
+                            transform: *transform,
                             ..default()
                         },
                         speargun_arrow_trail: SpeargunArrowTrail,
@@ -305,28 +305,64 @@ pub fn handle_arrow_enemy_collisions(
     }
 }
 
-fn control_speargun_with_arrows(
-    input: Res<Input<KeyCode>>,
-    mut q_speargun: Query<(&mut Transform, &Speargun), Without<Player>>,
-) {
-    for (mut transform, _) in q_speargun.iter_mut() {
-        let mut angle = 0.00;
-        if input.pressed(KeyCode::Left) {
-            angle = 0.1;
-        }
-        if input.pressed(KeyCode::Right) {
-            angle = -0.1;
-        }
+// --------
+// Controls
+// --------
 
-        transform.rotation *= Quat::from_rotation_z(angle);
+fn rotate_speargun(
+    mut q_speargun: Query<(&mut Transform, &mut Sprite, &Speargun), Without<Player>>,
+    angle: f32,
+) {
+    for (mut transform, mut sprite, _) in q_speargun.iter_mut() {
+        transform.rotation = Quat::from_rotation_z(angle);
+
+        if angle.abs() >= FRAC_PI_2 {
+            sprite.flip_y = true;
+        } else {
+            sprite.flip_y = false;
+        }
     }
 }
 
+// Those are exclusive systems:
+// arrows (gamepad) or mouse (keyboard)
+fn control_speargun_with_arrows(
+    input: Res<Input<KeyCode>>,
+    q_speargun: Query<(&mut Transform, &mut Sprite, &Speargun), Without<Player>>,
+) {
+    if q_speargun.iter().count() == 0 {
+        return;
+    }
+
+    if !(input.pressed(KeyCode::Left) || input.pressed(KeyCode::Right)) {
+        return;
+    }
+
+    let mut angle = q_speargun
+        .iter()
+        .next()
+        .unwrap()
+        .0
+        .rotation
+        .to_euler(EulerRot::ZYX)
+        .0;
+
+    if input.pressed(KeyCode::Left) {
+        angle += 0.1;
+    }
+    if input.pressed(KeyCode::Right) {
+        angle -= -0.1;
+    }
+
+    rotate_speargun(q_speargun, angle);
+}
+
+#[allow(unused_assignments)]
 fn control_speargun_with_mouse(
     q_window: Query<&Window, With<PrimaryWindow>>,
     q_camera: Query<(&Camera, &GlobalTransform), With<SpriteCamera>>,
     q_players: Query<(Entity, &GlobalTransform, &Player)>,
-    mut q_speargun: Query<(&mut Transform, &Speargun), Without<Player>>,
+    q_speargun: Query<(&mut Transform, &mut Sprite, &Speargun), Without<Player>>,
 ) {
     let (camera, camera_transform) = q_camera.single();
     let window = q_window.single();
@@ -352,9 +388,7 @@ fn control_speargun_with_mouse(
         direction.normalize().angle_between(Vec2::new(1.0, 0.0))
     };
 
-    for (mut transform, _) in q_speargun.iter_mut() {
-        transform.rotation = Quat::from_rotation_z(-angle);
-    }
+    rotate_speargun(q_speargun, -angle);
 }
 
 // ------
