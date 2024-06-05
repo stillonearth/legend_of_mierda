@@ -32,7 +32,7 @@ pub fn create_lantern_bundle(
         1,
         1,
         None,
-        32.,
+        Vec2::ONE * 32.,
         texture_atlasses,
     );
 

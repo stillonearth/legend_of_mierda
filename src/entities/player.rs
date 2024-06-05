@@ -66,7 +66,7 @@ impl LdtkEntity for PlayerBundle {
             SHEET_1_COLUMNS,
             SHEET_1_ROWS,
             None,
-            64.,
+            Vec2::ONE * 64.,
             texture_atlasses,
         );
 

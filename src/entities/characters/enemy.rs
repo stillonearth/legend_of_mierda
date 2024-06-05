@@ -34,6 +34,7 @@ pub enum EnemyType {
     #[default]
     Mierda,
     Pendejo,
+    Psychiatrist,
 }
 
 #[derive(Clone, PartialEq, Debug, Default, Component, Reflect)]
@@ -89,7 +90,7 @@ pub fn create_enemy_bundle(
                 5,
                 1,
                 None,
-                16.,
+                Vec2::ONE * 16.,
                 texture_atlasses,
             ),
             AnimatedCharacterType::NotAnimated,
@@ -106,12 +107,24 @@ pub fn create_enemy_bundle(
                     SHEET_1_COLUMNS,
                     SHEET_1_ROWS,
                     None,
-                    64.,
+                    Vec2::ONE * 64.,
                     texture_atlasses,
                 ),
                 *spritesheet_type,
             )
         }
+        EnemyType::Psychiatrist => (
+            load_texture_atlas(
+                PSYCHIATRIST_ASSET_SHEET.to_string(),
+                asset_server,
+                1,
+                1,
+                None,
+                Vec2::new(32., 16.),
+                texture_atlasses,
+            ),
+            AnimatedCharacterType::NotAnimated,
+        ),
     };
 
     let sprite_bundle = SpriteSheetBundle {
@@ -298,6 +311,7 @@ pub fn handle_enemy_hit(
             let damage = match enemy.enemy_type {
                 EnemyType::Mierda => (1.0 * event.damage as f32) as u8,
                 EnemyType::Pendejo => (0.5 * event.damage as f32) as u8,
+                EnemyType::Psychiatrist => (1.0 * event.damage as f32) as u8,
             };
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
@@ -338,6 +352,7 @@ pub fn despawn_dead_enemies(
         enemy.marked_for_despawn = true;
         score.score += match enemy.enemy_type {
             EnemyType::Mierda => 100,
+            EnemyType::Psychiatrist => 5000,
             EnemyType::Pendejo => 50,
         };
 

@@ -10,8 +10,8 @@
 	},
 	"iid": "a3386460-7820-11ed-b6fd-157a63b4d02d",
 	"jsonVersion": "1.5.3",
-	"appBuildId": 473703,
-	"nextUid": 229,
+	"appBuildId": 475928,
+	"nextUid": 232,
 	"identifierStyle": "Capitalize",
 	"toc": [
 		{
@@ -73,6 +73,21 @@
 				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
 				"entityIid": "8ee89370-8990-11ee-b898-d15885d355ef"
 			}, "worldX": 543, "worldY": 273, "widPx": 8, "heiPx": 8, "fields" : {} }]
+		},
+		{
+			"identifier": "Psychiatrist",
+			"instances": [{
+				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+				"entityIid": "9c94c930-fec0-11ee-91ea-c39aba4200e5"
+			}],
+			"instancesData": [{ "iids": {
+				"worldIid": "c9ef2d10-c640-11ed-ad34-f553e1d803f9",
+				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
+				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
+				"entityIid": "9c94c930-fec0-11ee-91ea-c39aba4200e5"
+			}, "worldX": 376, "worldY": 232, "widPx": 16, "heiPx": 16, "fields" : {} }]
 		}
 	],
 	"worldLayout": null,
@@ -1228,6 +1243,82 @@
 			"pivotX": 0.5,
 			"pivotY": 0.5,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "Psychiatrist",
+			"uid": 229,
+			"tags": ["actor"],
+			"exportToToc": true,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 16,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#03CB7C",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 104,
+			"tileRenderMode": "Stretch",
+			"tileRect": { "tilesetUid": 104, "x": 80, "y": 240, "w": 16, "h": 16 },
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0.5,
+			"pivotY": 0.5,
+			"fieldDefs": [
+				{
+					"identifier": "is_dummy",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 230,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ true ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		}
 	], "tilesets": [
 		{
@@ -1487,6 +1578,25 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "6655" }
+		},
+		{
+			"__cWid": 1,
+			"__cHei": 3,
+			"identifier": "Psychiatrist",
+			"uid": 231,
+			"relPath": "../sprites/psychiatrist.png",
+			"embedAtlas": null,
+			"pxWid": 15,
+			"pxHei": 32,
+			"tileGridSize": 15,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "001", "averageColors": "c854bccc0000" }
 		}
 	], "enums": [{ "identifier": "Item", "uid": 66, "values": [], "iconTilesetUid": 104, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [
 		{
@@ -1861,6 +1971,22 @@
 							"fieldInstances": [],
 							"__worldX": 472,
 							"__worldY": 120
+						},
+						{
+							"__identifier": "Psychiatrist",
+							"__grid": [7,14],
+							"__pivot": [0.5,0.5],
+							"__tags": ["actor"],
+							"__tile": { "tilesetUid": 104, "x": 80, "y": 240, "w": 16, "h": 16 },
+							"__smartColor": "#03CB7C",
+							"iid": "9c94c930-fec0-11ee-91ea-c39aba4200e5",
+							"width": 16,
+							"height": 16,
+							"defUid": 229,
+							"px": [120,232],
+							"fieldInstances": [{ "__identifier": "is_dummy", "__type": "Bool", "__value": true, "__tile": null, "defUid": 230, "realEditorValues": [] }],
+							"__worldX": 376,
+							"__worldY": 232
 						}
 					]
 				},

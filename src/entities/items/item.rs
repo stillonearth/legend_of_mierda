@@ -70,7 +70,7 @@ pub fn create_item_bundle(
             1,
             1,
             None,
-            16.,
+            Vec2::ONE * 16.,
             texture_atlasses,
         ),
         ItemType::Biboran => load_texture_atlas(
@@ -79,7 +79,7 @@ pub fn create_item_bundle(
             1,
             1,
             None,
-            32.,
+            Vec2::ONE * 32.,
             texture_atlasses,
         ),
     };

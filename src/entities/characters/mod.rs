@@ -3,6 +3,7 @@ use bevy::prelude::*;
 pub mod enemy;
 pub mod mierda;
 pub mod pendejo;
+pub mod psychiatrist;
 
 pub struct CharactersPlugin;
 
@@ -18,6 +19,7 @@ impl Plugin for CharactersPlugin {
             enemy::EnemyPlugin,
             mierda::MierdaPlugin,
             pendejo::PendejoPlugin,
+            psychiatrist::PsychiatristPlugin,
         ));
     }
 }

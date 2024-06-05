@@ -14,6 +14,7 @@ pub enum WaveEntry {
     Pizza { count: usize },
     Pendejo { count: usize },
     Biboran { count: usize },
+    Boss { count: usize },
 }
 
 #[derive(Clone)]
@@ -198,6 +199,12 @@ pub fn event_wave(
                     item_type: ItemType::Biboran,
                 });
             }
+            WaveEntry::Boss { count } => {
+                ev_enemy_spawn.send(SpawnEnemyEvent {
+                    count: count as u32,
+                    enemy_type: EnemyType::Psychiatrist,
+                });
+            }
         }
 
         gameplay_state.wave_event_timer = Timer::new(
@@ -230,7 +237,7 @@ pub fn ui_wave_info_text(
 pub fn get_level_1_waves() -> Vec<Wave> {
     vec![
         Wave {
-            events: vec![WaveEntry::Pizza { count: 0 }],
+            events: vec![WaveEntry::Boss { count: 1 }],
             event_duration: Duration::from_secs(100),
             wave_duration: Duration::from_secs(100),
         },

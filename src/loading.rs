@@ -9,7 +9,7 @@ pub struct LoadingPlugin;
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
         app.add_loading_state(
-            LoadingState::new(GameState::Loading).continue_to_state(GameState::Splash),
+            LoadingState::new(GameState::Loading).continue_to_state(GameState::GamePlay),
         );
 
         app.add_collection_to_loading_state::<_, AudioAssets>(GameState::Loading);
@@ -157,6 +157,7 @@ pub struct CharacterSpritesheets {
     pub mierda_atlas: Handle<TextureAtlas>,
     pub pendejo_atlas_1: Handle<TextureAtlas>,
     pub pendejo_atlas_2: Handle<TextureAtlas>,
+    pub psychiatrist_atlas: Handle<TextureAtlas>,
 }
 
 impl FromWorld for CharacterSpritesheets {
@@ -175,7 +176,7 @@ impl FromWorld for CharacterSpritesheets {
             SHEET_1_COLUMNS,
             SHEET_1_ROWS,
             None,
-            64.,
+            Vec2::ONE * 64.,
             texture_atlasses,
         );
 
@@ -185,7 +186,7 @@ impl FromWorld for CharacterSpritesheets {
             SHEET_1_COLUMNS,
             SHEET_1_ROWS,
             None,
-            64.,
+            Vec2::ONE * 64.,
             texture_atlasses,
         );
 
@@ -195,7 +196,7 @@ impl FromWorld for CharacterSpritesheets {
             SHEET_1_COLUMNS,
             SHEET_1_ROWS,
             None,
-            64.,
+            Vec2::ONE * 64.,
             texture_atlasses,
         );
 
@@ -205,7 +206,7 @@ impl FromWorld for CharacterSpritesheets {
             SHEET_2_COLUMNS,
             SHEET_2_ROWS,
             None,
-            64. * 3.,
+            Vec2::ONE * 64. * 3.,
             texture_atlasses,
         );
 
@@ -215,7 +216,17 @@ impl FromWorld for CharacterSpritesheets {
             5,
             1,
             None,
-            16.0,
+            Vec2::ONE * 16.0,
+            texture_atlasses,
+        );
+
+        let psychiatrist_atlas = load_texture_atlas(
+            PSYCHIATRIST_ASSET_SHEET.to_string(),
+            asset_server,
+            1,
+            1,
+            None,
+            Vec2::new(32., 16.),
             texture_atlasses,
         );
 
@@ -225,6 +236,7 @@ impl FromWorld for CharacterSpritesheets {
             mierda_atlas,
             pendejo_atlas_1,
             pendejo_atlas_2,
+            psychiatrist_atlas,
         }
     }
 }
@@ -235,14 +247,14 @@ pub fn load_texture_atlas(
     sheet_columns: usize,
     sheet_rows: usize,
     padding: Option<Vec2>,
-    sprite_size: f32,
+    sprite_size: Vec2,
     texture_atlasses: &mut Assets<TextureAtlas>,
 ) -> Handle<TextureAtlas> {
     let texture_handle = asset_server.load(path);
 
     let atlas = TextureAtlas::from_grid(
         texture_handle,
-        Vec2::ONE * sprite_size,
+        sprite_size,
         sheet_columns,
         sheet_rows,
         padding,
