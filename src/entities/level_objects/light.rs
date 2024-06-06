@@ -160,7 +160,7 @@ pub fn setup_light(
     //     commands.spawn((
     //         OmniLightSource2D {
     //             intensity: 1.0,
-    //             color: Color::rgb_u8(255, 255, 255),
+    //             color: Color::rgb_u16(255, 255, 255),
     //             falloff: Vec3::new(1.5, 5.0, 0.05),
     //             ..default()
     //         },

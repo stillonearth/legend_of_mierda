@@ -87,7 +87,7 @@
 				"levelIid": "d53f9950-c640-11ed-8430-4942c04951ff",
 				"layerIid": "d53f9951-c640-11ed-8430-3f3f71a3daf1",
 				"entityIid": "9c94c930-fec0-11ee-91ea-c39aba4200e5"
-			}, "worldX": 376, "worldY": 232, "widPx": 16, "heiPx": 16, "fields" : {} }]
+			}, "worldX": 376, "worldY": 232, "widPx": 64, "heiPx": 32, "fields" : {} }]
 		}
 	],
 	"worldLayout": null,
@@ -1251,8 +1251,8 @@
 			"exportToToc": true,
 			"allowOutOfBounds": false,
 			"doc": null,
-			"width": 16,
-			"height": 16,
+			"width": 64,
+			"height": 32,
 			"resizableX": false,
 			"resizableY": false,
 			"minWidth": null,
@@ -1267,9 +1267,9 @@
 			"color": "#03CB7C",
 			"renderMode": "Tile",
 			"showName": true,
-			"tilesetId": 104,
+			"tilesetId": 231,
 			"tileRenderMode": "Stretch",
-			"tileRect": { "tilesetUid": 104, "x": 80, "y": 240, "w": 16, "h": 16 },
+			"tileRect": { "tilesetUid": 231, "x": 0, "y": 0, "w": 32, "h": 32 },
 			"uiTileRect": null,
 			"nineSliceBorders": [],
 			"maxCount": 0,
@@ -1581,14 +1581,14 @@
 		},
 		{
 			"__cWid": 1,
-			"__cHei": 3,
+			"__cHei": 1,
 			"identifier": "Psychiatrist",
 			"uid": 231,
 			"relPath": "../sprites/psychiatrist.png",
 			"embedAtlas": null,
-			"pxWid": 15,
+			"pxWid": 32,
 			"pxHei": 32,
-			"tileGridSize": 15,
+			"tileGridSize": 32,
 			"spacing": 0,
 			"padding": 0,
 			"tags": [],
@@ -1596,7 +1596,7 @@
 			"enumTags": [],
 			"customData": [],
 			"savedSelections": [],
-			"cachedPixelData": { "opaqueTiles": "001", "averageColors": "c854bccc0000" }
+			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "ba88" }
 		}
 	], "enums": [{ "identifier": "Item", "uid": 66, "values": [], "iconTilesetUid": 104, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [
 		{
@@ -1977,11 +1977,11 @@
 							"__grid": [7,14],
 							"__pivot": [0.5,0.5],
 							"__tags": ["actor"],
-							"__tile": { "tilesetUid": 104, "x": 80, "y": 240, "w": 16, "h": 16 },
+							"__tile": { "tilesetUid": 231, "x": 0, "y": 0, "w": 32, "h": 32 },
 							"__smartColor": "#03CB7C",
 							"iid": "9c94c930-fec0-11ee-91ea-c39aba4200e5",
-							"width": 16,
-							"height": 16,
+							"width": 64,
+							"height": 32,
 							"defUid": 229,
 							"px": [120,232],
 							"fieldInstances": [{ "__identifier": "is_dummy", "__type": "Bool", "__value": true, "__tile": null, "defUid": 230, "realEditorValues": [] }],
@@ -2029,7 +2029,8 @@
 						{ "px": [364,234], "src": [0,0], "f": 0, "t": 0, "d": [194], "a": 1 },
 						{ "px": [78,338], "src": [0,0], "f": 0, "t": 0, "d": [263], "a": 1 },
 						{ "px": [104,338], "src": [0,0], "f": 0, "t": 0, "d": [264], "a": 1 },
-						{ "px": [364,338], "src": [0,0], "f": 0, "t": 0, "d": [274], "a": 1 }
+						{ "px": [364,338], "src": [0,0], "f": 0, "t": 0, "d": [274], "a": 1 },
+						{ "px": [364,442], "src": [0,0], "f": 0, "t": 0, "d": [354], "a": 1 }
 					],
 					"entityInstances": []
 				},

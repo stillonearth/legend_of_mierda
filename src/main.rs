@@ -74,7 +74,7 @@ fn main() {
                     filter: "info,wgpu_core=warn,wgpu_hal=warn,legend_of_mierda=debug,bevy_animation=error,bevy_gltf=error".into(),
                     level: bevy::log::Level::DEBUG,
                 }),
-            AudioPlugin, PostProcessPlugin))
+            AudioPlugin, /*PostProcessPlugin*/))
         .add_plugins((HookPlugin, PecsPlugin, TweeningPlugin, BevyMagicLight2DPlugin))
         .add_plugins((LoadingPlugin, MenuPlugin, CutscenePlugin, LegendOfMierdaPlugin))
         .add_plugins(audio::InternalAudioPlugin)

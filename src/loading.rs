@@ -226,7 +226,7 @@ impl FromWorld for CharacterSpritesheets {
             1,
             1,
             None,
-            Vec2::new(32., 16.),
+            Vec2::new(32., 32.),
             texture_atlasses,
         );
 

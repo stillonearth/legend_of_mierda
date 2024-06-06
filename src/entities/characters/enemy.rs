@@ -41,7 +41,7 @@ pub enum EnemyType {
 pub struct Enemy {
     pub enemy_type: EnemyType,
     pub move_direction: Vec2,
-    pub health: u8,
+    pub health: u16,
     pub hit_at: Option<Timer>,
     pub is_dummy: bool,
     pub marked_for_despawn: bool,
@@ -120,7 +120,7 @@ pub fn create_enemy_bundle(
                 1,
                 1,
                 None,
-                Vec2::new(32., 16.),
+                128. * Vec2::ONE,
                 texture_atlasses,
             ),
             AnimatedCharacterType::NotAnimated,
@@ -173,7 +173,7 @@ pub fn create_enemy_bundle(
 #[derive(Event, Clone)]
 pub struct EnemyHitEvent {
     pub entity: Entity,
-    pub damage: u8,
+    pub damage: u16,
 }
 
 #[derive(Event, Clone)]
@@ -261,7 +261,11 @@ pub fn handle_spawn_enemy(
                         commands.entity(new_entity).insert(Enemy {
                             enemy_type: ev_spawn.enemy_type,
                             is_dummy: false,
-                            health: 100,
+                            health: match ev_spawn.enemy_type {
+                                EnemyType::Mierda => 50,
+                                EnemyType::Pendejo => 100,
+                                EnemyType::Psychiatrist => 5000,
+                            },
                             move_direction: Vec2::ZERO,
                             hit_at: None,
                             marked_for_despawn: false,
@@ -309,14 +313,14 @@ pub fn handle_enemy_hit(
             enemy_velocity.linvel.y += vector_attack.y * 200.;
 
             let damage = match enemy.enemy_type {
-                EnemyType::Mierda => (1.0 * event.damage as f32) as u8,
-                EnemyType::Pendejo => (0.5 * event.damage as f32) as u8,
-                EnemyType::Psychiatrist => (1.0 * event.damage as f32) as u8,
+                EnemyType::Mierda => (1.0 * event.damage as f32) as u16,
+                EnemyType::Pendejo => (0.5 * event.damage as f32) as u16,
+                EnemyType::Psychiatrist => (1.0 * event.damage as f32) as u16,
             };
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
             enemy.hit_at = Some(timer.clone());
-            enemy.health -= u8::min(damage, enemy.health);
+            enemy.health -= u16::min(damage, enemy.health);
 
             if !hit_sound_played {
                 audio.play(audio_assets.hit.clone()).with_volume(0.05);

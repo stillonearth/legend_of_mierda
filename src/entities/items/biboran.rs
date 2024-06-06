@@ -282,7 +282,7 @@ fn biboran_holy_effect(
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
             mierda.hit_at = Some(timer.clone());
-            mierda.health -= u8::min(damage, mierda.health);
+            mierda.health -= u16::min(damage, mierda.health);
 
             commands.entity(mierda_entity).insert(FlashingTimer {
                 timer: timer.clone(),
@@ -299,7 +299,7 @@ fn biboran_holy_effect(
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
             enemy.hit_at = Some(timer.clone());
-            enemy.health -= u8::min(damage, enemy.health);
+            enemy.health -= u16::min(damage, enemy.health);
 
             commands.entity(enemy_entity).insert(FlashingTimer {
                 timer: timer.clone(),

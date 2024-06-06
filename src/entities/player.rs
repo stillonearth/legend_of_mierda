@@ -18,7 +18,7 @@ use super::characters::enemy::{Enemy, EnemyHitEvent};
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component, Reflect)]
 pub struct Player {
-    pub health: u8,
+    pub health: u16,
 }
 
 #[derive(Default, Bundle)]
