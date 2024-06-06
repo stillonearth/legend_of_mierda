@@ -113,18 +113,25 @@ pub fn create_enemy_bundle(
                 *spritesheet_type,
             )
         }
-        EnemyType::Psychiatrist => (
-            load_texture_atlas(
-                PSYCHIATRIST_ASSET_SHEET.to_string(),
-                asset_server,
-                1,
-                1,
-                None,
-                128. * Vec2::ONE,
-                texture_atlasses,
-            ),
-            AnimatedCharacterType::NotAnimated,
-        ),
+        EnemyType::Psychiatrist => {
+            let psychiatrist_sprite_sheet = if rand::random::<u8>() % 2 == 0 {
+                PSYCHIATRIST_1_ASSET_SHEET
+            } else {
+                PSYCHIATRIST_2_ASSET_SHEET
+            };
+            (
+                load_texture_atlas(
+                    psychiatrist_sprite_sheet.to_string(),
+                    asset_server,
+                    1,
+                    1,
+                    None,
+                    128. * Vec2::ONE,
+                    texture_atlasses,
+                ),
+                AnimatedCharacterType::NotAnimated,
+            )
+        }
     };
 
     let sprite_bundle = SpriteSheetBundle {

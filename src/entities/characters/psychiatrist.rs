@@ -45,14 +45,12 @@ impl LdtkEntity for PsychiatristBundle {
             .get_bool_field("is_dummy")
             .expect("expected entity to have non-nullable name string field");
 
-        let mut enemy_bundle = create_enemy_bundle(
+        let enemy_bundle = create_enemy_bundle(
             asset_server,
             texture_atlasses,
             is_dummy,
             EnemyType::Psychiatrist,
         );
-
-        // enemy_bundle.collider_bundle.collider = Collider::cuboid(512., 512.);
 
         PsychiatristBundle {
             spritesheet_bundle: enemy_bundle.spritesheet_bundle,

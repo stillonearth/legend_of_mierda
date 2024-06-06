@@ -106,7 +106,7 @@ fn inject_rotating_pill_sprite(
             parent.spawn((
                 RotatingPillBundle {
                     sprite_bundle: SpriteBundle {
-                        visibility: Visibility::Visible,
+                        visibility: Visibility::Hidden,
                         texture: static_sprite_assets.pill.clone(),
                         transform: Transform::from_translation(Vec3::new(0.0, 0., 0.))
                             .with_scale(Vec3::ONE * 2.0),
@@ -262,7 +262,7 @@ fn handle_arrow_timers(
                                 color: Color::rgba(0.3, 0.0, 0.0, 0.5),
                                 ..default()
                             },
-                            texture: static_sprite_assets.speargun_arrow.clone(),
+                            texture: static_sprite_assets.pill.clone(),
                             transform: *transform,
                             ..default()
                         },
@@ -270,7 +270,7 @@ fn handle_arrow_timers(
                         timer_despawn,
                     },
                     ZIndex::Local(105),
-                    Name::new("speargun arrow trail"),
+                    Name::new("pill trail"),
                 ));
             });
         }

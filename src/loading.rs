@@ -159,7 +159,7 @@ pub struct CharacterSpritesheets {
     pub mierda_atlas: Handle<TextureAtlas>,
     pub pendejo_atlas_1: Handle<TextureAtlas>,
     pub pendejo_atlas_2: Handle<TextureAtlas>,
-    pub psychiatrist_atlas: Handle<TextureAtlas>,
+    // pub psychiatrist_atlas: Handle<TextureAtlas>,
 }
 
 impl FromWorld for CharacterSpritesheets {
@@ -222,15 +222,15 @@ impl FromWorld for CharacterSpritesheets {
             texture_atlasses,
         );
 
-        let psychiatrist_atlas = load_texture_atlas(
-            PSYCHIATRIST_ASSET_SHEET.to_string(),
-            asset_server,
-            1,
-            1,
-            None,
-            Vec2::new(32., 32.),
-            texture_atlasses,
-        );
+        // let psychiatrist_atlas = load_texture_atlas(
+        //     PSYCHIATRIST_ASSET_SHEET.to_string(),
+        //     asset_server,
+        //     1,
+        //     1,
+        //     None,
+        //     Vec2::new(32., 32.),
+        //     texture_atlasses,
+        // );
 
         CharacterSpritesheets {
             player_atlas_1,
@@ -238,7 +238,7 @@ impl FromWorld for CharacterSpritesheets {
             mierda_atlas,
             pendejo_atlas_1,
             pendejo_atlas_2,
-            psychiatrist_atlas,
+            // psychiatrist_atlas,
         }
     }
 }
