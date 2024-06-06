@@ -96,7 +96,7 @@ pub fn psychiatrist_activity(
                 - psychiatrist.move_direction.y * rotation_angle.sin(),
             psychiatrist.move_direction.x * rotation_angle.sin()
                 + psychiatrist.move_direction.y * rotation_angle.cos(),
-        ) * 50.0;
+        ) * 100.0;
     }
 }
 

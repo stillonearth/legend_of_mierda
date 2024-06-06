@@ -10,7 +10,6 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy_magic_light_2d::SpriteCamera;
 use bevy_rapier2d::geometry::Collider;
-use bevy_rapier2d::na::ComplexField;
 use bevy_rapier2d::prelude::*;
 
 // ----------
@@ -126,7 +125,7 @@ fn handle_speargun_attack_event(
     for _ in ev_arrow_attack.read() {
         for (speargun_transform, _) in q_spearguns.iter() {
             for (_, parent, player_transform, _) in q_players.iter() {
-                commands.entity(parent.get()).with_children(|parent_| {
+                commands.entity(parent.get()).with_children(|parent| {
                     let timer_despawn = SpeargunArrowDespawnTimer(Timer::new(
                         Duration::from_secs_f32(1.0),
                         TimerMode::Repeating,
@@ -142,7 +141,7 @@ fn handle_speargun_attack_event(
                         + 32.0 * Vec3::new(z_rot.cos(), z_rot.sin(), 0.0);
                     let arrow_velocity = 350.0;
 
-                    parent_.spawn((
+                    parent.spawn((
                         SpeargunArrowBundle {
                             sprite_bundle: SpriteBundle {
                                 texture: static_sprite_assets.speargun_arrow.clone(),

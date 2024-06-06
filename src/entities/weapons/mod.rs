@@ -1,3 +1,4 @@
+pub mod pill;
 pub mod speargun;
 pub mod weapon_arrow;
 
@@ -10,6 +11,7 @@ impl Plugin for WeaponsPlugin {
         app.add_plugins((
             // weapon_arrow::WeaponArrowPlugin,
             speargun::WeaponSpeargunPlugin,
+            pill::WeaponPillPlugin,
         ));
     }
 }
