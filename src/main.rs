@@ -20,7 +20,7 @@ use pecs::prelude::*;
 use cutscene::*;
 use loading::*;
 use menu::*;
-use postprocessing::{PostProcessPlugin, PostProcessSettings};
+use postprocessing::{PostProcessSettings};
 
 mod audio;
 mod controls;

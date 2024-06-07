@@ -315,11 +315,7 @@ fn rotate_speargun(
     for (mut transform, mut sprite, _) in q_speargun.iter_mut() {
         transform.rotation = Quat::from_rotation_z(angle);
 
-        if angle.abs() >= FRAC_PI_2 {
-            sprite.flip_y = true;
-        } else {
-            sprite.flip_y = false;
-        }
+        sprite.flip_y = angle.abs() >= FRAC_PI_2;
     }
 }
 
