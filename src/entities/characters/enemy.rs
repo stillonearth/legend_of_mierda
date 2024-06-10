@@ -34,7 +34,8 @@ pub enum EnemyType {
     #[default]
     Mierda,
     Pendejo,
-    Psychiatrist,
+    Psychiatrist1,
+    Psychiatrist2,
 }
 
 #[derive(Clone, PartialEq, Debug, Default, Component, Reflect)]
@@ -113,25 +114,30 @@ pub fn create_enemy_bundle(
                 *spritesheet_type,
             )
         }
-        EnemyType::Psychiatrist => {
-            let psychiatrist_sprite_sheet = if rand::random::<u8>() % 2 == 0 {
-                PSYCHIATRIST_1_ASSET_SHEET
-            } else {
-                PSYCHIATRIST_2_ASSET_SHEET
-            };
-            (
-                load_texture_atlas(
-                    psychiatrist_sprite_sheet.to_string(),
-                    asset_server,
-                    1,
-                    1,
-                    None,
-                    128. * Vec2::ONE,
-                    texture_atlasses,
-                ),
-                AnimatedCharacterType::NotAnimated,
-            )
-        }
+        EnemyType::Psychiatrist1 => (
+            load_texture_atlas(
+                PSYCHIATRIST_1_ASSET_SHEET.to_string(),
+                asset_server,
+                1,
+                1,
+                None,
+                128. * Vec2::ONE,
+                texture_atlasses,
+            ),
+            AnimatedCharacterType::NotAnimated,
+        ),
+        EnemyType::Psychiatrist2 => (
+            load_texture_atlas(
+                PSYCHIATRIST_2_ASSET_SHEET.to_string(),
+                asset_server,
+                1,
+                1,
+                None,
+                128. * Vec2::ONE,
+                texture_atlasses,
+            ),
+            AnimatedCharacterType::NotAnimated,
+        ),
     };
 
     let sprite_bundle = SpriteSheetBundle {
@@ -271,7 +277,8 @@ pub fn handle_spawn_enemy(
                             health: match ev_spawn.enemy_type {
                                 EnemyType::Mierda => 50,
                                 EnemyType::Pendejo => 100,
-                                EnemyType::Psychiatrist => 5000,
+                                EnemyType::Psychiatrist1 => 5000,
+                                EnemyType::Psychiatrist2 => 5000,
                             },
                             move_direction: Vec2::ZERO,
                             hit_at: None,
@@ -322,7 +329,8 @@ pub fn handle_enemy_hit(
             let damage = match enemy.enemy_type {
                 EnemyType::Mierda => (1.0 * event.damage as f32) as u16,
                 EnemyType::Pendejo => (0.5 * event.damage as f32) as u16,
-                EnemyType::Psychiatrist => (1.0 * event.damage as f32) as u16,
+                EnemyType::Psychiatrist1 => (1.0 * event.damage as f32) as u16,
+                EnemyType::Psychiatrist2 => (1.0 * event.damage as f32) as u16,
             };
 
             let timer = Timer::new(std::time::Duration::from_millis(200), TimerMode::Once);
@@ -363,7 +371,8 @@ pub fn despawn_dead_enemies(
         enemy.marked_for_despawn = true;
         score.score += match enemy.enemy_type {
             EnemyType::Mierda => 100,
-            EnemyType::Psychiatrist => 5000,
+            EnemyType::Psychiatrist1 => 5000,
+            EnemyType::Psychiatrist2 => 5000,
             EnemyType::Pendejo => 50,
         };
 

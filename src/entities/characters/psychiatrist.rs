@@ -17,7 +17,19 @@ use super::enemy::{create_enemy_bundle, DirectionUpdateTime, Enemy, EnemyType};
 // --------
 
 #[derive(Default, Bundle, Clone)]
-pub struct PsychiatristBundle {
+pub struct Psychiatrist1Bundle {
+    pub spritesheet_bundle: SpriteSheetBundle,
+    pub character_animation: CharacterAnimation,
+    pub animation_timer: AnimationTimer,
+    pub enemy: Enemy,
+    pub collider_bundle: ColliderBundle,
+    pub active_events: ActiveEvents,
+    pub direction_update_time: DirectionUpdateTime,
+    pub animated_character_sprite: AnimatedCharacterSprite,
+}
+
+#[derive(Default, Bundle, Clone)]
+pub struct Psychiatrist2Bundle {
     pub spritesheet_bundle: SpriteSheetBundle,
     pub character_animation: CharacterAnimation,
     pub animation_timer: AnimationTimer,
@@ -32,7 +44,7 @@ pub struct PsychiatristBundle {
 // LDTK
 // ----
 
-impl LdtkEntity for PsychiatristBundle {
+impl LdtkEntity for Psychiatrist1Bundle {
     fn bundle_entity(
         entity_instance: &EntityInstance,
         _: &LayerInstance,
@@ -40,7 +52,7 @@ impl LdtkEntity for PsychiatristBundle {
         _: Option<&TilesetDefinition>,
         asset_server: &AssetServer,
         texture_atlasses: &mut Assets<TextureAtlas>,
-    ) -> PsychiatristBundle {
+    ) -> Psychiatrist1Bundle {
         let is_dummy = *entity_instance
             .get_bool_field("is_dummy")
             .expect("expected entity to have non-nullable name string field");
@@ -49,10 +61,43 @@ impl LdtkEntity for PsychiatristBundle {
             asset_server,
             texture_atlasses,
             is_dummy,
-            EnemyType::Psychiatrist,
+            EnemyType::Psychiatrist1,
         );
 
-        PsychiatristBundle {
+        Psychiatrist1Bundle {
+            spritesheet_bundle: enemy_bundle.spritesheet_bundle,
+            character_animation: enemy_bundle.character_animation,
+            animation_timer: enemy_bundle.animation_timer,
+            enemy: enemy_bundle.enemy,
+            collider_bundle: enemy_bundle.collider_bundle,
+            active_events: enemy_bundle.active_events,
+            direction_update_time: enemy_bundle.direction_update_time,
+            animated_character_sprite: enemy_bundle.animated_character_sprite,
+        }
+    }
+}
+
+impl LdtkEntity for Psychiatrist2Bundle {
+    fn bundle_entity(
+        entity_instance: &EntityInstance,
+        _: &LayerInstance,
+        _: Option<&Handle<Image>>,
+        _: Option<&TilesetDefinition>,
+        asset_server: &AssetServer,
+        texture_atlasses: &mut Assets<TextureAtlas>,
+    ) -> Psychiatrist2Bundle {
+        let is_dummy = *entity_instance
+            .get_bool_field("is_dummy")
+            .expect("expected entity to have non-nullable name string field");
+
+        let enemy_bundle = create_enemy_bundle(
+            asset_server,
+            texture_atlasses,
+            is_dummy,
+            EnemyType::Psychiatrist2,
+        );
+
+        Psychiatrist2Bundle {
             spritesheet_bundle: enemy_bundle.spritesheet_bundle,
             character_animation: enemy_bundle.character_animation,
             animation_timer: enemy_bundle.animation_timer,
@@ -76,7 +121,9 @@ pub fn psychiatrist_activity(
     for (mut v, mut psychiatrist) in q_psychiatrists
         .iter_mut()
         .filter(|(_, m)| !m.is_dummy)
-        .filter(|(_, m)| m.enemy_type == EnemyType::Psychiatrist)
+        .filter(|(_, m)| {
+            m.enemy_type == EnemyType::Psychiatrist1 || m.enemy_type == EnemyType::Psychiatrist2
+        })
     {
         let rotation_angle = time.elapsed_seconds().cos() * std::f32::consts::FRAC_PI_4;
 
@@ -117,7 +164,9 @@ pub fn update_psychiatrists_move_direction(
     for (psychiatrist_position, mut direction_update_timer, mut psychiatrist) in los_pendejos
         .iter_mut()
         .filter(|(_, _, p)| !p.is_dummy)
-        .filter(|(_, _, p)| p.enemy_type == EnemyType::Psychiatrist)
+        .filter(|(_, _, p)| {
+            p.enemy_type == EnemyType::Psychiatrist1 || p.enemy_type == EnemyType::Psychiatrist2
+        })
     {
         direction_update_timer.timer.tick(time.delta());
 
@@ -140,7 +189,8 @@ pub struct PsychiatristPlugin;
 
 impl Plugin for PsychiatristPlugin {
     fn build(&self, app: &mut App) {
-        app.register_ldtk_entity::<PsychiatristBundle>("Psychiatrist")
+        app.register_ldtk_entity::<Psychiatrist1Bundle>("Psychiatrist1")
+            .register_ldtk_entity::<Psychiatrist2Bundle>("Psychiatrist2")
             // Event Handlers
             .add_systems(
                 Update,

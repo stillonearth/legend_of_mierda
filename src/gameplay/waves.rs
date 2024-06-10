@@ -202,7 +202,11 @@ pub fn event_wave(
             WaveEntry::Boss { count } => {
                 ev_enemy_spawn.send(SpawnEnemyEvent {
                     count: count as u32,
-                    enemy_type: EnemyType::Psychiatrist,
+                    enemy_type: EnemyType::Psychiatrist1,
+                });
+                ev_enemy_spawn.send(SpawnEnemyEvent {
+                    count: count as u32,
+                    enemy_type: EnemyType::Psychiatrist2,
                 });
             }
         }
@@ -222,13 +226,13 @@ pub fn ui_wave_info_text(
         let wave_seconds_left =
             (gameplay_state.wave_timer.duration() - gameplay_state.wave_timer.elapsed()).as_secs();
         let current_wave = gameplay_state.wave_number.unwrap_or(0) + 1;
-        let wave_events_in_queue = gameplay_state.event_queue.len();
-        let next_wave_event_in = (gameplay_state.wave_event_timer.duration()
+        let _wave_events_in_queue = gameplay_state.event_queue.len();
+        let _next_wave_event_in = (gameplay_state.wave_event_timer.duration()
             - gameplay_state.wave_event_timer.elapsed())
         .as_secs();
         text.sections[0].value = format!(
-            "Wave: {}\t Next Wave in {} seconds\t Wave Events Left:{}\t Next Wave Event In: {}",
-            current_wave, wave_seconds_left, wave_events_in_queue, next_wave_event_in
+            "Wave: {}\t | {} seconds left",
+            current_wave, wave_seconds_left,
         );
     }
 }
@@ -237,7 +241,7 @@ pub fn ui_wave_info_text(
 pub fn get_level_1_waves() -> Vec<Wave> {
     vec![
         Wave {
-            events: vec![WaveEntry::Boss { count: 2 }],
+            events: vec![WaveEntry::Boss { count: 1 }],
             event_duration: Duration::from_secs(100),
             wave_duration: Duration::from_secs(100),
         },

@@ -20,7 +20,7 @@ use pecs::prelude::*;
 use cutscene::*;
 use loading::*;
 use menu::*;
-use postprocessing::{PostProcessSettings};
+use postprocessing::PostProcessSettings;
 
 mod audio;
 mod controls;
@@ -179,9 +179,11 @@ impl Plugin for LegendOfMierdaPlugin {
                 .run_if(in_state(GameState::GamePlay)),
         )
         // Controls
+        .add_event::<controls::ControlEvent>()
         .add_systems(
             Update,
-            (controls::controls).run_if(in_state(GameState::GamePlay)),
+            (controls::keyboard_controls, controls::control_character)
+                .run_if(in_state(GameState::GamePlay)),
         )
         // Particles
         .add_systems(

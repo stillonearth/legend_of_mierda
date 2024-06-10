@@ -1,7 +1,5 @@
 use bevy::prelude::*;
 
-
-
 #[derive(Component)]
 pub struct UIPlayerHealth;
 
@@ -10,6 +8,9 @@ pub struct UIGameOver;
 
 #[derive(Component)]
 pub struct UIGameplayWave;
+
+#[derive(Component)]
+pub struct UIWeaponName;
 
 #[derive(Component)]
 pub struct UIHighscore;
@@ -95,14 +96,16 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 },))
                 .insert(UIPlayerHealth);
         });
-    // highscore
+
+    // Weapon
+
     commands
         .spawn((
             NodeBundle {
                 style: Style {
                     position_type: PositionType::Absolute,
                     justify_content: JustifyContent::FlexStart,
-                    bottom: Val::Px(35.0),
+                    bottom: Val::Px(25.0),
                     right: Val::Px(10.0),
                     padding: UiRect {
                         right: Val::Px(75.0),
@@ -114,19 +117,55 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..default()
             },
             UIGamePlay,
-            Name::new("highscore"),
+            Name::new("Weapon image"),
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                NodeBundle {
+                    style: Style {
+                        width: Val::Px(320.0),
+                        height: Val::Px(45.0),
+                        // margin: UiRect::top(Val::VMin(5.)),
+                        ..default()
+                    },
+                    background_color: Color::WHITE.into(),
+                    ..default()
+                },
+                UiImage::new(asset_server.load("sprites/speargun.png")),
+            ));
+        });
+
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    justify_content: JustifyContent::FlexStart,
+                    bottom: Val::Px(75.0),
+                    right: Val::Px(20.0),
+                    padding: UiRect {
+                        right: Val::Px(75.0),
+                        ..default()
+                    },
+                    align_items: AlignItems::FlexStart,
+                    ..default()
+                },
+                ..default()
+            },
+            UIGamePlay,
+            Name::new("Weapon name"),
         ))
         .with_children(|parent| {
             parent.spawn((
                 TextBundle::from_section(
-                    "SCORE: 0",
+                    "SPEARGUN level 1",
                     TextStyle {
                         font: asset_server.load("fonts/PixeloidMono-d94EV.ttf"),
-                        font_size: 30.0,
+                        font_size: 20.0,
                         color: Color::WHITE,
                     },
                 ),
-                UIHighscore,
+                UIWeaponName,
             ));
         });
 
@@ -160,6 +199,39 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     },
                 ),
                 UIGameplayWave,
+            ));
+        });
+
+    // Highscore
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Percent(100.0),
+                    position_type: PositionType::Absolute,
+                    justify_content: JustifyContent::FlexEnd,
+                    top: Val::Px(20.0),
+                    right: Val::Px(20.0),
+                    align_items: AlignItems::FlexStart,
+                    ..default()
+                },
+                // visibility: Visibility::Hidden,
+                ..default()
+            },
+            UIGamePlay,
+            Name::new("Wave Text"),
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                TextBundle::from_section(
+                    "SCORE: 0",
+                    TextStyle {
+                        font: asset_server.load("fonts/PixeloidMono-d94EV.ttf"),
+                        font_size: 30.0,
+                        color: Color::WHITE,
+                    },
+                ),
+                UIHighscore,
             ));
         });
 }

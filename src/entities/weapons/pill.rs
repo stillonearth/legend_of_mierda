@@ -85,10 +85,10 @@ fn inject_rotating_pill_sprite(
     q_enemies: Query<(Entity, &Parent, &Transform, &Enemy), Without<RotatingPill>>,
     static_sprite_assets: Res<StaticSpriteAssets>,
 ) {
-    for (entity, _parent, _player_transform, _) in q_enemies
-        .iter()
-        .filter(|(_, _, _, e)| e.enemy_type == EnemyType::Psychiatrist && !e.is_dummy)
-    {
+    for (entity, _parent, _player_transform, _) in q_enemies.iter().filter(|(_, _, _, e)| {
+        (e.enemy_type == EnemyType::Psychiatrist1 || e.enemy_type == EnemyType::Psychiatrist2)
+            && !e.is_dummy
+    }) {
         if q_rotating_pills
             .iter()
             .filter(|(p, _)| p.get() == entity)

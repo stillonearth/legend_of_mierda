@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{ecs::event, prelude::*, time};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_kira_audio::prelude::*;
 use bevy_particle_systems::*;
@@ -6,8 +6,8 @@ use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::{
-    gameover::GameOverEvent, loading::load_texture_atlas, physics::ColliderBundle, sprites::*,
-    ui::UIPlayerHealth, AudioAssets, GameState,
+    controls::ControlEvent, gameover::GameOverEvent, loading::load_texture_atlas,
+    physics::ColliderBundle, sprites::*, ui::UIPlayerHealth, AudioAssets, GameState,
 };
 
 use super::characters::enemy::{Enemy, EnemyHitEvent};
@@ -15,6 +15,9 @@ use super::characters::enemy::{Enemy, EnemyHitEvent};
 // --------
 // Entities
 // --------
+
+#[derive(Component, Deref, DerefMut, Clone, Default, Reflect)]
+pub struct MacheteTimer(pub Timer);
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component, Reflect)]
 pub struct Player {
@@ -31,6 +34,7 @@ pub struct PlayerBundle {
     pub collider_bundle: ColliderBundle,
     pub active_events: ActiveEvents,
     pub name: Name,
+    pub machete_timer: MacheteTimer,
 }
 
 // ----
@@ -87,6 +91,7 @@ impl LdtkEntity for PlayerBundle {
                 animated_character_type: AnimatedCharacterType::Player,
             },
             name: Name::new("Player"),
+            machete_timer: MacheteTimer(Timer::from_seconds(1.0, TimerMode::Repeating)),
         }
     }
 }
@@ -103,6 +108,44 @@ pub struct PlayerAttackEvent {
 #[derive(Event, Clone)]
 pub struct PlayerHitEvent {
     pub entity: Entity,
+}
+
+// -----------
+// Auto Attack
+// -----------
+
+pub fn handle_machete_attack(
+    time: Res<Time>,
+    mut q_player: Query<(Entity, &Transform, &mut MacheteTimer), With<Player>>,
+    mut q_enemies: Query<(Entity, &Transform, &mut Enemy)>,
+    mut ev_control: EventWriter<ControlEvent>,
+) {
+    for (_, transform, mut machete_timer) in q_player.iter_mut() {
+        machete_timer.0.tick(time.delta());
+
+        if machete_timer.just_finished() {
+            let player_position = transform.translation;
+
+            for (entity, mierda_transform, _) in
+                q_enemies.iter_mut().filter(|(_, _, m)| !m.is_dummy)
+            {
+                let mierda_position = mierda_transform.translation;
+
+                let distance = player_position.distance(mierda_position);
+
+                if distance >= 40. {
+                    continue;
+                }
+
+                ev_control.send(ControlEvent {
+                    attack: true,
+                    ..Default::default()
+                });
+
+                return;
+            }
+        }
+    }
 }
 
 // --------------
@@ -126,7 +169,7 @@ pub fn event_player_attack(
         let (_, transform, char_animation) = q_player.get_mut(ev.entity).unwrap();
 
         let player_position = transform.translation;
-        let player_orientation = char_animation.direction;
+        let _player_orientation = char_animation.direction;
 
         audio.play(audio_assets.slash.clone());
 
@@ -141,16 +184,16 @@ pub fn event_player_attack(
             }
 
             // cause damage accrodign to player_orientation
-            let is_enemy_attacked = match player_orientation {
-                AnimationDirection::Up => player_position.y < mierda_position.y,
-                AnimationDirection::Down => player_position.y > mierda_position.y,
-                AnimationDirection::Left => player_position.x > mierda_position.x,
-                AnimationDirection::Right => player_position.x < mierda_position.x,
-            };
+            // let is_enemy_attacked = match player_orientation {
+            //     AnimationDirection::Up => player_position.y < mierda_position.y,
+            //     AnimationDirection::Down => player_position.y > mierda_position.y,
+            //     AnimationDirection::Left => player_position.x > mierda_position.x,
+            //     AnimationDirection::Right => player_position.x < mierda_position.x,
+            // };
 
-            if !is_enemy_attacked {
-                continue;
-            }
+            // if !is_enemy_attacked {
+            //     continue;
+            // }
 
             ev_enemy_hit.send(EnemyHitEvent {
                 entity,
@@ -273,6 +316,7 @@ impl Plugin for PlayerPlugin {
                     event_player_attack,
                     event_player_hit,
                     handle_player_enemy_collisions,
+                    handle_machete_attack,
                 )
                     .run_if(in_state(GameState::GamePlay)),
             );
