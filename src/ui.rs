@@ -97,8 +97,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .insert(UIPlayerHealth);
         });
 
-    // Weapon
-
+    // Weapon - Gun
     commands
         .spawn((
             NodeBundle {
@@ -117,7 +116,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..default()
             },
             UIGamePlay,
-            Name::new("Weapon image"),
+            Name::new("Weapon gun image"),
         ))
         .with_children(|parent| {
             parent.spawn((
@@ -141,7 +140,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                 style: Style {
                     position_type: PositionType::Absolute,
                     justify_content: JustifyContent::FlexStart,
-                    bottom: Val::Px(75.0),
+                    bottom: Val::Px(15.0),
                     right: Val::Px(20.0),
                     padding: UiRect {
                         right: Val::Px(75.0),
@@ -158,7 +157,78 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         .with_children(|parent| {
             parent.spawn((
                 TextBundle::from_section(
-                    "SPEARGUN level 1",
+                    "SPEARGUN LV 1",
+                    TextStyle {
+                        font: asset_server.load("fonts/PixeloidMono-d94EV.ttf"),
+                        font_size: 20.0,
+                        color: Color::WHITE,
+                    },
+                ),
+                UIWeaponName,
+            ));
+        });
+
+    // Weapon - Machete
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    justify_content: JustifyContent::FlexStart,
+                    bottom: Val::Px(100.0),
+                    right: Val::Px(10.0),
+                    padding: UiRect {
+                        right: Val::Px(75.0),
+                        ..default()
+                    },
+                    align_items: AlignItems::FlexStart,
+                    ..default()
+                },
+                ..default()
+            },
+            UIGamePlay,
+            Name::new("Weapon machete  image"),
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                NodeBundle {
+                    style: Style {
+                        width: Val::Px(320.0),
+                        height: Val::Px(45.0),
+                        // margin: UiRect::top(Val::VMin(5.)),
+                        ..default()
+                    },
+                    background_color: Color::WHITE.into(),
+                    ..default()
+                },
+                UiImage::new(asset_server.load("sprites/machete.png")),
+            ));
+        });
+
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    justify_content: JustifyContent::FlexStart,
+                    bottom: Val::Px(85.0),
+                    right: Val::Px(20.0),
+                    padding: UiRect {
+                        right: Val::Px(75.0),
+                        ..default()
+                    },
+                    align_items: AlignItems::FlexStart,
+                    ..default()
+                },
+                ..default()
+            },
+            UIGamePlay,
+            Name::new("Weapon name"),
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                TextBundle::from_section(
+                    "MACHETE LV 1",
                     TextStyle {
                         font: asset_server.load("fonts/PixeloidMono-d94EV.ttf"),
                         font_size: 20.0,

@@ -126,14 +126,12 @@ pub fn handle_machete_attack(
         if machete_timer.just_finished() {
             let player_position = transform.translation;
 
-            for (entity, mierda_transform, _) in
-                q_enemies.iter_mut().filter(|(_, _, m)| !m.is_dummy)
-            {
+            for (_, mierda_transform, _) in q_enemies.iter_mut().filter(|(_, _, m)| !m.is_dummy) {
                 let mierda_position = mierda_transform.translation;
 
                 let distance = player_position.distance(mierda_position);
 
-                if distance >= 40. {
+                if distance >= 45. {
                     continue;
                 }
 
@@ -179,7 +177,7 @@ pub fn event_player_attack(
 
             let distance = player_position.distance(mierda_position);
 
-            if distance >= 40. {
+            if distance >= 45. {
                 continue;
             }
 
