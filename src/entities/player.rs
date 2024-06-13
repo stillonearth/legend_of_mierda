@@ -1,4 +1,4 @@
-use bevy::{ecs::event, prelude::*, time};
+use bevy::{prelude::*};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_kira_audio::prelude::*;
 use bevy_particle_systems::*;
@@ -6,7 +6,7 @@ use bevy_particle_systems::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::{
-    controls::ControlEvent, gameover::GameOverEvent, loading::load_texture_atlas,
+    gameover::GameOverEvent, loading::load_texture_atlas,
     physics::ColliderBundle, sprites::*, ui::UIPlayerHealth, AudioAssets, GameState,
 };
 

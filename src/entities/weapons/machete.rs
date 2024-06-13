@@ -2,16 +2,15 @@ use std::time::Duration;
 
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use bevy_particle_systems::Lerpable;
-use bevy_tweening::{lens::TransformPositionLens, Animator, EaseFunction, Tween};
+
 
 use crate::{
     controls::ControlEvent,
     entities::{
-        characters::enemy::{Enemy, EnemyHitEvent},
         player::Player,
     },
 };
-use crate::{loading::StaticSpriteAssets, GameState};
+use crate::{GameState};
 
 // ----------
 // Components
@@ -102,100 +101,6 @@ fn animate_machete_indicator(
         *material = materials.add(ColorMaterial::from(Color::PURPLE.with_a(percentage)));
     }
 }
-
-// fn animate_arrow(
-//     mut commands: Commands,
-//     mut queries: ParamSet<(
-//         Query<(&Parent, &Transform, &Player)>,
-//         Query<(
-//             Entity,
-//             &mut Transform,
-//             &mut Visibility,
-//             &WeaponArrow,
-//             &mut MacheteIndictorTimer,
-//             &mut WeaponArrowHideTimer,
-//         )>,
-//     )>,
-//     mut ev_arrow_attack: EventWriter<WeaponArrowAttackEvent>,
-//     time: Res<Time>,
-// ) {
-//     if queries.p0().iter().next().is_none() {
-//         return;
-//     }animate_machete_indicator;
-
-//         if timer_activate.0.just_finished() {
-//             *visibility = Visibility::Visible;
-
-//             timer_hide.0.unpause();
-
-//             let end = match arrow {
-//                 WeaponArrow::Right => Vec3::new(55., 0., 0.),
-//                 WeaponArrow::Left => Vec3::new(-55., 0., 0.),
-//             };
-
-//             let tween = Tween::new(
-//                 EaseFunction::QuadraticInOut,
-//                 Duration::from_secs_f32(0.15),
-//                 TransformPositionLens {
-//                     start: match arrow {
-//                         WeaponArrow::Right => Vec3::new(20., 0., 0.),
-//                         WeaponArrow::Left => Vec3::new(-20., 0., 0.),
-//                     },
-//                     end,
-//                 },
-//             );
-
-//             ev_arrow_attack.send(WeaponArrowAttackEvent {});
-//             commands.entity(entity).insert(Animator::new(tween));
-//         }
-
-//         if timer_hide.0.just_finished() {
-//             timer_hide.0.pause();
-//             *visibility = Visibility::Hidden;
-
-//             transform.translation = match arrow {
-//                 WeaponArrow::Right => Vec3::new(20., 0., 0.),
-//                 WeaponArrow::Left => Vec3::new(-20., 0., 0.),
-//             };
-//         }
-//     }
-// }
-
-// fn handle_arrow_attack(
-//     mut arrow_attack_events: EventReader<WeaponArrowAttackEvent>,
-//     mut ev_enemy_hit: EventWriter<EnemyHitEvent>,
-//     mut queries: ParamSet<(
-//         Query<(&Transform, &Player)>,
-//         Query<(Entity, &Transform, &Enemy)>,
-//     )>,
-// ) {
-//     for _ in arrow_attack_events.read() {
-//         if queries.p0().iter().len() == 0 {
-//             return;
-//         }
-
-//         let player_translation = queries.p0().iter().next().unwrap().0.translation;
-
-//         for (e, transfrom, _) in queries.p1().iter() {
-//             let translation = transfrom.translation;
-
-//             if (translation.z - player_translation.z).abs() > 16.0 {
-//                 continue;
-//             }
-
-//             let distance = translation.distance(player_translation).abs();
-
-//             if distance > 40.0 {
-//                 continue;
-//             }
-
-//             ev_enemy_hit.send(EnemyHitEvent {
-//                 entity: e,
-//                 damage: 88,
-//             });
-//         }
-//     }
-// }
 
 // ------
 // Plugin

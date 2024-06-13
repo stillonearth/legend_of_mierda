@@ -237,7 +237,7 @@ pub fn ui_wave_info_text(
     }
 }
 
-// Composition of wave events
+#[allow(dead_code)]
 pub fn get_level_1_waves() -> Vec<Wave> {
     vec![
         Wave {
