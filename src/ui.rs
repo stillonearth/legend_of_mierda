@@ -157,7 +157,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         .with_children(|parent| {
             parent.spawn((
                 TextBundle::from_section(
-                    "SPEARGUN LV 1",
+                    "SPEARGUN",
                     TextStyle {
                         font: asset_server.load("fonts/PixeloidMono-d94EV.ttf"),
                         font_size: 20.0,
@@ -228,7 +228,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         .with_children(|parent| {
             parent.spawn((
                 TextBundle::from_section(
-                    "MACHETE LV 1",
+                    "MACHETE",
                     TextStyle {
                         font: asset_server.load("fonts/PixeloidMono-d94EV.ttf"),
                         font_size: 20.0,

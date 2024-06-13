@@ -1,3 +1,4 @@
+pub mod machete;
 pub mod pill;
 pub mod speargun;
 pub mod weapon_arrow;
@@ -12,6 +13,7 @@ impl Plugin for WeaponsPlugin {
             // weapon_arrow::WeaponArrowPlugin,
             speargun::WeaponSpeargunPlugin,
             pill::WeaponPillPlugin,
+            machete::MachetePlugin,
         ));
     }
 }

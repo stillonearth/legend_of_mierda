@@ -37,11 +37,6 @@ pub fn control_character(
         for (entity, mut texture_atlas, mut velocity, mut char_animation, mut sprite, _player) in
             &mut query
         {
-            // no control during attack phase
-            if char_animation.animation_type == AnimationType::Attack {
-                return;
-            }
-
             if control.attack {
                 char_animation.animation_type = AnimationType::Attack;
                 texture_atlas.clone_from(&spritesheets.player_atlas_2);
@@ -49,7 +44,7 @@ pub fn control_character(
                 let indices =
                     get_animation_indices(char_animation.animation_type, char_animation.direction);
                 sprite.index = indices.first;
-                velocity.linvel = Vec2::ZERO;
+                // velocity.linvel = Vec2::ZERO;
 
                 commands
                     .promise(|| (entity))
@@ -113,12 +108,6 @@ pub fn keyboard_controls(input: Res<Input<KeyCode>>, mut ev_control: EventWriter
     control.left = input.pressed(KeyCode::A);
     control.up = input.pressed(KeyCode::W);
     control.down = input.pressed(KeyCode::S);
-
-    // if input.pressed(KeyCode::Space) {
-    //     // control.attack = true;
-    // } else {
-
-    // }
 
     ev_control.send(control);
 }
