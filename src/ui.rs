@@ -71,7 +71,7 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     bottom: Val::Px(35.0),
                     left: Val::Px(20.0),
                     padding: UiRect {
-                        right: Val::Px(75.0),
+                        right: Val::Px(15.0),
                         ..default()
                     },
                     align_items: AlignItems::FlexStart,
@@ -105,9 +105,9 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     position_type: PositionType::Absolute,
                     justify_content: JustifyContent::FlexStart,
                     bottom: Val::Px(25.0),
-                    right: Val::Px(10.0),
+                    right: Val::Px(5.0),
                     padding: UiRect {
-                        right: Val::Px(75.0),
+                        right: Val::Px(15.0),
                         ..default()
                     },
                     align_items: AlignItems::FlexStart,
@@ -122,8 +122,8 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn((
                 NodeBundle {
                     style: Style {
-                        width: Val::Px(320.0),
-                        height: Val::Px(45.0),
+                        width: Val::Px(160.0),
+                        height: Val::Px(22.5),
                         // margin: UiRect::top(Val::VMin(5.)),
                         ..default()
                     },
@@ -141,9 +141,9 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     position_type: PositionType::Absolute,
                     justify_content: JustifyContent::FlexStart,
                     bottom: Val::Px(15.0),
-                    right: Val::Px(20.0),
+                    right: Val::Px(5.0),
                     padding: UiRect {
-                        right: Val::Px(75.0),
+                        right: Val::Px(15.0),
                         ..default()
                     },
                     align_items: AlignItems::FlexStart,
@@ -176,9 +176,9 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     position_type: PositionType::Absolute,
                     justify_content: JustifyContent::FlexStart,
                     bottom: Val::Px(100.0),
-                    right: Val::Px(10.0),
+                    right: Val::Px(5.0),
                     padding: UiRect {
-                        right: Val::Px(75.0),
+                        right: Val::Px(15.0),
                         ..default()
                     },
                     align_items: AlignItems::FlexStart,
@@ -193,9 +193,8 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
             parent.spawn((
                 NodeBundle {
                     style: Style {
-                        width: Val::Px(320.0),
-                        height: Val::Px(45.0),
-                        // margin: UiRect::top(Val::VMin(5.)),
+                        width: Val::Px(160.0),
+                        height: Val::Px(22.5),
                         ..default()
                     },
                     background_color: Color::WHITE.into(),
@@ -212,9 +211,9 @@ pub(crate) fn draw_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
                     position_type: PositionType::Absolute,
                     justify_content: JustifyContent::FlexStart,
                     bottom: Val::Px(85.0),
-                    right: Val::Px(20.0),
+                    right: Val::Px(5.0),
                     padding: UiRect {
-                        right: Val::Px(75.0),
+                        right: Val::Px(15.0),
                         ..default()
                     },
                     align_items: AlignItems::FlexStart,

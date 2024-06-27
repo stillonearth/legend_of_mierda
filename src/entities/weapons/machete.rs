@@ -3,14 +3,11 @@ use std::time::Duration;
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use bevy_particle_systems::Lerpable;
 
+use crate::GameState;
+use crate::{controls::ControlEvent, entities::player::Player};
 
-use crate::{
-    controls::ControlEvent,
-    entities::{
-        player::Player,
-    },
-};
-use crate::{GameState};
+// note to self: attack happens every 1.3 seconds but there is delay
+// for attack 0.3 secodns so i hinda hack this around
 
 // ----------
 // Components
@@ -96,8 +93,12 @@ fn animate_machete_indicator(
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     for (_, mut material, timer) in q_machete.iter_mut() {
-        let current_value = timer.0.percent_left().max(0.2);
-        let percentage = timer.0.percent_left().max(0.2).lerp(0.8, current_value);
+        let elapsed = timer.0.elapsed_secs();
+        let mut percentage = (1.0 - elapsed) / (1.0 - 0.3);
+        if elapsed < 0.3 {
+            percentage = 0.0;
+        }
+
         *material = materials.add(ColorMaterial::from(Color::PURPLE.with_a(percentage)));
     }
 }
@@ -105,6 +106,9 @@ fn animate_machete_indicator(
 // ------
 // Plugin
 // ------
+
+// I--------I--------I
+//   x        x
 
 pub struct MachetePlugin;
 

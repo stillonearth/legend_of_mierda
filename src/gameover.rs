@@ -6,8 +6,14 @@ use crate::{ui::UIGameOver, AudioAssets, ButtonColors, ChangeState, FontAssets, 
 #[derive(Event, Clone)]
 pub struct GameOverEvent;
 
+#[derive(Event, Clone)]
+pub struct GameWinEvent;
+
 #[derive(Component)]
 struct UIGameOverButton;
+
+#[derive(Component)]
+struct UIGameOverText;
 
 pub fn event_game_over(
     mut ev_game_over: EventReader<GameOverEvent>,
@@ -15,6 +21,7 @@ pub fn event_game_over(
     mut next_state: ResMut<NextState<GameState>>,
     audio: Res<Audio>,
     audio_assets: Res<AudioAssets>,
+    mut text_query: Query<(&mut Text, &UIGameOverText)>,
 ) {
     for _ in ev_game_over.read() {
         for (mut visibility, _) in q_ui_game_over.iter_mut() {
@@ -23,6 +30,30 @@ pub fn event_game_over(
 
         audio.play(audio_assets.gameover.clone()).with_volume(0.5);
         next_state.set(GameState::GameOver);
+        for (mut text_component, _) in text_query.iter_mut() {
+            text_component.sections[0].value = "  JUEGO\nTERMINADO".to_string();
+        }
+    }
+}
+
+pub fn event_game_won(
+    mut ev_game_over: EventReader<GameOverEvent>,
+    mut q_ui_game_over: Query<(&mut Visibility, &UIGameOver)>,
+    mut next_state: ResMut<NextState<GameState>>,
+    audio: Res<Audio>,
+    audio_assets: Res<AudioAssets>,
+    mut text_query: Query<(&mut Text, &UIGameOverText)>,
+) {
+    for _ in ev_game_over.read() {
+        for (mut visibility, _) in q_ui_game_over.iter_mut() {
+            *visibility = Visibility::Visible;
+        }
+
+        // audio.play(audio_assets.gameover.clone()).with_volume(0.5);
+        next_state.set(GameState::GameOver);
+        for (mut text_component, _) in text_query.iter_mut() {
+            text_component.sections[0].value = "  JUEGO\nGANADO".to_string();
+        }
     }
 }
 
@@ -53,13 +84,16 @@ pub(crate) fn draw_ui(mut commands: Commands, font_assets: Res<FontAssets>) {
             Name::new("ui game over"),
         ))
         .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                "  JUEGO\nTERMINADO",
-                TextStyle {
-                    font: font_assets.pixeloid_mono.clone(),
-                    font_size: 100.0,
-                    color: Color::WHITE,
-                },
+            parent.spawn((
+                TextBundle::from_section(
+                    "  JUEGO\nTERMINADO",
+                    TextStyle {
+                        font: font_assets.pixeloid_mono.clone(),
+                        font_size: 100.0,
+                        color: Color::WHITE,
+                    },
+                ),
+                UIGameOverText,
             ));
 
             parent
@@ -134,7 +168,7 @@ impl Plugin for GameOverPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (event_game_over,).run_if(in_state(GameState::GamePlay)),
+            (event_game_over, event_game_won).run_if(in_state(GameState::GamePlay)),
         )
         .add_systems(
             Update,

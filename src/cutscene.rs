@@ -86,12 +86,14 @@ fn setup_cutscene(
                         left: Val::Px(20.0),
                         ..default()
                     },
+                    z_index: ZIndex::Global(100),
                     background_color: Color::WHITE.into(),
                     ..default()
                 },
                 UiImage::new(avatar_assets.alextime.clone()),
                 Name::new("avatar alextime"),
                 CutsceneAvatarAlextime,
+                // ZIndex::Local(100),
             ));
 
             parent.spawn((
@@ -104,6 +106,7 @@ fn setup_cutscene(
                         ..default()
                     },
                     background_color: Color::WHITE.into(),
+                    z_index: ZIndex::Global(100),
                     ..default()
                 },
                 UiImage::new(avatar_assets.gennadiy.clone()),
@@ -119,6 +122,7 @@ fn setup_cutscene(
                             margin: UiRect::bottom(Val::Percent(10.)),
                             ..default()
                         },
+                        z_index: ZIndex::Global(101),
                         ..default()
                     },
                     Name::new("dialog text"),
@@ -160,7 +164,7 @@ fn setup_cutscene(
         .with_children(|parent| {
             parent.spawn((
                 TextBundle::from_section(
-                    "   PRISON CPS 17\n   <<MICHOACAN>>\nMEXICO, BUENAVISTA",
+                    "   PRISON CPS 17\nMEXICO, BUENAVISTA",
                     TextStyle {
                         font: font_assets.pixeloid_mono.clone(),
                         font_size: 40.0,
@@ -261,14 +265,28 @@ fn handle_cutscene_text(
 
 fn get_cutscene_dialog_text() -> Vec<(usize, String)> {
     vec![
-        (0, "LEGEND OF MIERDA".to_string()),
-        (1, "VERSION 24-4-4".to_string()),
-        // (0, "Privet gennadiy!.".to_string()),
-        // (0, "Shapka the snachala.".to_string()),
-        // (0, "Ya Alexey Viktorovich Makeev".to_string()),
-        // (0, "AlexTime".to_string()),
-        // (0, "Date of birth 08/22/1974".to_string()),
-        // (0, "Citizen of Russia".to_string()),
-        // (0, "CPS 17 Michoacan".to_string()),
+        (
+            1,
+            "Your Highness, they've charged you with smuggling red caviar into the mess hall."
+                .to_string(),
+        ),
+        (
+            0,
+            "Ah, Gena, they simply cannot resist my gourmet diplomacy".to_string(),
+        ),
+        (
+            1,
+            "Diplomacy, sire? It's more like high-seas gastronomy.".to_string(),
+        ),
+        (
+            0,
+            "Fear not, Gena. If they lock me up, I'll become the Cell Block Caviar Tsar!"
+                .to_string(),
+        ),
+        (
+            1,
+            "Your platform: From the Elecrostahl to the cell, promising red caviar for all!"
+                .to_string(),
+        ),
     ]
 }

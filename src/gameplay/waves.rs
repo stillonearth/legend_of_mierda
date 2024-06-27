@@ -3,9 +3,11 @@ use std::time::Duration;
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::entities::characters::enemy::{EnemyType, SpawnEnemyEvent};
+use crate::entities::characters::enemy::{Enemy, EnemyType, SpawnEnemyEvent};
 use crate::entities::items::item::ItemType;
+use crate::gameover::{GameOverEvent, GameWinEvent};
 use crate::ldtk::LevelChangeEvent;
+use crate::GameState;
 use crate::{entities::items::item::SpawnItemEvent, ui::*};
 
 #[derive(Clone)]
@@ -166,6 +168,25 @@ pub fn event_on_level_change(
     }
 }
 
+pub fn check_game_won_or_lost(
+    mut next_state: ResMut<NextState<GameState>>,
+    gameplay_state: Res<GameplayState>,
+    query: Query<&Enemy>,
+    mut ev_game_won: EventWriter<GameWinEvent>,
+) {
+    // check if current wave is last
+    if let Some(current_wave) = gameplay_state.current_wave() {
+        if gameplay_state.wave_number.unwrap()
+            == (gameplay_state.current_level_waves().unwrap().len() - 1)
+        {
+            // check if all enemies are dead
+            if query.iter().count() == 0 {
+                ev_game_won.send(GameWinEvent);
+            }
+        }
+    }
+}
+
 pub fn event_wave(
     mut er_on_wave_change: EventReader<WaveEvent>,
 
@@ -241,48 +262,37 @@ pub fn ui_wave_info_text(
 pub fn get_level_1_waves() -> Vec<Wave> {
     vec![
         Wave {
-            events: vec![WaveEntry::Mierda { count: 800 }],
-            // events: vec![WaveEntry::Boss { count: 1 }],
-            event_duration: Duration::from_secs(30),
-            wave_duration: Duration::from_secs(30),
+            events: vec![WaveEntry::Mierda { count: 100 }],
+            event_duration: Duration::from_secs(10),
+            wave_duration: Duration::from_secs(10),
         },
-        // Wave {
-        //     events: vec![
-        //         WaveEntry::Mierda { count: 200 },
-        //         WaveEntry::Pizza { count: 5 },
-        //         WaveEntry::Mierda { count: 300 },
-        //         WaveEntry::Biboran { count: 5 },
-        //         WaveEntry::Mierda { count: 400 },
-        //     ],
-        //     event_duration: Duration::from_secs(10),
-        //     wave_duration: Duration::from_secs(60),
-        // },
-        // Wave {
-        //     events: vec![
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //         WaveEntry::Pendejo { count: 200 },
-        //         WaveEntry::Pizza { count: 3 },
-        //     ],
-        //     event_duration: Duration::from_secs(5),
-        //     wave_duration: Duration::from_secs(120),
-        // },
-        // Wave {
-        //     events: vec![WaveEntry::Boss { count: 1 }],
-        //     event_duration: Duration::from_secs(5),
-        //     wave_duration: Duration::from_secs(120),
-        // },
+        Wave {
+            events: vec![
+                WaveEntry::Mierda { count: 100 },
+                WaveEntry::Pizza { count: 5 },
+                WaveEntry::Mierda { count: 100 },
+                WaveEntry::Biboran { count: 5 },
+                WaveEntry::Mierda { count: 100 },
+            ],
+            event_duration: Duration::from_secs(10),
+            wave_duration: Duration::from_secs(40),
+        },
+        Wave {
+            events: vec![
+                WaveEntry::Pendejo { count: 100 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Pendejo { count: 100 },
+                WaveEntry::Pizza { count: 3 },
+                WaveEntry::Pendejo { count: 100 },
+                WaveEntry::Pizza { count: 3 },
+            ],
+            event_duration: Duration::from_secs(5),
+            wave_duration: Duration::from_secs(60),
+        },
+        Wave {
+            events: vec![WaveEntry::Boss { count: 1 }],
+            event_duration: Duration::from_secs(5),
+            wave_duration: Duration::from_secs(120),
+        },
     ]
 }
