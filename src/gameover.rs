@@ -37,7 +37,7 @@ pub fn event_game_over(
 }
 
 pub fn event_game_won(
-    mut ev_game_over: EventReader<GameOverEvent>,
+    mut ev_game_over: EventReader<GameWinEvent>,
     mut q_ui_game_over: Query<(&mut Visibility, &UIGameOver)>,
     mut next_state: ResMut<NextState<GameState>>,
     audio: Res<Audio>,
@@ -176,6 +176,7 @@ impl Plugin for GameOverPlugin {
         )
         .add_systems(OnEnter(GameState::GameOver), draw_ui)
         .add_systems(OnExit(GameState::GameOver), despawn_ui)
+        .add_event::<GameWinEvent>()
         .add_event::<GameOverEvent>();
     }
 }

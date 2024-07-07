@@ -16,9 +16,6 @@ pub struct UIWeaponName;
 pub struct UIHighscore;
 
 #[derive(Component)]
-struct UIGameOverButton;
-
-#[derive(Component)]
 pub struct UIGamePlay;
 
 pub(crate) fn despawn_ui(mut commands: Commands, query: Query<Entity, With<UIGamePlay>>) {
